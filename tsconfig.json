@@ -1,32 +1,37 @@
 {
-  "compilerOptions": {
-    "composite": true,
-    "declaration": true,
-    /* */
-    "strict": true, /* Enable all strict type-checking options. */
-    "noImplicitAny": false, /* Raise error on expressions and declarations with an implied 'any' type. */
-    "strictNullChecks": false, /* Enable strict null checks. */
-    "strictFunctionTypes": false, /* Enable strict checking of function types. */
-    "strictBindCallApply": false, /* Enable strict 'bind', 'call', and 'apply' methods on functions. */
-    "strictPropertyInitialization": false, /* Enable strict checking of property initialization in classes. */
-    "noImplicitThis": false,                /* Raise error on 'this' expressions with an implied 'any' type. */
-    "alwaysStrict": false, /* Parse in strict mode and emit "use strict" for each source file. */
-    /* Additional Checks */
-    "noUnusedLocals": false,                /* Report errors on unused locals. */
-    "noUnusedParameters": false,            /* Report errors on unused parameters. */
-    "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
-    "noFallthroughCasesInSwitch": false, /* Report errors for fallthrough cases in switch statement. */
-    "lib": [
-      "es2022"
-    ], /* Specify library files to be included in the compilation. */
-    "types": [
-      "jsdom", 
-      "seedrandom",
-      "jasmine",
-    ]
-  },
-  "include": [
-    "./tsc/sugarcube-parser/**/*.ts",
-  ],
-  "exclude": ["tsc/sugarcube-parser/test-api/internal/sugarcube-testapi.reference.d.ts"],
+    "compilerOptions": {
+        "target": "ES2022",
+        "module": "ES2022",
+        "outDir": "tscbuild",
+        "importHelpers": true,
+        "downlevelIteration": true,
+        "esModuleInterop": true,
+        "moduleResolution": "node",
+        "strict": true,
+        "noImplicitAny": false,
+        "strictNullChecks": false,
+        "strictFunctionTypes": false,
+        "strictBindCallApply": false,
+        "strictPropertyInitialization": false,
+        "noImplicitThis": false,
+        "alwaysStrict": false,
+        "noUnusedLocals": false,
+        "noUnusedParameters": false,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": false,
+        "lib": [
+            "es2022"
+        ],
+        "types": [
+            "jsdom",
+            "seedrandom",
+            "jasmine",
+        ]
+    },
+    "include": [
+        "./src/**/*.ts",
+    ],
+    "exclude": [
+        "tsc/sugarcube-parser/test-api/internal/sugarcube-testapi.reference.d.ts"
+    ],
 }
