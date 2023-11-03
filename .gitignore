@@ -1,0 +1,7 @@
+*.swp
+**/dist/
+**/node_modules
+tscbuild
+screenshots/
+random_content.zip
+watch.sh.pids

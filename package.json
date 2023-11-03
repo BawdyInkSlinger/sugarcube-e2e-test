@@ -1,0 +1,29 @@
+{
+  "name": "sugarcube-e2e-test",
+  "version": "0.0.1",
+  "description": "Write end to end tests for your sugarcube project without firing up a browser.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jasmine"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BawdyInkSlinger/sugarcube-e2e-test.git"
+  },
+  "keywords": [
+    "testing",
+    "sugarcube",
+    "twine"
+  ],
+  "author": "Bawdy Ink Slinger",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/BawdyInkSlinger/sugarcube-e2e-test/issues"
+  },
+  "homepage": "https://github.com/BawdyInkSlinger/sugarcube-e2e-test#readme",
+  "devDependencies": {
+    "@types/jasmine": "^5.1.1",
+    "eslint": "^8.52.0",
+    "jasmine": "^5.1.0"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "env": {
+    "browser": true,
+    "es6": true,
+    "node": true,
+    "jasmine": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "prettier",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:testcafe/recommended"
+  ],
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly",
+    "State": "writable",
+    "setup": "writable"
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "project": [
+      "./tsconfig.json",
+      "./tsconfig.src.json",
+      "./tsconfig.spec.json",
+      "./tsconfig.test.json",
+      "./tsconfig.sugarcube-parser.json"
+    ]
+  },
+  "plugins": [
+    "@typescript-eslint",
+    "testcafe"
+  ],
+  "ignorePatterns": [
+    "src/**/*.js"
+  ],
+  "rules": {
+    "quotes": [
+      "off"
+    ],
+    "no-plusplus": [
+      "off"
+    ],
+    "@typescript-eslint/no-misused-promises": [
+      2
+    ],
+    "@typescript-eslint/no-floating-promises": [
+      2
+    ],
+    "@typescript-eslint/no-empty-function": [
+      "off"
+    ],
+    "@typescript-eslint/camelcase": [
+      "off"
+    ],
+    "@typescript-eslint/triple-slash-reference": [
+      "off"
+    ],
+    "@typescript-eslint/no-unused-vars": [
+      "off"
+    ],
+    "@typescript-eslint/no-non-null-assertion": [
+      "off"
+    ],
+    "@typescript-eslint/no-non-null-asserted-optional-chain": [
+      "off"
+    ],
+    "prefer-const": [
+      "warn"
+    ]
+  }
+}
