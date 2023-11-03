@@ -2,10 +2,11 @@
   "name": "sugarcube-e2e-test",
   "version": "0.0.1",
   "description": "Write end to end tests for your sugarcube project without firing up a browser.",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
   "scripts": {
     "test": "jasmine",
-    "compile-typescript": "echo \"compile ts\" && tsc --build && rollup -c",
+    "compile-typescript": "echo \"compile ts\" && tsc --build && echo \"rollup\" && rollup -c",
     "only-build": "npm run compile-typescript",
     "clean": "rm -rf tscbuild; rm -rf dist"
   },
@@ -27,6 +28,7 @@
   "devDependencies": {
     "@rollup/plugin-alias": "^5.0.1",
     "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-json": "^6.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@types/glob": "^8.1.0",
     "@types/jasmine": "^5.1.1",
