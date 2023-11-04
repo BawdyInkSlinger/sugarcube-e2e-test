@@ -192,7 +192,7 @@ export class SugarcubeParser {
     document: Document;
   }> {
     const sugarcubeHtml = (
-      await fs.readFile(`./tsc/sugarcube-parser/internal/html.tpl`)
+      await fs.readFile(`${__dirname}/internal/html.tpl`)
     ).toString();
     const jsdom = setupJsdom(sugarcubeHtml, {
       url: 'http://localhost',
