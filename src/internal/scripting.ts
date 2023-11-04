@@ -8,6 +8,7 @@ import { getTypeOf } from './gettypeof';
 import { Patterns } from './patterns';
 import { stringFrom } from './stringfrom';
 import { objectCreateNull } from './util/object-create-null';
+import { parseURL } from './parseurl';
 /***********************************************************************************************************************
 
 	markup/scripting.js

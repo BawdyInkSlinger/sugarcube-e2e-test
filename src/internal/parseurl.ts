@@ -10,7 +10,7 @@
 /*
 	Returns an immutable object containing the component properties parsed from the given URL.
 */
-function parseURL(url: string) { // eslint-disable-line no-unused-vars
+export function parseURL(url: string) { // eslint-disable-line no-unused-vars
 	const parser       = document.createElement('a');
 	const searchParams = Object.create(null);
 
