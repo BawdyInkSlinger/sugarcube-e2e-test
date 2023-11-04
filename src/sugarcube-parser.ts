@@ -14,6 +14,7 @@ import {
   testController,
 } from './test-api/test-controller';
 import { DEBUG, DEBUG_PASSAGES } from './constants';
+import { waitForPassageEnd } from './test-api/wait-for-passage-end';
 
 declare global {
   interface Document {
@@ -34,8 +35,9 @@ export class SugarcubeParser {
   Story: any;
   initializeStory: any;
   javascriptContents: string[];
+  customPassageLoadedHandler: (debugNote: string) => Promise<void>;
 
-  private constructor(passages: SimplePassage[], javascriptContents: string[]) {
+  private constructor(passages: SimplePassage[], javascriptContents: string[], customPassageLoadedHandler: (debugNote: string) => Promise<void>) {
     this.passages = passages;
     this.jQuery = jQuery;
     this.Config = globalThis.Config;
@@ -48,11 +50,13 @@ export class SugarcubeParser {
     this.Story = globalThis.Story;
     this.initializeStory = globalThis.initializeStory;
     this.javascriptContents = javascriptContents;
+    this.customPassageLoadedHandler = customPassageLoadedHandler;
   }
 
   static async create(
     setup: unknown,
     passages: SimplePassage[],
+    customPassageLoadedHandler = waitForPassageEnd
   ): Promise<SugarcubeParser> {
     const { document, window } = await SugarcubeParser.load();
     // console.log('*************************************')
@@ -184,7 +188,7 @@ export class SugarcubeParser {
       javascriptScripts: javascriptContents,
     });
 
-    return new SugarcubeParser(passages, javascriptContents);
+    return new SugarcubeParser(passages, javascriptContents, customPassageLoadedHandler);
   }
 
   private static async load(): Promise<{
@@ -239,7 +243,7 @@ export class SugarcubeParser {
   // }
 
   get testController(): TestController {
-    return testController;
+    return testController; // todo: pass in customPassageLoadedHandler
   }
 
   get variables(): SugarCubeStoryVariables {
