@@ -17,7 +17,7 @@ import { Wikifier } from '../../wikifier';
 import { Macro } from '../macro';
 import { cssTimeToMS } from '../../csstimetoms';
 import { MacroContext } from '../macrocontext';
-import { TimeoutData, triggerTimeout } from '../../util/trigger-timeout';
+import { TimeoutData, triggerTimeout } from '../../../trigger-timeout';
 
 export {} // imported for side effects only
 

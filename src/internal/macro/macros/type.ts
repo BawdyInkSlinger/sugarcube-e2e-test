@@ -18,7 +18,7 @@ import { cssTimeToMS } from '../../csstimetoms';
 import { NodeTyper } from '../../nodetyper';
 import { scrubEventKey } from '../../scrubeventkey';
 import { TempStateContainer } from '../../fakes/tempstate';
-import { triggerTimeout } from '../../util/trigger-timeout';
+import { triggerTimeout } from '../../../trigger-timeout';
 
 export {} // imported for side effects only
 

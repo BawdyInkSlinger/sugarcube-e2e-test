@@ -12,9 +12,10 @@ import {
 import {
   clearTimeouts,
   findLastTimeoutEvent,
-} from '../internal/util/trigger-timeout';
+} from '../trigger-timeout';
 import { waitForPassageEnd } from './wait-for-passage-end';
 import { oneCondition } from './one-condition';
+import { getPassageLoadedHandler } from './passage-loaded-handler';
 
 export interface TestController {
   // ctx: { [key: string]: any };
@@ -332,7 +333,7 @@ export const testController: TestController = {
 
     return Object.assign(
       thisAsPromise(this).then(() => {
-        const pageLoadPromise = waitForPageLoad(`goto '${passageTitle}'`);
+        const pageLoadPromise = getPassageLoadedHandler()(`goto '${passageTitle}'`);
         globalThis.Engine.play(passageTitle);
 
         return pageLoadPromise;
@@ -357,7 +358,7 @@ export const testController: TestController = {
           `${new Date().getTime()} testController: entering asyncClick selector='${selector}'`
         );
 
-      const pageLoadPromise = waitForPageLoad(`click ${selector?.toString()}`);
+      const pageLoadPromise = getPassageLoadedHandler()(`click ${selector?.toString()}`);
       DEBUG && console.log(`$(${selector.selectorString}).trigger('click');`);
       $(selector.selectorString).trigger('click');
       return pageLoadPromise;
@@ -399,53 +400,6 @@ const thisAsPromise = (self: Promise<void> | TestController) => {
     DEBUG && console.log(`${new Date().getTime()} thisPromise: this`);
     return Promise.resolve();
   }
-};
-
-const waitForPageLoad = (debugNote: string): Promise<void> => {
-  DEBUG &&
-    DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES &&
-    console.log(
-      `${new Date().getTime()} testController: entering waitForPageLoad debugNote=${debugNote}`
-    );
-  clearTimeouts();
-  const waitForBeforePassage = new Promise<void>((resolve) => {
-    DEBUG &&
-      DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES &&
-      console.log(
-        `${new Date().getTime()} testController: entering waitForBeforePassage debugNote=${debugNote}`
-      );
-    oneCondition(
-      ':completetimeout',
-      (ev, data) =>
-        data.context.startsWith(`<<timed>> macro:`) &&
-        data.context.indexOf(`<<include "Menu">>`) !== -1,
-      () => resolve()
-    );
-  }).then(() => {
-    const renderBarsEvent = findLastTimeoutEvent(
-      (data) =>
-        data.context.startsWith(`<<done>> macro:`) &&
-        data.context.indexOf(`<<renderbars>>`) !== -1
-    );
-    if (renderBarsEvent === 'created') {
-      return new Promise<void>((resolve) => {
-        oneCondition(
-          ':completetimeout',
-          (ev, data) =>
-            data.context.startsWith(`<<done>> macro:`) &&
-            data.context.indexOf(`<<renderbars>>`) !== -1,
-          () => resolve()
-        );
-      });
-    } else {
-      return Promise.resolve();
-    }
-  });
-
-  return Promise.all([
-    waitForPassageEnd(debugNote),
-    waitForBeforePassage,
-  ]) as unknown as Promise<void>;
 };
 
 const wait = (millis: number): Promise<void> =>

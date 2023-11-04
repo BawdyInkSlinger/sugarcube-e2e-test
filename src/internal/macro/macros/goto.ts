@@ -11,7 +11,7 @@ import { Has } from '../../has';
 import { Story } from '../../fakes/story';
 import { Macro } from '../macro';
 import { Engine } from '../../fakes/engine';
-import { triggerTimeout } from '../../util/trigger-timeout';
+import { triggerTimeout } from '../../../trigger-timeout';
 
 export {} // imported for side effects only
 

@@ -12,7 +12,7 @@ import { Has } from '../../has';
 import { Wikifier } from '../../wikifier';
 import { Macro } from '../macro';
 import { Engine } from '../../fakes/engine';
-import { triggerTimeout } from '../../util/trigger-timeout';
+import { triggerTimeout } from '../../../trigger-timeout';
 
 export {} // imported for side effects only
 

@@ -16,7 +16,7 @@ import { objectCreateNull } from '../util/object-create-null';
 import { setDisplayTitle } from '../setdisplaytitle';
 import { inspect } from 'util';
 import { TempStateContainer } from './tempstate';
-import { triggerTimeout } from '../util/trigger-timeout';
+import { triggerTimeout } from '../../trigger-timeout';
 
 /* eslint-disable no-var */
 // copied from sugarcube.js

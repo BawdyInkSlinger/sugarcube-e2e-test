@@ -9,7 +9,7 @@
 /* global Engine, Macro */
 import { Engine } from '../../fakes/engine';
 import { Has } from '../../has';
-import { triggerTimeout } from '../../util/trigger-timeout';
+import { triggerTimeout } from '../../../trigger-timeout';
 import { Macro } from '../macro';
 
 export {} // imported for side effects only

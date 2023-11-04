@@ -14,7 +14,7 @@ import { Engine } from '../../fakes/engine';
 import { State } from '../../state';
 import { Has } from '../../has';
 import { Macro } from '../macro';
-import { triggerTimeout } from '../../util/trigger-timeout';
+import { triggerTimeout } from '../../../trigger-timeout';
 
 export {} // imported for side effects only
 

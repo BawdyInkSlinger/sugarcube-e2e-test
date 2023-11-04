@@ -4,8 +4,8 @@
  * the setTimeout lifecycle does not trigger events.
  */
 
-import { DEBUG, DEBUG_TRIGGER_TIMEOUT } from '../../constants';
-import { Branded } from './branded';
+import { DEBUG, DEBUG_TRIGGER_TIMEOUT } from './constants';
+import { Branded } from './internal/util/branded';
 
 type LastTimeoutEvent = 'created' | 'completed' | 'cleared';
 type TimeoutID = Branded<string, 'TimeoutID'>;
