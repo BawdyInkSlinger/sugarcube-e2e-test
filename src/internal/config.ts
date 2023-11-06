@@ -2,19 +2,26 @@
 
 	config.js
 
-	Copyright © 2013–2022 Thomas Michael Edwards <thomasmedwards@gmail.com>. All rights reserved.
+	Copyright © 2013–2021 Thomas Michael Edwards <thomasmedwards@gmail.com>. All rights reserved.
 	Use of this source code is governed by a BSD 2-clause "Simplified" License, which may be found in the LICENSE file.
 
 ***********************************************************************************************************************/
-/* global Save, getTypeOf */
+/* global Save, Util */
 
-import { LoadHandler, SaveEventAPI, SaveHandler } from './declarations/twine-sugarcube-copy/save';
-import { Save } from './fakes/save';
-import { getTypeOf } from './gettypeof';
+import {
+  LoadHandler,
+  SaveEventAPI,
+  SaveHandler,
+} from "./declarations/twine-sugarcube-copy/save";
+import { Save } from "./fakes/save";
+import { getTypeOf } from "./gettypeof";
+import { State } from "./state";
+import { Util } from "./util";
 
 export const Config = (() => {
-
   // eslint-disable-line no-unused-vars, no-var
+  "use strict";
+
   // General settings.
   let _debug = false;
   let _addVisitedLinkClass = false;
@@ -32,13 +39,14 @@ export const Config = (() => {
   // Macros settings.
   let _macrosIfAssignmentError = true;
   let _macrosMaxLoopIterations = 1000;
-  let _macrosTypeSkipKey = '\x20'; // Space
+  let _macrosTypeSkipKey = "\x20"; // Space
   let _macrosTypeVisitedPassages = true;
 
   // Navigation settings.
   let _navigationOverride;
 
   // Passages settings.
+  let _passagesDescriptions;
   let _passagesDisplayTitles = false;
   let _passagesNobr = false;
   let _passagesStart; // set by `Story.load()`
@@ -46,12 +54,12 @@ export const Config = (() => {
   let _passagesTransitionOut;
 
   // Saves settings.
-  let _savesAutoload; // QUESTION: Deprecate this?
-  let _savesDescriptions;
-  let _savesId; // NOTE: Initially set by `Story.load()`.
+  let _savesAutoload;
+  let _savesAutosave;
+  let _savesId = "untitled-story";
   let _savesIsAllowed;
-  let _savesMaxAuto = 0;
-  let _savesMaxSlot = 8;
+  let _savesSlots = 8;
+  let _savesTryDiskOnMobile = true;
   let _savesVersion;
 
   // UI settings.
@@ -63,21 +71,13 @@ export const Config = (() => {
 	*******************************************************************************/
 
   const _errHistoryModeDeprecated =
-    'Config.history.mode has been deprecated and is no longer used by SugarCube, please remove it from your code';
+    "Config.history.mode has been deprecated and is no longer used by SugarCube, please remove it from your code";
   const _errHistoryTrackingDeprecated =
-    'Config.history.tracking has been deprecated, use Config.history.maxStates instead';
-  const _errPassagesDescriptionsDeprecated =
-    'Config.passages.descriptions has been deprecated, use Config.saves.descriptions instead';
-  const _errSavesAutosaveDeprecated =
-    'Config.saves.autosave has been deprecated, use Config.saves.isAllowed instead';
+    "Config.history.tracking has been deprecated, use Config.history.maxStates instead";
   const _errSavesOnLoadDeprecated =
-    'Config.saves.onLoad has been deprecated, use the Save.onLoad API instead';
+    "Config.saves.onLoad has been deprecated, use the Save.onLoad API instead";
   const _errSavesOnSaveDeprecated =
-    'Config.saves.onSave has been deprecated, use the Save.onSave API instead';
-  const _errSavesSlotsDeprecated =
-    'Config.saves.slots has been deprecated, use Config.saves.maxSlotSaves instead';
-  const _errSavesTryDiskOnMobileDeprecated =
-    'Config.saves.tryDiskOnMobile has been deprecated';
+    "Config.saves.onSave has been deprecated, use the Save.onSave API instead";
 
   /*******************************************************************************
 		Object Exports.
@@ -113,7 +113,7 @@ export const Config = (() => {
     },
     set loadDelay(value) {
       if (!Number.isSafeInteger(value) || value < 0) {
-        throw new RangeError('Config.loadDelay must be a non-negative integer');
+        throw new RangeError("Config.loadDelay must be a non-negative integer");
       }
 
       _loadDelay = value;
@@ -151,7 +151,7 @@ export const Config = (() => {
 
         if (_historyMaxStates === 1 && controls) {
           throw new Error(
-            'Config.history.controls must be false when Config.history.maxStates is 1'
+            "Config.history.controls must be false when Config.history.maxStates is 1"
           );
         }
 
@@ -164,7 +164,7 @@ export const Config = (() => {
       set maxStates(value) {
         if (!Number.isSafeInteger(value) || value < 1) {
           throw new RangeError(
-            'Config.history.maxStates must be a positive integer'
+            "Config.history.maxStates must be a positive integer"
           );
         }
 
@@ -210,7 +210,7 @@ export const Config = (() => {
       set maxLoopIterations(value) {
         if (!Number.isSafeInteger(value) || value < 1) {
           throw new RangeError(
-            'Config.macros.maxLoopIterations must be a positive integer'
+            "Config.macros.maxLoopIterations must be a positive integer"
           );
         }
 
@@ -243,7 +243,7 @@ export const Config = (() => {
         if (!(value == null || value instanceof Function)) {
           // lazy equality for null
           throw new TypeError(
-            `Config.navigation.override must be a function or null/undefined (received: ${getTypeOf(
+            `Config.navigation.override must be a function or null/undefined (received: ${Util.getType(
               value
             )})`
           );
@@ -257,6 +257,28 @@ export const Config = (() => {
 			Passages settings.
 		*/
     passages: Object.freeze({
+      get descriptions() {
+        return _passagesDescriptions;
+      },
+      set descriptions(value) {
+        if (value != null) {
+          // lazy equality for null
+          const valueType = Util.getType(value);
+
+          if (
+            valueType !== "boolean" &&
+            valueType !== "Object" &&
+            valueType !== "function"
+          ) {
+            throw new TypeError(
+              `Config.passages.descriptions must be a boolean, object, function, or null/undefined (received: ${valueType})`
+            );
+          }
+        }
+
+        _passagesDescriptions = value;
+      },
+
       // TODO: (v3) This should be under Navigation settings → `Config.navigation.updateTitle`.
       get displayTitles() {
         return _passagesDisplayTitles;
@@ -278,9 +300,9 @@ export const Config = (() => {
       set onProcess(value) {
         if (value != null) {
           // lazy equality for null
-          const valueType = getTypeOf(value);
+          const valueType = Util.getType(value);
 
-          if (valueType !== 'function') {
+          if (valueType !== "function") {
             throw new TypeError(
               `Config.passages.onProcess must be a function or null/undefined (received: ${valueType})`
             );
@@ -297,9 +319,9 @@ export const Config = (() => {
       set start(value) {
         if (value != null) {
           // lazy equality for null
-          const valueType = getTypeOf(value);
+          const valueType = Util.getType(value);
 
-          if (valueType !== 'string') {
+          if (valueType !== "string") {
             throw new TypeError(
               `Config.passages.start must be a string or null/undefined (received: ${valueType})`
             );
@@ -316,11 +338,11 @@ export const Config = (() => {
       set transitionOut(value) {
         if (value != null) {
           // lazy equality for null
-          const valueType = getTypeOf(value);
+          const valueType = Util.getType(value);
 
           if (
-            valueType !== 'string' &&
-            (valueType !== 'number' ||
+            valueType !== "string" &&
+            (valueType !== "number" ||
               !Number.isSafeInteger(value) ||
               value < 0)
           ) {
@@ -332,22 +354,6 @@ export const Config = (() => {
 
         _passagesTransitionOut = value;
       },
-
-      /* legacy */
-      // Die if deprecated passages descriptions getter is accessed.
-      get descriptions() {
-        throw new Error(_errPassagesDescriptionsDeprecated);
-      },
-      // Warn if deprecated passages descriptions setter is assigned to,
-      // then pass the value to the `Config.saves.descriptions` for
-      // compatibilities sake.
-      set descriptions(value) {
-        console.warn(_errPassagesDescriptionsDeprecated);
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        Config.saves.descriptions = value;
-      },
-      /* /legacy */
     }),
 
     /*
@@ -360,15 +366,15 @@ export const Config = (() => {
       set autoload(value) {
         if (value != null) {
           // lazy equality for null
-          const valueType = getTypeOf(value);
+          const valueType = Util.getType(value);
 
           if (
-            valueType !== 'boolean' &&
-            (valueType !== 'string' || value !== 'prompt') &&
-            valueType !== 'function'
+            valueType !== "boolean" &&
+            valueType !== "string" &&
+            valueType !== "function"
           ) {
             throw new TypeError(
-              `Config.saves.autoload must be a boolean, string ('prompt'), function, or null/undefined (received: ${valueType})`
+              `Config.saves.autoload must be a boolean, string, function, or null/undefined (received: ${valueType})`
             );
           }
         }
@@ -376,35 +382,46 @@ export const Config = (() => {
         _savesAutoload = value;
       },
 
-      get descriptions() {
-        return _savesDescriptions;
+      get autosave() {
+        return _savesAutosave;
       },
-      set descriptions(value) {
+      set autosave(value) {
         if (value != null) {
           // lazy equality for null
-          const valueType = getTypeOf(value);
+          const valueType = Util.getType(value);
+
+          // legacy
+          // Convert a string value to an Array of string.
+          if (valueType === "string") {
+            _savesAutosave = [value];
+            return;
+          }
+          // /legacy
 
           if (
-            valueType !== 'boolean' &&
-            valueType !== 'Object' &&
-            valueType !== 'function'
+            valueType !== "boolean" &&
+            (valueType !== "Array" ||
+              !value.every((item) => typeof item === "string")) &&
+            valueType !== "function"
           ) {
             throw new TypeError(
-              `Config.saves.descriptions must be a boolean, object, function, or null/undefined (received: ${valueType})`
+              `Config.saves.autosave must be a boolean, Array<string>, function, or null/undefined (received: ${valueType}${
+                valueType === "Array" ? "<any>" : ""
+              })`
             );
           }
         }
 
-        _savesDescriptions = value;
+        _savesAutosave = value;
       },
 
       get id() {
         return _savesId;
       },
       set id(value) {
-        if (typeof value !== 'string' || value === '') {
+        if (typeof value !== "string" || value === "") {
           throw new TypeError(
-            `Config.saves.id must be a non-empty string (received: ${getTypeOf(
+            `Config.saves.id must be a non-empty string (received: ${Util.getType(
               value
             )})`
           );
@@ -420,7 +437,7 @@ export const Config = (() => {
         if (!(value == null || value instanceof Function)) {
           // lazy equality for null
           throw new TypeError(
-            `Config.saves.isAllowed must be a function or null/undefined (received: ${getTypeOf(
+            `Config.saves.isAllowed must be a function or null/undefined (received: ${Util.getType(
               value
             )})`
           );
@@ -429,38 +446,26 @@ export const Config = (() => {
         _savesIsAllowed = value;
       },
 
-      get maxAutoSaves() {
-        return _savesMaxAuto;
+      get slots() {
+        return _savesSlots;
       },
-      set maxAutoSaves(value) {
-        if (!Number.isInteger(value)) {
-          throw new TypeError('Config.saves.maxAutoSaves must be an integer');
-        } else if (value < 0 || value > Save.MAX_IDX + 1) {
-          throw new RangeError(
-            `Config.saves.maxAutoSaves out of bounds (range: 0–${
-              Save.MAX_IDX + 1
-            }; received: ${value})`
+      set slots(value) {
+        if (!Number.isSafeInteger(value) || value < 0) {
+          throw new TypeError(
+            `Config.saves.slots must be a non-negative integer (received: ${Util.getType(
+              value
+            )})`
           );
         }
 
-        _savesMaxAuto = value;
+        _savesSlots = value;
       },
 
-      get maxSlotSaves() {
-        return _savesMaxSlot;
+      get tryDiskOnMobile() {
+        return _savesTryDiskOnMobile;
       },
-      set maxSlotSaves(value) {
-        if (!Number.isInteger(value)) {
-          throw new TypeError('Config.saves.maxSlotSaves must be an integer');
-        } else if (value < 0 || value > Save.MAX_IDX + 1) {
-          throw new RangeError(
-            `Config.saves.maxSlotSaves out of bounds (range: 0–${
-              Save.MAX_IDX + 1
-            }; received: ${value})`
-          );
-        }
-
-        _savesMaxSlot = value;
+      set tryDiskOnMobile(value) {
+        _savesTryDiskOnMobile = Boolean(value);
       },
 
       get version() {
@@ -470,23 +475,14 @@ export const Config = (() => {
         _savesVersion = value;
       },
 
-      /* legacy */
-      // Die if deprecated saves autosave getter is accessed.
-      get autosave() {
-        throw new Error(_errSavesAutosaveDeprecated);
-      },
-      // Die if deprecated saves autosave setter is accessed.
-      set autosave(value) {
-        throw new Error(_errSavesAutosaveDeprecated);
-      },
-
+      // legacy
       // Die if deprecated saves onLoad handler getter is accessed.
       get onLoad(): LoadHandler {
         throw new Error(_errSavesOnLoadDeprecated);
       },
       // Warn if deprecated saves onLoad handler setter is assigned to, then
       // pass the handler to the `Save.onLoad` API for compatibilities sake.
-      set onLoad(value: LoadHandler) {
+      set onLoad(value) {
         console.warn(_errSavesOnLoadDeprecated);
         Save.onLoad.add(value);
       },
@@ -501,32 +497,7 @@ export const Config = (() => {
         console.warn(_errSavesOnSaveDeprecated);
         Save.onSave.add(value);
       },
-
-      // Die if deprecated saves slots getter is accessed.
-      get slots() {
-        throw new Error(_errSavesSlotsDeprecated);
-      },
-      // Warn if deprecated saves slots setter is assigned to, then pass
-      // the value to the `Config.saves.maxSlotSaves` for compatibilities
-      // sake.
-      set slots(value) {
-        console.warn(_errSavesSlotsDeprecated);
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        Config.saves.maxSlotSaves = value;
-      },
-
-      // Warn if deprecated saves tryDiskOnMobile getter is accessed, then
-      // return `true`.
-      get tryDiskOnMobile() {
-        console.warn(_errSavesTryDiskOnMobileDeprecated);
-        return true;
-      },
-      // Warn if deprecated saves tryDiskOnMobile setter is assigned to.
-      set tryDiskOnMobile(value) {
-        console.warn(_errSavesTryDiskOnMobileDeprecated);
-      },
-      /* /legacy */
+      // /legacy
     }),
 
     /*
@@ -537,11 +508,11 @@ export const Config = (() => {
         return _uiStowBarInitially;
       },
       set stowBarInitially(value) {
-        const valueType = getTypeOf(value);
+        const valueType = Util.getType(value);
 
         if (
-          valueType !== 'boolean' &&
-          (valueType !== 'number' || !Number.isSafeInteger(value) || value < 0)
+          valueType !== "boolean" &&
+          (valueType !== "number" || !Number.isSafeInteger(value) || value < 0)
         ) {
           throw new TypeError(
             `Config.ui.stowBarInitially must be a boolean or non-negative integer (received: ${valueType})`
