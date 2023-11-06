@@ -225,26 +225,8 @@ export class SugarcubeParser {
     });
   }
 
-  // goto(passageTitle: string): TestControllerPromise {
-  //   // console.log(`inspecting TestController: `, inspect(TestController, { showHidden: true, showProxy: true, getters: true, depth: null}));
-  //   // console.log(`inspecting new TestController: `, inspect(new TestController, { showHidden: true, showProxy: true, getters: true, depth: null}));
-  //   // console.log(`inspecting new TestController(): `, inspect(new TestController(), { showHidden: true, showProxy: true, getters: true, depth: null}));
-  //   // console.log(`inspecting new TestController().click: `, inspect(new TestController().click, { showHidden: true, showProxy: true, getters: true, depth: null}));
-  //   // console.log(`inspecting new TestController().click(): `, inspect(new TestController().click(Selector("")), { showHidden: true, showProxy: true, getters: true, depth: null}));
-  //   const passageEnd = new Promise<void>((resolve, reject) => {
-  //     $(document).one(':passageend', function (ev) {
-  //       console.log(':passageend triggered');
-  //       resolve();
-  //     });
-  //   });
-
-  //   globalThis.Engine.play(passageTitle);
-
-  //   return Object.assign(passageEnd, TestController);
-  // }
-
   get testController(): TestController {
-    return testController; // todo: pass in customPassageLoadedHandler
+    return testController;
   }
 
   get variables(): SugarCubeStoryVariables {
