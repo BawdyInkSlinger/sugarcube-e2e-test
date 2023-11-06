@@ -10,6 +10,7 @@
 
 import { Has } from "./has";
 import { Scripting } from "./scripting";
+import { objectCreateNull } from "./util/object-create-null";
 
 export const Util = (() => {
   // eslint-disable-line no-unused-vars, no-var
@@ -786,8 +787,8 @@ export const Util = (() => {
 		Module Exports.
 	*******************************************************************************************************************/
   return Object.freeze(
-    Object.defineProperties(
-      {},
+    objectCreateNull(
+      null,
       {
         /*
 			Type Functions.
