@@ -242,10 +242,10 @@ export class SugarcubeParser {
     globalThis.runStoryInit();
   }
 
-  assignStateAndReload<V = any, T = any>(
+  async assignStateAndReload<V = any, T = any>(
     variables: Partial<V>,
     temporary?: Partial<T>
-  ): void {
+  ): Promise<void> {
     Object.assign(globalThis.State.variables, variables);
     if (temporary) {
       Object.assign(globalThis.State.temporary, temporary);
@@ -253,7 +253,7 @@ export class SugarcubeParser {
     const currentTitle = globalThis.State.current?.title;
     DEBUG && console.log(`assignStateAndReload: currentTitle=`, currentTitle);
     if (currentTitle) {
-      globalThis.Engine.play(globalThis.State.current?.title);
+      await testController.goto(currentTitle);
     }
   }
 }
