@@ -1,10 +1,8 @@
-import {
-  DEBUG,
-  DEBUG_ASSERTIONS_ENTER_LOG_MESSAGES,
-} from '../../constants';
-import { AssertionOptions } from './assertion-options';
-import ReExecutablePromise from './re-executable-promise';
-import { testController, TestControllerPromise } from '../test-controller';
+import { DEBUG, DEBUG_ASSERTIONS_ENTER_LOG_MESSAGES } from "../../constants";
+import { AssertionOptions } from "./assertion-options";
+import ReExecutablePromise from "./re-executable-promise";
+import { testController, TestControllerPromise } from "../test-controller";
+import _ from "lodash";
 
 export type ElementOf<T> = T extends (infer E)[] ? E : never;
 export type Extend<T, E> = T extends E ? E : never;
@@ -34,19 +32,19 @@ export interface AssertionApi<E = any> {
   //   message?: string,
   //   options?: AssertionOptions
   // ): TestControllerPromise;
-  // contains<R>(
-  //   expected: EnsureString<E> | ElementOf<E> | Extend<E, R>,
-  //   options?: AssertionOptions
-  // ): TestControllerPromise;
+  contains<R>(
+    expected: EnsureString<E> | ElementOf<E> | Extend<E, R>,
+    options?: AssertionOptions
+  ): TestControllerPromise;
   // notContains<R>(
   //   unexpected: EnsureString<E> | ElementOf<E> | Extend<E, R>,
   //   message?: string,
   //   options?: AssertionOptions
   // ): TestControllerPromise;
-  // notContains<R>(
-  //   unexpected: EnsureString<E> | ElementOf<E> | Extend<E, R>,
-  //   options?: AssertionOptions
-  // ): TestControllerPromise;
+  notContains<R>(
+    unexpected: EnsureString<E> | ElementOf<E> | Extend<E, R>,
+    options?: AssertionOptions
+  ): TestControllerPromise;
   // typeOf(
   //   typeName:
   //     | 'function'
@@ -166,6 +164,63 @@ export class StringAssertions implements AssertionApi<string> {
     this.currentPromise = currentPromise;
   }
 
+  contains<R>(
+    expected: string | Extend<string, R>,
+    options?: AssertionOptions
+  ): TestControllerPromise<void> {
+    const cause = new Error();
+    DEBUG &&
+      DEBUG_ASSERTIONS_ENTER_LOG_MESSAGES &&
+      console.log(
+        `${new Date().getTime()} StringAssertions: entering contains expected='${expected}' this.actual='${
+          this.actual
+        }'`
+      );
+    return Object.assign(
+      this.currentPromise.then(() => {
+        DEBUG &&
+          console.log(
+            `${new Date().getTime()} StringAssertions: resolving contains then expected='${expected}' this.actual='${
+              this.actual
+            }'`
+          );
+        if (this.actual.indexOf(expected + "") === -1) {
+          cause.message = `\n  Expected:\n${this.actual}\n  To Contain:\n${expected}`;
+          throw cause;
+        }
+      }),
+      testController
+    );
+  }
+  notContains<R>(
+    unexpected: string | Extend<string, R>,
+    options?: AssertionOptions
+  ): TestControllerPromise<void> {
+    const cause = new Error();
+    DEBUG &&
+      DEBUG_ASSERTIONS_ENTER_LOG_MESSAGES &&
+      console.log(
+        `${new Date().getTime()} StringAssertions: entering contains unexpected='${unexpected}' this.actual='${
+          this.actual
+        }'`
+      );
+    return Object.assign(
+      this.currentPromise.then(() => {
+        DEBUG &&
+          console.log(
+            `${new Date().getTime()} StringAssertions: resolving contains then unexpected='${unexpected}' this.actual='${
+              this.actual
+            }'`
+          );
+        if (this.actual.indexOf(unexpected + "") === -1) {
+          cause.message = `\n  Expected:\n${this.actual}\n  To NOT Contain:\n${unexpected}`;
+          throw cause;
+        }
+      }),
+      testController
+    );
+  }
+
   eql(
     expected: string,
     options?: AssertionOptions
@@ -243,6 +298,131 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
     this.actual = actual;
   }
 
+  contains<R>(
+    needle: EnsureString<A> | ElementOf<A> | Extend<A, R>,
+    options?: AssertionOptions
+  ): TestControllerPromise<void> {
+    const cause = new Error();
+    DEBUG &&
+      DEBUG_ASSERTIONS_ENTER_LOG_MESSAGES &&
+      console.log(
+        `${new Date().getTime()} PromiseAssertions: entering contains needle='${needle}' this.actual='${
+          this.actual
+        }'`
+      );
+    return Object.assign(
+      this.currentPromise
+        .then(() => {
+          DEBUG &&
+            console.log(
+              `${new Date().getTime()} PromiseAssertions: resolving contains then needle='${needle}' this.actual='${
+                this.actual
+              }'`
+            );
+          if (this.actual instanceof ReExecutablePromise) {
+            DEBUG &&
+              console.log(
+                `${new Date().getTime()} PromiseAssertions: re-executing!='${needle}' this.actual='${
+                  this.actual
+                }'`
+              );
+            return this.actual._reExecute();
+          } else {
+            return this.actual;
+          }
+        })
+        .then((actualValue: A) => {
+          DEBUG &&
+            console.log(
+              `${new Date().getTime()} PromiseAssertions: resolving contains then needle='${needle}' actualValue='${actualValue}'`
+            );
+          if (
+            typeof actualValue === "string" &&
+            actualValue.indexOf(needle + "") !== -1
+          ) {
+            return Promise.resolve();
+          } else if (
+            actualValue instanceof Array &&
+            actualValue.includes(needle)
+          ) {
+            return Promise.resolve();
+          } else if (
+            typeof actualValue === "object" &&
+            typeof needle === "object" &&
+            _.isMatch(actualValue, needle)
+          ) {
+            return Promise.resolve();
+          }
+
+          cause.message = `\n  Expected:\n${actualValue}\n  To Contain:\n${needle}`;
+          return Promise.reject(cause);
+        }),
+      testController
+    );
+  }
+  notContains<R>(
+    needle: EnsureString<A> | ElementOf<A> | Extend<A, R>,
+    options?: AssertionOptions
+  ): TestControllerPromise<void> {
+    const cause = new Error();
+    DEBUG &&
+      DEBUG_ASSERTIONS_ENTER_LOG_MESSAGES &&
+      console.log(
+        `${new Date().getTime()} PromiseAssertions: entering notContains needle='${needle}' this.actual='${
+          this.actual
+        }'`
+      );
+    return Object.assign(
+      this.currentPromise
+        .then(() => {
+          DEBUG &&
+            console.log(
+              `${new Date().getTime()} PromiseAssertions: resolving notContains then needle='${needle}' this.actual='${
+                this.actual
+              }'`
+            );
+          if (this.actual instanceof ReExecutablePromise) {
+            DEBUG &&
+              console.log(
+                `${new Date().getTime()} PromiseAssertions: re-executing!='${needle}' this.actual='${
+                  this.actual
+                }'`
+              );
+            return this.actual._reExecute();
+          } else {
+            return this.actual;
+          }
+        })
+        .then((actualValue: A) => {
+          DEBUG &&
+            console.log(
+              `${new Date().getTime()} PromiseAssertions: resolving notContains then needle='${needle}' actualValue='${actualValue}'`
+            );
+          if (
+            typeof actualValue === "string" &&
+            actualValue.indexOf(needle + "") === -1
+          ) {
+            return Promise.resolve();
+          } else if (
+            actualValue instanceof Array &&
+            !actualValue.includes(needle)
+          ) {
+            return Promise.resolve();
+          } else if (
+            typeof actualValue === "object" &&
+            typeof needle === "object" &&
+            !_.isMatch(actualValue, needle)
+          ) {
+            return Promise.resolve();
+          }
+
+          cause.message = `\n  Expected:\n${actualValue}\n  To NOT Contain:\n${needle}`;
+          return Promise.reject(cause);
+        }),
+      testController
+    );
+  }
+
   eql(expected: A, options?: AssertionOptions): TestControllerPromise<void> {
     const cause = new Error();
     DEBUG &&
@@ -261,7 +441,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
                 this.actual
               }'`
             );
-            if (this.actual instanceof ReExecutablePromise) {
+          if (this.actual instanceof ReExecutablePromise) {
             DEBUG &&
               console.log(
                 `${new Date().getTime()} PromiseAssertions: re-executing!='${expected}' this.actual='${
@@ -278,12 +458,12 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
             console.log(
               `${new Date().getTime()} PromiseAssertions: resolving eql then expected='${expected}' actualValue='${actualValue}'`
             );
-            if (actualValue !== expected) {
-              cause.message = `\n  Expected:\n${expected}\n  Actual:\n${actualValue}`
-              return Promise.reject(cause);
-            } else {
-              return Promise.resolve();
-            }
+          if (actualValue !== expected) {
+            cause.message = `\n  Expected:\n${expected}\n  Actual:\n${actualValue}`;
+            return Promise.reject(cause);
+          } else {
+            return Promise.resolve();
+          }
         }),
       testController
     );
@@ -317,12 +497,12 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
             console.log(
               `${new Date().getTime()} PromiseAssertions: resolving ok then actualValue=${actualValue}`
             );
-            if (!actualValue) {
-              cause.message = `\n  Expected:\nTruthy\n  Actual:\n${actualValue}`
-              return Promise.reject(cause);
-            } else {
-              return Promise.resolve();
-            }
+          if (!actualValue) {
+            cause.message = `\n  Expected:\nTruthy\n  Actual:\n${actualValue}`;
+            return Promise.reject(cause);
+          } else {
+            return Promise.resolve();
+          }
         }),
       testController
     );
@@ -352,12 +532,12 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
             console.log(
               `${new Date().getTime()} PromiseAssertions: resolving notOk then actualValue=${actualValue}`
             );
-            if (actualValue) {
-              cause.message = `\n  Expected:\nFalsy\n  Actual:\n${actualValue}`
-              return Promise.reject(cause);
-            } else {
-              return Promise.resolve();
-            }
+          if (actualValue) {
+            cause.message = `\n  Expected:\nFalsy\n  Actual:\n${actualValue}`;
+            return Promise.reject(cause);
+          } else {
+            return Promise.resolve();
+          }
         }),
       testController
     );
