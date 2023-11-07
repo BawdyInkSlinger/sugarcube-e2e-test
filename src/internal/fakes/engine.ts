@@ -492,7 +492,7 @@ export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var
     }
 
 		if (_state === States.Init) {
-      console.warn(`[Engine/enginePlay(title: "${title}", noHistory: ${noHistory}, _state: ${_state})] (_state === States.Init: ${_state})`);
+            console.warn(`[Engine/enginePlay(title: "${title}", noHistory: ${noHistory}, _state: ${_state})] (_state === States.Init: ${_state})`);
 			return false;
 		}
 
