@@ -146,6 +146,8 @@ export class SugarcubeParser {
     const { Template } = await import("./internal/template");
     setGlobal("Template", Template);
 
+    setGlobal("settings", {});
+
     const {
       initialize: initializeStory,
       runStoryInit,
