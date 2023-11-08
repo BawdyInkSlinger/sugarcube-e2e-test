@@ -9,6 +9,7 @@ import { Patterns } from './patterns';
 import { stringFrom } from './stringfrom';
 import { objectCreateNull } from './util/object-create-null';
 import { parseURL } from './parseurl';
+import { DEBUG } from '../constants';
 /***********************************************************************************************************************
 
 	markup/scripting.js
@@ -283,18 +284,21 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 		}
 
 		if (State.isEmpty()) {
+            DEBUG && console.log(`[Scripting/hasVisited()]: returning false because State.isEmpty()`);
 			return false;
 		}
 
 		const needles = Array.prototype.concat.apply([], arguments);
 		const played  = State.passages;
-
+        DEBUG && console.log(`[Scripting/hasVisited()]: needles: '${needles}' played: '${played}'`);
+        
 		for (let i = 0, iend = needles.length; i < iend; ++i) {
-			if (!played.includes(needles[i])) {
+            if (!played.includes(needles[i])) {
+                DEBUG && console.log(`[Scripting/hasVisited()]: returning false because !played.includes(needles[i]). needles[i]: ${needles[i]}`);
 				return false;
 			}
 		}
-
+        
 		return true;
 	}
 
@@ -914,8 +918,6 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 	*/
 	function evalJavaScript(code, output?, data?) {
 		return (function (code, output, SCRIPT$DATA$) {
-      // console.log(`code code code code code code code code code code code code code code code`, code);
-      
 			return eval(code);
 		}).call(output ? { output } : null, String(code), output, data);
 	}

@@ -192,6 +192,7 @@ export const State = (() => { // eslint-disable-line no-unused-vars, no-var
 		Returns the passage titles of all played moments (expired + in-play history moments).
 	*/
 	function stateTitles() {
+        if (DEBUG) { console.log(`[State/stateTitles()]: _expired: '${_expired}' historyLength(): '${historyLength()}' _history: '${JSON.stringify(_history)}'`); }
 		return _expired.concat(_history.slice(0, historyLength()).map(moment => moment.title));
 	}
 
