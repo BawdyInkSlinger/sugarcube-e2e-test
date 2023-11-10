@@ -3,6 +3,7 @@ import { Selector } from './selector';
 import {
   DEBUG,
   DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES,
+  DEBUG_THIS_AS_PROMISE,
 } from '../constants';
 import { getPassageLoadedHandler } from './passage-loaded-handler';
 
@@ -383,10 +384,10 @@ export const testController: TestController = {
 
 const thisAsPromise = (self: Promise<void> | TestController) => {
   if (self instanceof Promise) {
-    DEBUG && console.log(`${new Date().getTime()} thisPromise: Promise`);
+    DEBUG && DEBUG_THIS_AS_PROMISE && console.log(`${new Date().getTime()} thisPromise: Promise`);
     return self;
   } else {
-    DEBUG && console.log(`${new Date().getTime()} thisPromise: this`);
+    DEBUG && DEBUG_THIS_AS_PROMISE && console.log(`${new Date().getTime()} thisPromise: this`);
     return Promise.resolve();
   }
 };

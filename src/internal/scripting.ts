@@ -17,7 +17,7 @@ import { getTypeOf } from './gettypeof';
 import { Patterns } from './patterns';
 import { stringFrom } from './stringfrom';
 import { parseURL } from './parseurl';
-import { DEBUG } from '../constants';
+import { DEBUG, DEBUG_HAS_VISITED } from '../constants';
 import { Util } from './util';
 import { objectDefineProperties } from './utils/object-define-properties';
 
@@ -288,11 +288,11 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 
 		const needles = Array.prototype.concat.apply([], arguments);
 		const played  = State.passages;
-        DEBUG && console.log(`[Scripting/hasVisited()]: needles: '${needles}' played: '${played}'`);
+        DEBUG && DEBUG_HAS_VISITED && console.log(`[Scripting/hasVisited()]: needles: '${needles}' played: '${played}'`);
         
 		for (let i = 0, iend = needles.length; i < iend; ++i) {
             if (!played.includes(needles[i])) {
-                DEBUG && console.log(`[Scripting/hasVisited()]: returning false because !played.includes(needles[i]). needles[i]: ${needles[i]}`);
+                DEBUG && DEBUG_HAS_VISITED && console.log(`[Scripting/hasVisited()]: returning false because !played.includes(needles[i]). needles[i]: ${needles[i]}`);
 				return false;
 			}
 		}
