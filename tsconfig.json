@@ -19,7 +19,7 @@
         "alwaysStrict": false,
         "noUnusedLocals": false,
         "noUnusedParameters": false,
-        "noImplicitReturns": true,
+        "noImplicitReturns": false,
         "noFallthroughCasesInSwitch": false,
         "lib": [
             "es2022"

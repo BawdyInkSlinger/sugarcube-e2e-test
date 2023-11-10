@@ -1,4 +1,3 @@
-// NOT OFFICIAL: this is implemented in an external sugarcube named seedrandom.min.js
 declare global {
   interface Math {
     /**
@@ -14,13 +13,7 @@ declare global {
      */
     easeInOut(num: number): number;
 
-    seedrandom(
-      seed: number,
-      options: {
-        entropy: boolean;
-        pass: (prng: number, seed: number) => { prng: number; seed: number };
-      }
-    ): void;
+    seedrandom: seedrandom.prng;
   }
 }
 

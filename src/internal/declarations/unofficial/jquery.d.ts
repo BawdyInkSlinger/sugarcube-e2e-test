@@ -17,7 +17,7 @@ declare global {
 
   interface JQuery {
     wikiWithOptions(
-      options: { cleanup: boolean; profile: string },
+      options: { cleanup?: boolean; profile: string },
       ...sources: string[]
     ): this;
   }

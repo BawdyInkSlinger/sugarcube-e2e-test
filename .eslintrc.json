@@ -21,11 +21,7 @@
   "parserOptions": {
     "ecmaVersion": 2018,
     "project": [
-      "./tsconfig.json",
-      "./tsconfig.src.json",
-      "./tsconfig.spec.json",
-      "./tsconfig.test.json",
-      "./tsconfig.sugarcube-parser.json"
+      "./tsconfig.json"
     ]
   },
   "plugins": [

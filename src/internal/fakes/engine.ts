@@ -3,7 +3,6 @@ import jQuery, { now } from 'jquery';
 import { Alert } from '../alert';
 import { Config } from '../config';
 import { DebugView } from '../debugview';
-import { enumFrom } from '../enumfrom';
 import { DEBUG } from '../../constants';
 import { Save } from './save';
 import { Story } from './story';
@@ -12,23 +11,23 @@ import { Has } from '../has';
 import { Scripting } from '../scripting';
 import { State } from '../state';
 import { Wikifier } from '../wikifier';
-import { objectCreateNull } from '../util/object-create-null';
+import { objectCreateNull } from '../utils/object-create-null';
 import { setDisplayTitle } from '../setdisplaytitle';
-import { inspect } from 'util';
 import { TempStateContainer } from './tempstate';
 import { triggerTimeout } from '../../trigger-timeout';
+import { Util } from '../util';
 
 /* eslint-disable no-var */
 // copied from sugarcube.js
-var prehistory = {};
-var predisplay = {};
-var prerender = {};
-var postrender = {};
-var postdisplay = {};
+export var prehistory = {};
+export var predisplay = {};
+export var prerender = {};
+export var postrender = {};
+export var postdisplay = {};
 
 export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var  
 	// Engine state types object.
-	const States = enumFrom({
+	const States = Util.toEnum({
 		Init      : 'init',
 		Idle      : 'idle',
 		Playing   : 'playing',

@@ -12,7 +12,7 @@
 */
 
 import jQuery from 'jquery'
-import { objectCreateNull } from './util/object-create-null';
+import { objectCreateNull } from './utils/object-create-null';
 import { Lexer, EOF } from './lexer';
 import { Patterns } from './patterns';
 import { getTypeOf } from './gettypeof';
@@ -322,7 +322,7 @@ class Wikifier {
 			the currently executing macro after doing TwineScript to JavaScript desugaring.
 		*/
   fullArgs() {
-    return Scripting.desugar(this._rawArgs);
+    return Scripting.parse(this._rawArgs);
   }
 
   /*
@@ -662,7 +662,7 @@ Object.defineProperties(Wikifier, {
   isExternalLink: { value: isExternalLinkImport },
   getValue: { value: State.getVar }, // SEE: `state.js`.
   setValue: { value: State.setVar }, // SEE: `state.js`.
-  parse: { value: Scripting.desugar }, // SEE: `markup/scripting.js`.
+  parse: { value: Scripting.parse }, // SEE: `markup/scripting.js`.
   evalExpression: { value: Scripting.evalTwineScript }, // SEE: `markup/scripting.js`.
   evalStatements: { value: Scripting.evalTwineScript }, // SEE: `markup/scripting.js`.
   textPrimitives: { value: Patterns }, // SEE: `lib/patterns.js`.

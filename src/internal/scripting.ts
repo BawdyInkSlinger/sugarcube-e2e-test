@@ -1,32 +1,32 @@
+/***********************************************************************************************************************
+
+	markup/scripting.js
+
+	Copyright © 2013–2021 Thomas Michael Edwards <thomasmedwards@gmail.com>. All rights reserved.
+	Use of this source code is governed by a BSD 2-clause "Simplified" License, which may be found in the LICENSE file.
+
+***********************************************************************************************************************/
+/* global Engine, Patterns, State, Story, Util, stringFrom */
+
 /* eslint-disable prefer-rest-params */
 import jQuery, { now } from 'jquery';
-import { enumFrom } from './enumfrom';
 import { Engine } from './fakes/engine';
 import { State } from './state';
 import { Story } from './fakes/story';
 import { getTypeOf } from './gettypeof';
 import { Patterns } from './patterns';
 import { stringFrom } from './stringfrom';
-import { objectCreateNull } from './util/object-create-null';
 import { parseURL } from './parseurl';
 import { DEBUG } from '../constants';
-/***********************************************************************************************************************
-
-	markup/scripting.js
-
-	Copyright © 2013–2022 Thomas Michael Edwards <thomasmedwards@gmail.com>. All rights reserved.
-	Use of this source code is governed by a BSD 2-clause "Simplified" License, which may be found in the LICENSE file.
-
-***********************************************************************************************************************/
-/* global Engine, Patterns, State, Story, enumFrom, getTypeOf, now, parseURL, stringFrom */
+import { Util } from './util';
+import { objectDefineProperties } from './utils/object-define-properties';
 
 export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 	/* eslint-disable no-unused-vars */
 
-	/*******************************************************************************
+	/*******************************************************************************************************************
 		Deprecated Legacy Functions.
-	*******************************************************************************/
-
+	*******************************************************************************************************************/
 	/*
 		[DEPRECATED] Returns the jQuery-wrapped target element(s) after making them accessible
 		clickables (ARIA compatibility).
@@ -247,10 +247,9 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 	}
 
 
-	/*******************************************************************************
+	/*******************************************************************************************************************
 		User Functions.
-	*******************************************************************************/
-
+	*******************************************************************************************************************/
 	/*
 		Returns a random value from its given arguments.
 	*/
@@ -267,7 +266,7 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 	*/
 	function forget(key) {
 		if (typeof key !== 'string') {
-			throw new TypeError(`forget key parameter must be a string (received: ${getTypeOf(key)})`);
+			throw new TypeError(`forget key parameter must be a string (received: ${Util.getType(key)})`);
 		}
 
 		State.metadata.delete(key);
@@ -284,7 +283,6 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 		}
 
 		if (State.isEmpty()) {
-            DEBUG && console.log(`[Scripting/hasVisited()]: returning false because State.isEmpty()`);
 			return false;
 		}
 
@@ -298,7 +296,7 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 				return false;
 			}
 		}
-        
+
 		return true;
 	}
 
@@ -334,7 +332,7 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 	*/
 	function memorize(key, value) {
 		if (typeof key !== 'string') {
-			throw new TypeError(`memorize key parameter must be a string (received: ${getTypeOf(key)})`);
+			throw new TypeError(`memorize key parameter must be a string (received: ${Util.getType(key)})`);
 		}
 
 		State.metadata.set(key, value);
@@ -384,16 +382,16 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 		let max;
 
 		switch (arguments.length) {
-			case 0:
-				throw new Error('random called with insufficient parameters');
-			case 1:
-				min = 0;
-				max = Math.trunc(arguments[0]);
-				break;
-			default:
-				min = Math.trunc(arguments[0]);
-				max = Math.trunc(arguments[1]);
-				break;
+		case 0:
+			throw new Error('random called with insufficient parameters');
+		case 1:
+			min = 0;
+			max = Math.trunc(arguments[0]);
+			break;
+		default:
+			min = Math.trunc(arguments[0]);
+			max = Math.trunc(arguments[1]);
+			break;
 		}
 
 		if (!Number.isInteger(min)) {
@@ -422,16 +420,16 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 		let max;
 
 		switch (arguments.length) {
-			case 0:
-				throw new Error('randomFloat called with insufficient parameters');
-			case 1:
-				min = 0.0;
-				max = Number(arguments[0]);
-				break;
-			default:
-				min = Number(arguments[0]);
-				max = Number(arguments[1]);
-				break;
+		case 0:
+			throw new Error('randomFloat called with insufficient parameters');
+		case 1:
+			min = 0.0;
+			max = Number(arguments[0]);
+			break;
+		default:
+			min = Number(arguments[0]);
+			max = Number(arguments[1]);
+			break;
 		}
 
 		if (Number.isNaN(min) || !Number.isFinite(min)) {
@@ -454,7 +452,7 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 	*/
 	function recall(key, defaultValue) {
 		if (typeof key !== 'string') {
-			throw new TypeError(`recall key parameter must be a string (received: ${getTypeOf(key)})`);
+			throw new TypeError(`recall key parameter must be a string (received: ${Util.getType(key)})`);
 		}
 
 		return State.metadata.has(key) ? State.metadata.get(key) : defaultValue;
@@ -489,7 +487,7 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 		Returns the number of milliseconds which have passed since the current passage was rendered.
 	*/
 	function time() {
-		return Engine.lastPlay === null ? 0 : now() - Engine.lastPlay;
+		return Engine.lastPlay === null ? 0 : Util.now() - Engine.lastPlay;
 	}
 
 	/*
@@ -586,10 +584,9 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 	/* eslint-enable no-unused-vars */
 
 
-	/*******************************************************************************
+	/*******************************************************************************************************************
 		Import Functions.
-	*******************************************************************************/
-
+	*******************************************************************************************************************/
 	var { // eslint-disable-line no-var
 		/* eslint-disable no-unused-vars */
 		importScripts,
@@ -598,7 +595,7 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 	} = (() => {
 		// Slugify the given URL.
 		function slugifyUrl(url) {
-			return parseURL(url).path
+			return Util.parseUrl(url).path
 				.replace(/^[^\w]+|[^\w]+$/g, '')
 				.replace(/[^\w]+/g, '-')
 				.toLocaleLowerCase();
@@ -707,22 +704,21 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 	})();
 
 
-	/*******************************************************************************
-		Desugaring Functions.
-	*******************************************************************************/
-
+	/*******************************************************************************************************************
+		Parsing Functions.
+	*******************************************************************************************************************/
 	/*
-		Returns the given string after converting all TwineScript syntactical sugars
-		to their native JavaScript counterparts.
+		Returns the given string after converting all TwineScript syntactical sugars to
+		their native JavaScript counterparts.
 	*/
-	const desugar = (() => {
-		const tokenTable = enumFrom({
+	const parse = (() => {
+		const tokenTable = Util.toEnum({
 			/* eslint-disable quote-props */
 			// Story $variable sigil-prefix.
 			'$'     : 'State.variables.',
 			// Temporary _variable sigil-prefix.
 			'_'     : 'State.temporary.',
-			// Assignment operator.
+			// Assignment operators.
 			'to'    : '=',
 			// Equality operators.
 			'eq'    : '==',
@@ -743,43 +739,42 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 			'ndef'  : '"undefined" === typeof'
 			/* eslint-enable quote-props */
 		});
-		const desugarRE = new RegExp([
+		const parseRe = new RegExp([
 			'(?:""|\'\'|``)',                                     //   Empty quotes (incl. template literal)
 			'(?:"(?:\\\\.|[^"\\\\])+")',                          //   Double quoted, non-empty
 			"(?:'(?:\\\\.|[^'\\\\])+')",                          //   Single quoted, non-empty
 			'(`(?:\\\\.|[^`\\\\])+`)',                            // 1=Template literal, non-empty
 			'(?:[=+\\-*\\/%<>&\\|\\^~!?:,;\\(\\)\\[\\]{}]+)',     //   Operator delimiters
-			'(?:\\.{3})',                                         //   Spread/rest syntax
 			'([^"\'=+\\-*\\/%<>&\\|\\^~!?:,;\\(\\)\\[\\]{}\\s]+)' // 2=Barewords
 		].join('|'), 'g');
-		const notSpaceRE      = new RegExp(`${Patterns.notSpace}`);
+		const notSpaceRe      = /\S/;
 		const varTest         = new RegExp(`^${Patterns.variable}`);
-		const withColonTestRE = new RegExp(`^${Patterns.space}*:`);
-		const withNotTestRE   = new RegExp(`^${Patterns.space}+not\b`);
+		const withColonTestRe = /^\s*:/;
+		const withNotTestRe   = /^\s+not\b/;
 
-		function desugar(rawCodeString) {
-			if (desugarRE.lastIndex !== 0) {
-				throw new RangeError('Scripting.desugar last index is non-zero at start');
+		function parse(rawCodeString) {
+			if (parseRe.lastIndex !== 0) {
+				throw new RangeError('Scripting.parse last index is non-zero at start');
 			}
 
 			let code  = rawCodeString;
 			let match;
 
-			while ((match = desugarRE.exec(code)) !== null) {
-				// no-op: Empty quotes, Double quoted, Single quoted, Operator delimiters, Spread/rest syntax
+			while ((match = parseRe.exec(code)) !== null) {
+				// no-op: Empty quotes | Double quoted | Single quoted | Operator delimiters
 
 				// Template literal, non-empty.
 				if (match[1]) {
 					const rawTemplate = match[1];
-					const desugaredTemplate = desugarTemplate(rawTemplate);
+					const parsedTemplate = parseTemplate(rawTemplate);
 
-					if (desugaredTemplate !== rawTemplate) {
+					if (parsedTemplate !== rawTemplate) {
 						code = code.splice(
 							match.index,        // starting index
 							rawTemplate.length, // replace how many
-							desugaredTemplate      // replacement string
+							parsedTemplate      // replacement string
 						);
-						desugarRE.lastIndex += desugaredTemplate.length - rawTemplate.length;
+						parseRe.lastIndex += parsedTemplate.length - rawTemplate.length;
 					}
 				}
 
@@ -805,11 +800,11 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 					// NOTE: This is a safety feature, since `$a is not $b` probably sounds
 					// reasonable to most users.
 					else if (token === 'is') {
-						const start = desugarRE.lastIndex;
+						const start = parseRe.lastIndex;
 						const ahead = code.slice(start);
 
-						if (withNotTestRE.test(ahead)) {
-							code = code.splice(start, ahead.search(notSpaceRE));
+						if (withNotTestRe.test(ahead)) {
+							code = code.splice(start, ahead.search(notSpaceRe));
 							token = 'isnot';
 						}
 					}
@@ -817,9 +812,9 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 					// If the token is followed by a colon, then it's likely to be an object
 					// property, so skip it.
 					else {
-						const ahead = code.slice(desugarRE.lastIndex);
+						const ahead = code.slice(parseRe.lastIndex);
 
-						if (withColonTestRE.test(ahead)) {
+						if (withColonTestRe.test(ahead)) {
 							continue;
 						}
 					}
@@ -832,7 +827,7 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 							token.length,     // replace how many
 							tokenTable[token] // replacement string
 						);
-						desugarRE.lastIndex += tokenTable[token].length - token.length;
+						parseRe.lastIndex += tokenTable[token].length - token.length;
 					}
 				}
 			}
@@ -840,8 +835,8 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 			return code;
 		}
 
-		const templateGroupStartRE = /\$\{/g;
-		const templateGroupParseRE = new RegExp([
+		const templateGroupStartRe = /\$\{/g;
+		const templateGroupParseRe = new RegExp([
 			'(?:""|\'\')',               //   Empty quotes
 			'(?:"(?:\\\\.|[^"\\\\])+")', //   Double quoted, non-empty
 			"(?:'(?:\\\\.|[^'\\\\])+')", //   Single quoted, non-empty
@@ -849,24 +844,23 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 			'(\\})'                      // 2=Closing curly brace
 		].join('|'), 'g');
 
-		// WARNING: Does not currently handle nested template strings.
-		function desugarTemplate(rawTemplateLiteral) {
-			if (templateGroupStartRE.lastIndex !== 0) {
-				throw new RangeError('Scripting.desugar last index is non-zero at start of template literal');
+		function parseTemplate(rawTemplateLiteral) {
+			if (templateGroupStartRe.lastIndex !== 0) {
+				throw new RangeError('Scripting.parse last index is non-zero at start of template literal');
 			}
 
 			let template   = rawTemplateLiteral;
 			let startMatch;
 
-			while ((startMatch = templateGroupStartRE.exec(template)) !== null) {
-				const startIndex = startMatch.index + 2;
-				let endIndex = startIndex;
+			while ((startMatch = templateGroupStartRe.exec(template)) !== null) {
+				const startIdx = startMatch.index + 2;
+				let endIdx   = startIdx;
 				let depth    = 1;
 				let endMatch;
 
-				templateGroupParseRE.lastIndex = startIndex;
+				templateGroupParseRe.lastIndex = startIdx;
 
-				while ((endMatch = templateGroupParseRE.exec(template)) !== null) {
+				while ((endMatch = templateGroupParseRe.exec(template)) !== null) {
 					// Opening curly brace.
 					if (endMatch[1]) {
 						++depth;
@@ -877,47 +871,46 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 					}
 
 					if (depth === 0) {
-						endIndex = endMatch.index;
+						endIdx = endMatch.index;
 						break;
 					}
 				}
 
 				// If the group is not empty, replace it within the template
-				// with its desugared counterpart.
-				if (endIndex > startIndex) {
-					const desugarIndex = desugarRE.lastIndex;
-					const rawGroup     = template.slice(startIndex, endIndex);
+				// with its parsed counterpart.
+				if (endIdx > startIdx) {
+					const parseIndex = parseRe.lastIndex;
+					const rawGroup   = template.slice(startIdx, endIdx);
 
-					desugarRE.lastIndex = 0;
-					const desugaredGroup = desugar(rawGroup);
-					desugarRE.lastIndex = desugarIndex;
+					parseRe.lastIndex = 0;
+					const parsedGroup = parse(rawGroup);
+					parseRe.lastIndex = parseIndex;
 
 					template = template.splice(
-						startIndex,      // starting index
+						startIdx,        // starting index
 						rawGroup.length, // replace how many
-						desugaredGroup   // replacement string
+						parsedGroup      // replacement string
 					);
-					templateGroupStartRE.lastIndex += desugaredGroup.length - rawGroup.length;
+					templateGroupStartRe.lastIndex += parsedGroup.length - rawGroup.length;
 				}
 			}
 
 			return template;
 		}
 
-		return desugar;
+		return parse;
 	})();
 
 
-	/*******************************************************************************
+	/*******************************************************************************************************************
 		Eval Functions.
-	*******************************************************************************/
-
+	*******************************************************************************************************************/
 	/* eslint-disable no-eval, no-extra-parens, no-unused-vars */
 	/*
 		Evaluates the given JavaScript code and returns the result, throwing if there were errors.
 	*/
 	function evalJavaScript(code, output?, data?) {
-		return (function (code, output, SCRIPT$DATA$) {
+		return (function (code, output, evalJavaScript$Data$) {
 			return eval(code);
 		}).call(output ? { output } : null, String(code), output, data);
 	}
@@ -926,28 +919,21 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 		Evaluates the given TwineScript code and returns the result, throwing if there were errors.
 	*/
 	function evalTwineScript(code, output?, data?) {
-		// WARNING: Do not use a dollar sign or underscore as the first character of the
-		// data variable, `SCRIPT$DATA$`, as `desugar()` will break references to it within
-		// the code string.
-		return (function (code, output, SCRIPT$DATA$) {
+		// NOTE: Do not move the dollar sign to the front of `evalTwineScript$Data$`,
+		// as `parse()` will break references to it within the code string.
+		return (function (code, output, evalTwineScript$Data$) {
 			return eval(code);
-		}).call(output ? { output } : null, desugar(String(code)), output, data);
+		}).call(output ? { output } : null, parse(String(code)), output, data);
 	}
 	/* eslint-enable no-eval, no-extra-parens, no-unused-vars */
 
 
-	/*******************************************************************************
-		Object Exports.
-	*******************************************************************************/
-
-	return Object.preventExtensions(objectCreateNull(null, {
-		desugar         : { value : desugar },
+	/*******************************************************************************************************************
+		Module Exports.
+	*******************************************************************************************************************/
+	return Object.freeze(objectDefineProperties({}, {
+		parse           : { value : parse },
 		evalJavaScript  : { value : evalJavaScript },
-		evalTwineScript : { value : evalTwineScript },
-
-		/*
-			Legacy Functions.
-		*/
-		parse : { value : desugar }
+		evalTwineScript : { value : evalTwineScript }
 	}));
 })();

@@ -8,7 +8,7 @@
 ***********************************************************************************************************************/
 
 import { Adapter } from './fakes/in-memory-storage-adapter';
-import { objectCreateNull } from './util/object-create-null';
+import { objectCreateNull } from './utils/object-create-null';
 
 export const SimpleStore: {
   adapters: Adapter[];

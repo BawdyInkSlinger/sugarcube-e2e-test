@@ -7,7 +7,7 @@
 
 ***********************************************************************************************************************/
 
-import { objectCreateNull } from './util/object-create-null';
+import { objectCreateNull } from './utils/object-create-null';
 
 /*
 	Serial API static object.

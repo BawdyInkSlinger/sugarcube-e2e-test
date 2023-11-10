@@ -1,20 +1,9 @@
-import { inspect } from 'util';
 import { AssertionApi, PromiseAssertions, StringAssertions } from './internal/assertion';
-import { ClickActionOptions } from './internal/click-action-options';
-import { NodeSnapshot } from './internal/node-snapshot';
-import { PressActionOptions } from './internal/press-action-options';
-import { Selector, SelectorPromise } from './selector';
-import { TypeActionOptions } from './internal/type-action-options';
+import { Selector } from './selector';
 import {
   DEBUG,
   DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES,
 } from '../constants';
-import {
-  clearTimeouts,
-  findLastTimeoutEvent,
-} from '../trigger-timeout';
-import { waitForPassageEnd } from './wait-for-passage-end';
-import { oneCondition } from './one-condition';
 import { getPassageLoadedHandler } from './passage-loaded-handler';
 
 export interface TestController {

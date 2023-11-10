@@ -9,7 +9,7 @@
 /* global Patterns */
 
 import { Patterns } from './patterns';
-import { objectCreateNull } from './util/object-create-null';
+import { objectCreateNull } from './utils/object-create-null';
 
 export const Template = (() => { // eslint-disable-line no-unused-vars, no-var
 	// Template definitions.

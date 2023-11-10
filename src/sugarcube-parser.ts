@@ -92,38 +92,7 @@ export class SugarcubeParser {
     setGlobal("setup", setup); // doesn't seem to be required
     // but if gameSetup isn't manually created, errors. Passing it in prevents tree-shaking(?)
 
-    await import("./internal/macro/macros/addclass-toggleclass");
-    await import("./internal/macro/macros/append-prepend-replace");
-    await import("./internal/macro/macros/audio-macros");
-    await import("./internal/macro/macros/back-return");
-    await import("./internal/macro/macros/button-link");
-    await import("./internal/macro/macros/capture");
-    await import("./internal/macro/macros/checkbox");
-    await import("./internal/macro/macros/copy");
-    await import("./internal/macro/macros/cycle-listbox");
-    await import("./internal/macro/macros/do-refresh");
-    await import("./internal/macro/macros/done");
-    await import("./internal/macro/macros/for-break-continue");
-    await import("./internal/macro/macros/goto");
-    await import("./internal/macro/macros/if");
-    await import("./internal/macro/macros/include");
-    await import("./internal/macro/macros/linkappend-linkprepend-linkreplace");
-    await import("./internal/macro/macros/nobr");
-    await import("./internal/macro/macros/numberbox-textbox");
-    await import("./internal/macro/macros/print");
-    await import("./internal/macro/macros/radiobutton");
-    await import("./internal/macro/macros/remove");
-    await import("./internal/macro/macros/removeclass");
-    await import("./internal/macro/macros/repeat-stop");
-    await import("./internal/macro/macros/script");
-    await import("./internal/macro/macros/set-run");
-    await import("./internal/macro/macros/silent");
-    await import("./internal/macro/macros/switch");
-    await import("./internal/macro/macros/textarea");
-    await import("./internal/macro/macros/timed");
-    await import("./internal/macro/macros/type");
-    await import("./internal/macro/macros/unset");
-    await import("./internal/macro/macros/widget");
+    await import("./internal/macro/macrolib");
 
     const { Wikifier }: any = await import("./internal/wikifier");
     setGlobal("Wikifier", Wikifier);

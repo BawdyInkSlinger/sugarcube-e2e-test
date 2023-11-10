@@ -9,7 +9,7 @@
 /* global l10nStrings */
 
 import { l10nStrings } from './strings';
-import { objectCreateNull } from './util/object-create-null';
+import { objectCreateNull } from './utils/object-create-null';
 
 const L10n = (() => { // eslint-disable-line no-unused-vars, no-var
 	// Maximum replacement depth.

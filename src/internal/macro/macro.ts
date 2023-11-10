@@ -11,7 +11,7 @@
 import { macros } from '../macros';
 import { Patterns } from '../patterns';
 import { Scripting } from '../scripting';
-import { objectCreateNull } from '../util/object-create-null';
+import { objectCreateNull } from '../utils/object-create-null';
 
 const Macro = (() => {
   // eslint-disable-line no-unused-vars, no-var

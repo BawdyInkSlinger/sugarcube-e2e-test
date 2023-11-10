@@ -11,12 +11,11 @@
 import { Config } from '../config';
 import { createSlug } from '../createslug';
 import { SimplePassage } from '../declarations/unofficial/simple-passage';
-import { decodeEntities } from '../decodeentities';
-import { enumFrom } from '../enumfrom';
 import L10n from '../l10n';
 import { State } from '../state';
 import { Wikifier } from '../wikifier';
 import { TWINE1 } from '../../constants';
+import { Util } from '../util';
 
 export const PassageClass = (() => {
   // eslint-disable-line no-unused-vars, no-var
@@ -50,7 +49,7 @@ export const PassageClass = (() => {
 		*/
     const _twine1EscapesRe = /(?:\\n|\\t|\\s|\\|\r)/g;
     const _hasTwine1EscapesRe = new RegExp(_twine1EscapesRe.source); // to drop the global flag
-    const _twine1EscapesMap = enumFrom({
+    const _twine1EscapesMap = Util.toEnum({
       '\\n': '\n',
       '\\t': '\t',
       '\\s': '\\',
@@ -90,7 +89,7 @@ export const PassageClass = (() => {
       );
 
       const id = `passage-${createSlug(title)}`;
-      const name = decodeEntities(title);
+      const name = Util.entityDecode(title);
       this.#construct(id, name, text, sortedAndUniqueTags);
     }
 

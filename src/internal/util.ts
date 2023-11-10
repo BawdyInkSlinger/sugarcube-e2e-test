@@ -9,12 +9,10 @@
 /* global Has, Scripting */
 
 import { Has } from "./has";
-import { Scripting } from "./scripting";
-import { objectCreateNull } from "./util/object-create-null";
+import { objectCreateNull } from "./utils/object-create-null";
 
 export const Util = (() => {
   // eslint-disable-line no-unused-vars, no-var
-  "use strict";
 
   /*******************************************************************************************************************
 		Type Functions.
@@ -838,20 +836,27 @@ export const Util = (() => {
         entityEncode: { value: utilEscape },
         entityDecode: { value: utilUnescape },
 
-        evalExpression: {
-          value: (...args: unknown[]) =>
-            Scripting.evalJavaScript(
-              // @ts-ignore
-              ...args
-            ),
-        }, // SEE: `markup/scripting.js`.
-        evalStatements: {
-          value: (...args: unknown[]) =>
-            Scripting.evalJavaScript(
-              // @ts-ignore
-              ...args
-            ),
-        }, // SEE: `markup/scripting.js`.
+        /* commented by BIS to prevent cyclical dependency that throws runtime error: 
+
+          Message:
+            TypeError: Cannot read properties of undefined (reading 'toEnum')
+          Stack:
+            at ...sugarcube-e2e-test\dist\internal\diff.js:23:28
+        */
+        // evalExpression: {
+        //   value: (...args: unknown[]) =>
+        //     Scripting.evalJavaScript(
+        //       // @ts-ignore
+        //       ...args
+        //     ),
+        // }, // SEE: `markup/scripting.js`.
+        // evalStatements: {
+        //   value: (...args: unknown[]) =>
+        //     Scripting.evalJavaScript(
+        //       // @ts-ignore
+        //       ...args
+        //     ),
+        // }, // SEE: `markup/scripting.js`.
       }
     )
   );

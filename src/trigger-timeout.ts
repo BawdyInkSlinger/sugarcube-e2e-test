@@ -5,7 +5,7 @@
  */
 
 import { DEBUG, DEBUG_TRIGGER_TIMEOUT } from './constants';
-import { Branded } from './internal/util/branded';
+import { Branded } from './internal/utils/branded';
 
 type LastTimeoutEvent = 'created' | 'completed' | 'cleared';
 type TimeoutID = Branded<string, 'TimeoutID'>;

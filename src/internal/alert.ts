@@ -7,7 +7,7 @@
 
 ***********************************************************************************************************************/
 
-import { objectCreateNull } from './util/object-create-null';
+import { objectCreateNull } from './utils/object-create-null';
 
 /*
 	TODO: This regular expression should be elsewhere.
