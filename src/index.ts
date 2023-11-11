@@ -1,5 +1,5 @@
 export * from "./sugarcube-parser"
-export * from "./constants"
+export * from "./logger"
 export * from "./trigger-timeout"
 export * from "./test-api/one-condition"
 export * from "./test-api/selector"

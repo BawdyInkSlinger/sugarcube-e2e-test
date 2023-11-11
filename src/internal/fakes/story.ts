@@ -4,7 +4,6 @@ import { Macro } from '../macro/macro';
 import { Scripting } from '../scripting';
 import { Wikifier } from '../wikifier';
 import { Config } from '../config';
-import { DEBUG, DEBUG_PASSAGES, TWINE1 } from '../../constants';
 import { SimpleStore } from '../simplestore';
 import { InMemoryStorageAdapter } from './in-memory-storage-adapter';
 import { Engine } from './engine';
@@ -14,6 +13,7 @@ import { StorageContainer } from './storage';
 import { Alert } from '../alert';
 import { SimplePassage } from '../declarations/unofficial/simple-passage';
 import { sameValueZero } from '../samevaluezero';
+import { getLogger } from '../../logger';
 
 let storyPassages: Passage[] = [];
 
@@ -47,34 +47,45 @@ export const Story = {
     );
   },
 
-  lookup(key: string | number, value: unknown  /* legacy */, sortKey = 'name'/* /legacy */) {
-		/* eslint-disable eqeqeq, no-nested-ternary, max-len */
-		return filter(passage => {
-			// Objects (sans `null`).
-			if (typeof passage[key] === 'object' && passage[key] !== null) {
-				// The only object type currently supported is `Array`, since the
-				// non-method `Passage` object properties currently yield only either
-				// primitives or arrays.
-				return passage[key] instanceof Array && passage[key].some(m => sameValueZero(m, value));
-			}
+  lookup(
+    key: string | number,
+    value: unknown /* legacy */,
+    sortKey = 'name' /* /legacy */
+  ) {
+    /* eslint-disable eqeqeq, no-nested-ternary, max-len */
+    return filter((passage) => {
+      // Objects (sans `null`).
+      if (typeof passage[key] === 'object' && passage[key] !== null) {
+        // The only object type currently supported is `Array`, since the
+        // non-method `Passage` object properties currently yield only either
+        // primitives or arrays.
+        return (
+          passage[key] instanceof Array &&
+          passage[key].some((m) => sameValueZero(m, value))
+        );
+      }
 
-			// All other types (incl. `null`).
-			return sameValueZero(passage[key], value);
-		})
-			.sort((a, b) => a[sortKey] == b[sortKey] ? 0 : a[sortKey] < b[sortKey] ? -1 : +1); // lazy equality for null
-		/* eslint-enable eqeqeq, no-nested-ternary, max-len */
-	},
+      // All other types (incl. `null`).
+      return sameValueZero(passage[key], value);
+    }).sort((a, b) =>
+      a[sortKey] == b[sortKey] ? 0 : a[sortKey] < b[sortKey] ? -1 : +1
+    ); // lazy equality for null
+    /* eslint-enable eqeqeq, no-nested-ternary, max-len */
+  },
 
-	lookupWith(predicate /* legacy */, sortKey = 'name'/* /legacy */) {
-		if (typeof predicate !== 'function') {
-			throw new TypeError('Story.lookupWith predicate parameter must be a function');
-		}
+  lookupWith(predicate /* legacy */, sortKey = 'name' /* /legacy */) {
+    if (typeof predicate !== 'function') {
+      throw new TypeError(
+        'Story.lookupWith predicate parameter must be a function'
+      );
+    }
 
-		/* eslint-disable eqeqeq, no-nested-ternary, max-len */
-		return filter(predicate)
-			.sort((a, b) => a[sortKey] == b[sortKey] ? 0 : a[sortKey] < b[sortKey] ? -1 : +1); // lazy equality for null
-		/* eslint-enable eqeqeq, no-nested-ternary, max-len */
-	},
+    /* eslint-disable eqeqeq, no-nested-ternary, max-len */
+    return filter(predicate).sort((a, b) =>
+      a[sortKey] == b[sortKey] ? 0 : a[sortKey] < b[sortKey] ? -1 : +1
+    ); // lazy equality for null
+    /* eslint-enable eqeqeq, no-nested-ternary, max-len */
+  },
 };
 
 function filter(predicate: (passage: Passage) => boolean, thisArg?: undefined) {
@@ -95,6 +106,9 @@ function filter(predicate: (passage: Passage) => boolean, thisArg?: undefined) {
   return results;
 }
 
+const logger = getLogger('DEFAULT');
+const passageLogger = getLogger('DEBUG_PASSAGES');
+
 let storyScripts: string[] = [];
 let moduleScripts: string[] = [];
 
@@ -109,17 +123,13 @@ export const initialize = ({
   javascriptScripts,
 }: Options) => {
   storyPassages = passages.map((simplePassage) => {
-    if (DEBUG && DEBUG_PASSAGES) {
-      console.log(
-        `Initialize: passage found: \`${simplePassage.title}\` tags: \`${simplePassage.tags}\``
-      );
-    }
+    passageLogger.debug(
+      `Initialize: passage found: \`${simplePassage.title}\` tags: \`${simplePassage.tags}\``
+    );
     return new PassageClass(simplePassage);
   });
   storyScripts = javascriptScripts.map((js: string) => {
-    if (DEBUG && DEBUG_PASSAGES) {
-      console.log(`Initialize: js found:\n${js}\n`);
-    }
+    passageLogger.debug(`Initialize: js found:\n${js}\n`);
     return js;
   });
   moduleScripts = localModuleScripts;
@@ -134,9 +144,7 @@ const _scripts: Passage[] = [];
 
 // copied and modified from story.js
 function storyLoad() {
-  if (DEBUG) {
-    console.log('[Story/storyLoad()]');
-  }
+  logger.debug('[Story/storyLoad()]');
 
   _inits.length = 0;
   _widgets.length = 0;
@@ -208,13 +216,12 @@ function storyLoad() {
   );
   _scripts.push(
     ...storyPassages.filter((p) => {
-      if (DEBUG && DEBUG_PASSAGES) {
-        console.log(
-          `title ${p.title}    p.tags.includes('script') ${p.tags.includes(
-            'script'
-          )}`
-        );
-      }
+      passageLogger.debug(
+        `title ${p.title}    p.tags.includes('script') ${p.tags.includes(
+          'script'
+        )}`
+      );
+
       return p.tags.includes('script');
     })
   );
@@ -301,7 +308,5 @@ export function runStoryInit() {
   // Trigger the `:storyready` global synthetic event.
   jQuery.event.trigger(':storyready');
 
-  if (DEBUG) {
-    console.log('[SugarCube/main()] Startup complete; story ready.');
-  }
+  logger.debug('[SugarCube/main()] Startup complete; story ready.');
 }

@@ -4,8 +4,10 @@
  * the setTimeout lifecycle does not trigger events.
  */
 
-import { DEBUG, DEBUG_TRIGGER_TIMEOUT } from './constants';
 import { Branded } from './internal/utils/branded';
+import { getLogger } from './logger';
+
+const logger = getLogger('DEBUG_TRIGGER_TIMEOUT');
 
 type LastTimeoutEvent = 'created' | 'completed' | 'cleared';
 type TimeoutID = Branded<string, 'TimeoutID'>;
@@ -34,14 +36,12 @@ export function triggerTimeout<Params extends unknown[]>(
   delay: number,
   ...params: Params
 ): TimeoutData {
-  const cause = DEBUG ? new Error() : undefined;
+  const cause = new Error();
   const timeoutId = setTimeout(setTimeoutWithTrigger, delay);
   const result = {
     cancelTimeout: () => {
       clearTimeout(timeoutId);
-      DEBUG &&
-        DEBUG_TRIGGER_TIMEOUT &&
-        console.log(
+      logger.debug(
           `${new Date().getTime()} triggerTimeout: trigger :cleartimeout for '${context.replaceAll(
             /\r/g,
             ''
@@ -67,9 +67,7 @@ export function triggerTimeout<Params extends unknown[]>(
         throw new Error(ex + '');
       }
     } finally {
-      DEBUG &&
-        DEBUG_TRIGGER_TIMEOUT &&
-        console.log(
+      logger.debug(
           `${new Date().getTime()} triggerTimeout: trigger :completetimeout for '${context.replaceAll(
             /\r/g,
             ''
@@ -80,9 +78,7 @@ export function triggerTimeout<Params extends unknown[]>(
     }
   }
 
-  DEBUG &&
-    DEBUG_TRIGGER_TIMEOUT &&
-    console.log(
+  logger.debug(
       `${new Date().getTime()} triggerTimeout: trigger :createtimeout for '${context.replaceAll(
         /\r/g,
         ''

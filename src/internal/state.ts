@@ -12,7 +12,7 @@ import jQuery from 'jquery';
 import { SugarCubeTemporaryVariables } from './declarations/twine-sugarcube-copy/userdata';
 import { Diff } from './diff';
 import { Config } from './config';
-import { DEBUG, TWINE1 } from '../constants';
+import { TWINE1 } from '../constants';
 import { Engine } from './fakes/engine';
 import { Scripting } from './scripting';
 import { objectCreateNull } from './utils/object-create-null';
@@ -22,6 +22,9 @@ import { StorageContainer } from './fakes/storage';
 import { TempVariablesContainer } from './fakes/tempvariables';
 import { PRNGWrapper } from './prngwrapper';
 import { objectDefineProperties } from './utils/object-define-properties';
+import { getLogger } from '../logger';
+
+const logger = getLogger('DEFAULT');
 
 export const State = (() => { // eslint-disable-line no-unused-vars, no-var
     type History = ReturnType<typeof momentCreate> & { pull?: any};
@@ -53,7 +56,7 @@ export const State = (() => { // eslint-disable-line no-unused-vars, no-var
 		Resets the story state.
 	*/
 	function stateReset() {
-		if (DEBUG) { console.log('[State/stateReset()]'); }
+		logger.debug('[State/stateReset()]'); 
 
 		// Delete the active session.
         // BIS change. Original: session.delete('state');
@@ -73,7 +76,7 @@ export const State = (() => { // eslint-disable-line no-unused-vars, no-var
 		Restores the story state from the active session.
 	*/
 	function stateRestore() {
-		if (DEBUG) { console.log('[State/stateRestore()]'); }
+		logger.debug('[State/stateRestore()]'); 
 
 		/*
 			Attempt to restore an active session.
@@ -84,7 +87,7 @@ export const State = (() => { // eslint-disable-line no-unused-vars, no-var
 			*/
 			const stateObj = SessionContainer.session.get('state');
 
-			if (DEBUG) { console.log('\tsession state:', stateObj); }
+			logger.debug('\tsession state:', stateObj); 
 
 			if (stateObj == null) { // lazy equality for null
 				return false;
@@ -444,7 +447,7 @@ export const State = (() => { // eslint-disable-line no-unused-vars, no-var
 		Creates a new moment and pushes it onto the history, discarding future moments if necessary.
 	*/
 	function historyCreate(title) {
-		if (DEBUG) { console.log(`[State/historyCreate(title: "${title}")]`); }
+		logger.debug(`[State/historyCreate(title: "${title}")]`); 
 
 		/*
 			TODO: It might be good to have some assertions about the passage title here.
@@ -454,7 +457,7 @@ export const State = (() => { // eslint-disable-line no-unused-vars, no-var
 			If we're not at the top of the stack, discard the future moments.
 		*/
 		if (historyLength() < historySize()) {
-			if (DEBUG) { console.log(`\tnon-top push; discarding ${historySize() - historyLength()} future moments`); }
+			logger.debug(`\tnon-top push; discarding ${historySize() - historyLength()} future moments`); 
 
 			_history.splice(historyLength(), historySize() - historyLength());
 		}
@@ -488,7 +491,7 @@ export const State = (() => { // eslint-disable-line no-unused-vars, no-var
 		Activate the moment at the given index within the history.
 	*/
 	function historyGoTo(index) {
-		if (DEBUG) { console.log(`[State/historyGoTo(index: ${index})]`); }
+		logger.debug(`[State/historyGoTo(index: ${index})]`); 
 
 		if (
 			   index == null /* lazy equality for null */
@@ -509,7 +512,7 @@ export const State = (() => { // eslint-disable-line no-unused-vars, no-var
 		Activate the moment at the given offset from the active moment within the history.
 	*/
 	function historyGo(offset) {
-		if (DEBUG) { console.log(`[State/historyGo(offset: ${offset})]`); }
+		logger.debug(`[State/historyGo(offset: ${offset})]`); 
 
 		if (offset == null || offset === 0) { // lazy equality for null
 			return false;
@@ -567,7 +570,7 @@ export const State = (() => { // eslint-disable-line no-unused-vars, no-var
 		PRNG Functions.
 	*******************************************************************************************************************/
 	function prngInit(seed, useEntropy) {
-		if (DEBUG) { console.log(`[State/prngInit(seed: ${seed}, useEntropy: ${useEntropy})]`); }
+		logger.debug(`[State/prngInit(seed: ${seed}, useEntropy: ${useEntropy})]`); 
 
 		if (!historyIsEmpty()) {
 			let scriptSection;
@@ -599,7 +602,7 @@ export const State = (() => { // eslint-disable-line no-unused-vars, no-var
 	}
 
 	function prngRandom() {
-		if (DEBUG) { console.log('[State/prngRandom()]'); }
+		logger.debug('[State/prngRandom()]'); 
 
 		return _prng ? _prng.random() : Math.random();
 	}
@@ -612,7 +615,7 @@ export const State = (() => { // eslint-disable-line no-unused-vars, no-var
 		Clear the temporary variables.
 	*/
 	function tempVariablesClear() {
-		if (DEBUG) { console.log('[State/tempVariablesClear()]'); }
+		logger.debug('[State/tempVariablesClear()]'); 
 
 		_tempVariables = {};
 

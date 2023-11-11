@@ -1,8 +1,8 @@
-import { DEBUG, DEBUG_ASSERTIONS_ENTER_LOG_MESSAGES } from "../../constants";
-import { AssertionOptions } from "./assertion-options";
-import ReExecutablePromise from "./re-executable-promise";
-import { testController, TestControllerPromise } from "../test-controller";
-import _ from "lodash";
+import { AssertionOptions } from './assertion-options';
+import ReExecutablePromise from './re-executable-promise';
+import { testController, TestControllerPromise } from '../test-controller';
+import _ from 'lodash';
+import { getLogger } from '../../logger';
 
 export type ElementOf<T> = T extends (infer E)[] ? E : never;
 export type Extend<T, E> = T extends E ? E : never;
@@ -155,6 +155,10 @@ export interface AssertionApi<E = any> {
   // notMatch(re: RegExp, options?: AssertionOptions): TestControllerPromise;
 }
 
+// added by BIS:
+const logger = getLogger('DEFAULT');
+const enterLogger = getLogger('DEBUG_ASSERTIONS_ENTER_LOG_MESSAGES');
+
 export class StringAssertions implements AssertionApi<string> {
   actual: string;
   currentPromise: Promise<void>;
@@ -169,22 +173,19 @@ export class StringAssertions implements AssertionApi<string> {
     options?: AssertionOptions
   ): TestControllerPromise<void> {
     const cause = new Error();
-    DEBUG &&
-      DEBUG_ASSERTIONS_ENTER_LOG_MESSAGES &&
-      console.log(
-        `${new Date().getTime()} StringAssertions: entering contains expected='${expected}' this.actual='${
-          this.actual
-        }'`
-      );
+    enterLogger.debug(
+      `${new Date().getTime()} StringAssertions: entering contains expected='${expected}' this.actual='${
+        this.actual
+      }'`
+    );
     return Object.assign(
       this.currentPromise.then(() => {
-        DEBUG &&
-          console.log(
-            `${new Date().getTime()} StringAssertions: resolving contains then expected='${expected}' this.actual='${
-              this.actual
-            }'`
-          );
-        if (this.actual.indexOf(expected + "") === -1) {
+        logger.debug(
+          `${new Date().getTime()} StringAssertions: resolving contains then expected='${expected}' this.actual='${
+            this.actual
+          }'`
+        );
+        if (this.actual.indexOf(expected + '') === -1) {
           cause.message = `\n  Expected:\n${this.actual}\n  To Contain:\n${expected}`;
           throw cause;
         }
@@ -197,22 +198,19 @@ export class StringAssertions implements AssertionApi<string> {
     options?: AssertionOptions
   ): TestControllerPromise<void> {
     const cause = new Error();
-    DEBUG &&
-      DEBUG_ASSERTIONS_ENTER_LOG_MESSAGES &&
-      console.log(
-        `${new Date().getTime()} StringAssertions: entering contains unexpected='${unexpected}' this.actual='${
-          this.actual
-        }'`
-      );
+    enterLogger.debug(
+      `${new Date().getTime()} StringAssertions: entering contains unexpected='${unexpected}' this.actual='${
+        this.actual
+      }'`
+    );
     return Object.assign(
       this.currentPromise.then(() => {
-        DEBUG &&
-          console.log(
-            `${new Date().getTime()} StringAssertions: resolving contains then unexpected='${unexpected}' this.actual='${
-              this.actual
-            }'`
-          );
-        if (this.actual.indexOf(unexpected + "") === -1) {
+        logger.debug(
+          `${new Date().getTime()} StringAssertions: resolving contains then unexpected='${unexpected}' this.actual='${
+            this.actual
+          }'`
+        );
+        if (this.actual.indexOf(unexpected + '') === -1) {
           cause.message = `\n  Expected:\n${this.actual}\n  To NOT Contain:\n${unexpected}`;
           throw cause;
         }
@@ -225,63 +223,54 @@ export class StringAssertions implements AssertionApi<string> {
     expected: string,
     options?: AssertionOptions
   ): TestControllerPromise<void> {
-    DEBUG &&
-      DEBUG_ASSERTIONS_ENTER_LOG_MESSAGES &&
-      console.log(
-        `${new Date().getTime()} StringAssertions: entering eql expected='${expected}' this.actual='${
-          this.actual
-        }'`
-      );
+    enterLogger.debug(
+      `${new Date().getTime()} StringAssertions: entering eql expected='${expected}' this.actual='${
+        this.actual
+      }'`
+    );
     return Object.assign(
       this.currentPromise.then(() => {
-        DEBUG &&
-          console.log(
-            `${new Date().getTime()} StringAssertions: resolving eql then expected='${expected}' this.actual='${
-              this.actual
-            }'`
-          );
+        logger.debug(
+          `${new Date().getTime()} StringAssertions: resolving eql then expected='${expected}' this.actual='${
+            this.actual
+          }'`
+        );
         expect(this.actual).toEqual(expected); // todo: throw error if failure
       }),
       testController
     );
   }
   ok(options?: AssertionOptions): TestControllerPromise<void> {
-    DEBUG &&
-      DEBUG_ASSERTIONS_ENTER_LOG_MESSAGES &&
-      console.log(
-        `${new Date().getTime()} StringAssertions: entering ok this.actual='${
-          this.actual
-        }'`
-      );
+    enterLogger.debug(
+      `${new Date().getTime()} StringAssertions: entering ok this.actual='${
+        this.actual
+      }'`
+    );
     return Object.assign(
       this.currentPromise.then(() => {
-        DEBUG &&
-          console.log(
-            `${new Date().getTime()} StringAssertions: resolving ok then this.actual='${
-              this.actual
-            }'`
-          );
+        logger.debug(
+          `${new Date().getTime()} StringAssertions: resolving ok then this.actual='${
+            this.actual
+          }'`
+        );
         expect(this.actual).toBeTruthy(); // todo: throw error if failure
       }),
       testController
     );
   }
   notOk(options?: AssertionOptions): TestControllerPromise<void> {
-    DEBUG &&
-      DEBUG_ASSERTIONS_ENTER_LOG_MESSAGES &&
-      console.log(
-        `${new Date().getTime()} StringAssertions: entering notOk this.actual='${
-          this.actual
-        }'`
-      );
+    enterLogger.debug(
+      `${new Date().getTime()} StringAssertions: entering notOk this.actual='${
+        this.actual
+      }'`
+    );
     return Object.assign(
       this.currentPromise.then(() => {
-        DEBUG &&
-          console.log(
-            `${new Date().getTime()} StringAssertions: resolving notOk then this.actual='${
-              this.actual
-            }'`
-          );
+        logger.debug(
+          `${new Date().getTime()} StringAssertions: resolving notOk then this.actual='${
+            this.actual
+          }'`
+        );
         expect(this.actual).toBeFalsy(); // todo: throw error if failure
       }),
       testController
@@ -303,42 +292,37 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
     options?: AssertionOptions
   ): TestControllerPromise<void> {
     const cause = new Error();
-    DEBUG &&
-      DEBUG_ASSERTIONS_ENTER_LOG_MESSAGES &&
-      console.log(
-        `${new Date().getTime()} PromiseAssertions: entering contains needle='${needle}' this.actual='${
-          this.actual
-        }'`
-      );
+    enterLogger.debug(
+      `${new Date().getTime()} PromiseAssertions: entering contains needle='${needle}' this.actual='${
+        this.actual
+      }'`
+    );
     return Object.assign(
       this.currentPromise
         .then(() => {
-          DEBUG &&
-            console.log(
-              `${new Date().getTime()} PromiseAssertions: resolving contains then needle='${needle}' this.actual='${
+          logger.debug(
+            `${new Date().getTime()} PromiseAssertions: resolving contains then needle='${needle}' this.actual='${
+              this.actual
+            }'`
+          );
+          if (this.actual instanceof ReExecutablePromise) {
+            logger.debug(
+              `${new Date().getTime()} PromiseAssertions: re-executing!='${needle}' this.actual='${
                 this.actual
               }'`
             );
-          if (this.actual instanceof ReExecutablePromise) {
-            DEBUG &&
-              console.log(
-                `${new Date().getTime()} PromiseAssertions: re-executing!='${needle}' this.actual='${
-                  this.actual
-                }'`
-              );
             return this.actual._reExecute();
           } else {
             return this.actual;
           }
         })
         .then((actualValue: A) => {
-          DEBUG &&
-            console.log(
-              `${new Date().getTime()} PromiseAssertions: resolving contains then needle='${needle}' actualValue='${actualValue}'`
-            );
+          logger.debug(
+            `${new Date().getTime()} PromiseAssertions: resolving contains then needle='${needle}' actualValue='${actualValue}'`
+          );
           if (
-            typeof actualValue === "string" &&
-            actualValue.indexOf(needle + "") !== -1
+            typeof actualValue === 'string' &&
+            actualValue.indexOf(needle + '') !== -1
           ) {
             return Promise.resolve();
           } else if (
@@ -347,8 +331,8 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
           ) {
             return Promise.resolve();
           } else if (
-            typeof actualValue === "object" &&
-            typeof needle === "object" &&
+            typeof actualValue === 'object' &&
+            typeof needle === 'object' &&
             _.isMatch(actualValue, needle)
           ) {
             return Promise.resolve();
@@ -365,42 +349,37 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
     options?: AssertionOptions
   ): TestControllerPromise<void> {
     const cause = new Error();
-    DEBUG &&
-      DEBUG_ASSERTIONS_ENTER_LOG_MESSAGES &&
-      console.log(
-        `${new Date().getTime()} PromiseAssertions: entering notContains needle='${needle}' this.actual='${
-          this.actual
-        }'`
-      );
+    enterLogger.debug(
+      `${new Date().getTime()} PromiseAssertions: entering notContains needle='${needle}' this.actual='${
+        this.actual
+      }'`
+    );
     return Object.assign(
       this.currentPromise
         .then(() => {
-          DEBUG &&
-            console.log(
-              `${new Date().getTime()} PromiseAssertions: resolving notContains then needle='${needle}' this.actual='${
+          logger.debug(
+            `${new Date().getTime()} PromiseAssertions: resolving notContains then needle='${needle}' this.actual='${
+              this.actual
+            }'`
+          );
+          if (this.actual instanceof ReExecutablePromise) {
+            logger.debug(
+              `${new Date().getTime()} PromiseAssertions: re-executing!='${needle}' this.actual='${
                 this.actual
               }'`
             );
-          if (this.actual instanceof ReExecutablePromise) {
-            DEBUG &&
-              console.log(
-                `${new Date().getTime()} PromiseAssertions: re-executing!='${needle}' this.actual='${
-                  this.actual
-                }'`
-              );
             return this.actual._reExecute();
           } else {
             return this.actual;
           }
         })
         .then((actualValue: A) => {
-          DEBUG &&
-            console.log(
-              `${new Date().getTime()} PromiseAssertions: resolving notContains then needle='${needle}' actualValue='${actualValue}'`
-            );
+          logger.debug(
+            `${new Date().getTime()} PromiseAssertions: resolving notContains then needle='${needle}' actualValue='${actualValue}'`
+          );
           if (
-            typeof actualValue === "string" &&
-            actualValue.indexOf(needle + "") === -1
+            typeof actualValue === 'string' &&
+            actualValue.indexOf(needle + '') === -1
           ) {
             return Promise.resolve();
           } else if (
@@ -409,8 +388,8 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
           ) {
             return Promise.resolve();
           } else if (
-            typeof actualValue === "object" &&
-            typeof needle === "object" &&
+            typeof actualValue === 'object' &&
+            typeof needle === 'object' &&
             !_.isMatch(actualValue, needle)
           ) {
             return Promise.resolve();
@@ -425,39 +404,34 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
 
   eql(expected: A, options?: AssertionOptions): TestControllerPromise<void> {
     const cause = new Error();
-    DEBUG &&
-      DEBUG_ASSERTIONS_ENTER_LOG_MESSAGES &&
-      console.log(
-        `${new Date().getTime()} PromiseAssertions: entering eql expected='${expected}' this.actual='${
-          this.actual
-        }'`
-      );
+    enterLogger.debug(
+      `${new Date().getTime()} PromiseAssertions: entering eql expected='${expected}' this.actual='${
+        this.actual
+      }'`
+    );
     return Object.assign(
       this.currentPromise
         .then(() => {
-          DEBUG &&
-            console.log(
-              `${new Date().getTime()} PromiseAssertions: resolving eql then expected='${expected}' this.actual='${
+          logger.debug(
+            `${new Date().getTime()} PromiseAssertions: resolving eql then expected='${expected}' this.actual='${
+              this.actual
+            }'`
+          );
+          if (this.actual instanceof ReExecutablePromise) {
+            logger.debug(
+              `${new Date().getTime()} PromiseAssertions: re-executing!='${expected}' this.actual='${
                 this.actual
               }'`
             );
-          if (this.actual instanceof ReExecutablePromise) {
-            DEBUG &&
-              console.log(
-                `${new Date().getTime()} PromiseAssertions: re-executing!='${expected}' this.actual='${
-                  this.actual
-                }'`
-              );
             return this.actual._reExecute();
           } else {
             return this.actual;
           }
         })
         .then((actualValue: A) => {
-          DEBUG &&
-            console.log(
-              `${new Date().getTime()} PromiseAssertions: resolving eql then expected='${expected}' actualValue='${actualValue}'`
-            );
+          logger.debug(
+            `${new Date().getTime()} PromiseAssertions: resolving eql then expected='${expected}' actualValue='${actualValue}'`
+          );
           if (actualValue !== expected) {
             cause.message = `\n  Expected:\n${expected}\n  Actual:\n${actualValue}`;
             return Promise.reject(cause);
@@ -470,22 +444,19 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
   }
   ok(options?: AssertionOptions): TestControllerPromise<void> {
     const cause = new Error();
-    DEBUG &&
-      DEBUG_ASSERTIONS_ENTER_LOG_MESSAGES &&
-      console.log(
-        `${new Date().getTime()} PromiseAssertions: entering ok this.actual=${
-          this.actual
-        }`
-      );
+    enterLogger.debug(
+      `${new Date().getTime()} PromiseAssertions: entering ok this.actual=${
+        this.actual
+      }`
+    );
     return Object.assign(
       this.currentPromise
         .then(() => {
-          DEBUG &&
-            console.log(
-              `${new Date().getTime()} PromiseAssertions: resolving ok then this.actual=${
-                this.actual
-              }`
-            );
+          logger.debug(
+            `${new Date().getTime()} PromiseAssertions: resolving ok then this.actual=${
+              this.actual
+            }`
+          );
           if (this.actual instanceof ReExecutablePromise) {
             return this.actual._reExecute();
           } else {
@@ -493,10 +464,9 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
           }
         })
         .then((actualValue: A) => {
-          DEBUG &&
-            console.log(
-              `${new Date().getTime()} PromiseAssertions: resolving ok then actualValue=${actualValue}`
-            );
+          logger.debug(
+            `${new Date().getTime()} PromiseAssertions: resolving ok then actualValue=${actualValue}`
+          );
           if (!actualValue) {
             cause.message = `\n  Expected:\nTruthy\n  Actual:\n${actualValue}`;
             return Promise.reject(cause);
@@ -509,29 +479,25 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
   }
   notOk(options?: AssertionOptions): TestControllerPromise<void> {
     const cause = new Error();
-    DEBUG &&
-      DEBUG_ASSERTIONS_ENTER_LOG_MESSAGES &&
-      console.log(
-        `${new Date().getTime()} PromiseAssertions: entering notOk this.actual=${
-          this.actual
-        }`
-      );
+    enterLogger.debug(
+      `${new Date().getTime()} PromiseAssertions: entering notOk this.actual=${
+        this.actual
+      }`
+    );
     return Object.assign(
       this.currentPromise
         .then(() => {
-          DEBUG &&
-            console.log(
-              `${new Date().getTime()} PromiseAssertions: resolving notOk then this.actual=${
-                this.actual
-              }`
-            );
+          logger.debug(
+            `${new Date().getTime()} PromiseAssertions: resolving notOk then this.actual=${
+              this.actual
+            }`
+          );
           return this.actual;
         })
         .then((actualValue: A) => {
-          DEBUG &&
-            console.log(
-              `${new Date().getTime()} PromiseAssertions: resolving notOk then actualValue=${actualValue}`
-            );
+          logger.debug(
+            `${new Date().getTime()} PromiseAssertions: resolving notOk then actualValue=${actualValue}`
+          );
           if (actualValue) {
             cause.message = `\n  Expected:\nFalsy\n  Actual:\n${actualValue}`;
             return Promise.reject(cause);

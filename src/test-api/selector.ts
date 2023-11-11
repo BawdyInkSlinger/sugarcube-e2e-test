@@ -1,9 +1,8 @@
-import {
-  DEBUG,
-  DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES,
-} from '../constants';
+import { getLogger } from '../logger';
 import { NodeSnapshot } from './internal/node-snapshot';
 import ReExecutablePromise from './internal/re-executable-promise';
+
+const enterLogger = getLogger('DEBUG_SELECTOR_ENTER_LOG_MESSAGES');
 
 interface SelectorFactory {
   (
@@ -139,18 +138,14 @@ export const Selector: SelectorFactory = (
   // | SelectorPromise,
   // options?: SelectorOptions
 ): Selector => {
-  DEBUG &&
-    DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES &&
-    console.log(`${new Date().getTime()} selector: entering init='${init}'`);
+  enterLogger.debug(`${new Date().getTime()} selector: entering init='${init}'`);
   const selectorImpl: Selector & { toString: () => string } = {
     selectorString: init,
     innerText: ReExecutablePromise.fromFn(() => {
       return $(init).text().trim();
     }),
     withText: function (text: string): Selector {
-      DEBUG &&
-        DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES &&
-        console.log(
+      enterLogger.debug(
           `${new Date().getTime()} selector: entering withText init='${init}' text='${text}'`
         );
       // return Selector(`${init}:contains('${$.escapeSelector(text)}')`);

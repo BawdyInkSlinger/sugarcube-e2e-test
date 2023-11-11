@@ -1,11 +1,16 @@
-import { AssertionApi, PromiseAssertions, StringAssertions } from './internal/assertion';
-import { Selector } from './selector';
 import {
-  DEBUG,
-  DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES,
-  DEBUG_THIS_AS_PROMISE,
-} from '../constants';
+  AssertionApi,
+  PromiseAssertions,
+  StringAssertions,
+} from './internal/assertion';
+import { Selector } from './selector';
 import { getPassageLoadedHandler } from './passage-loaded-handler';
+import { getLogger } from '../logger';
+
+// added by BIS:
+const logger = getLogger('DEFAULT');
+const enterLogger = getLogger('DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES');
+const thisAsPromiseLogger = getLogger('DEBUG_THIS_AS_PROMISE');
 
 export interface TestController {
   // ctx: { [key: string]: any };
@@ -315,15 +320,15 @@ export const testController: TestController = {
     this: Promise<void> | TestController,
     passageTitle: string
   ): TestControllerPromise {
-    DEBUG &&
-      DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES &&
-      console.log(
-        `${new Date().getTime()} testController: entering goto '${passageTitle}'`
-      );
+    enterLogger.debug(
+      `${new Date().getTime()} testController: entering goto '${passageTitle}'`
+    );
 
     return Object.assign(
       thisAsPromise(this).then(() => {
-        const pageLoadPromise = getPassageLoadedHandler()(`goto '${passageTitle}'`);
+        const pageLoadPromise = getPassageLoadedHandler()(
+          `goto '${passageTitle}'`
+        );
         globalThis.Engine.play(passageTitle);
 
         return pageLoadPromise;
@@ -336,20 +341,18 @@ export const testController: TestController = {
     this: Promise<void> | TestController,
     selector: Selector
   ): TestControllerPromise {
-    DEBUG &&
-      DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES &&
-      console.log(
-        `${new Date().getTime()} testController: entering click selector='${selector}'`
-      );
+    enterLogger.debug(
+      `${new Date().getTime()} testController: entering click selector='${selector}'`
+    );
     const asyncClick = thisAsPromise(this).then<void>(() => {
-      DEBUG &&
-        DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES &&
-        console.log(
-          `${new Date().getTime()} testController: entering asyncClick selector='${selector}'`
-        );
+      enterLogger.debug(
+        `${new Date().getTime()} testController: entering asyncClick selector='${selector}'`
+      );
 
-      const pageLoadPromise = getPassageLoadedHandler()(`click ${selector?.toString()}`);
-      DEBUG && console.log(`$(${selector.selectorString}).trigger('click');`);
+      const pageLoadPromise = getPassageLoadedHandler()(
+        `click ${selector?.toString()}`
+      );
+      logger.debug(`$(${selector.selectorString}).trigger('click');`);
       $(selector.selectorString).trigger('click');
       return pageLoadPromise;
     });
@@ -360,12 +363,10 @@ export const testController: TestController = {
     this: Promise<void> | TestController,
     actual: A | Promise<A>
   ): AssertionApi<A> {
-    DEBUG &&
-      DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES &&
-      console.log(
-        `${new Date().getTime()} testController: entering expect actual=`,
-        actual
-      );
+    enterLogger.debug(
+      `${new Date().getTime()} testController: entering expect actual=`,
+      actual
+    );
     let assertionApi: AssertionApi<unknown>;
     if (actual instanceof Promise) {
       assertionApi = new PromiseAssertions(thisAsPromise(this), actual);
@@ -384,21 +385,19 @@ export const testController: TestController = {
 
 const thisAsPromise = (self: Promise<void> | TestController) => {
   if (self instanceof Promise) {
-    DEBUG && DEBUG_THIS_AS_PROMISE && console.log(`${new Date().getTime()} thisPromise: Promise`);
+    thisAsPromiseLogger.debug(`${new Date().getTime()} thisPromise: Promise`);
     return self;
   } else {
-    DEBUG && DEBUG_THIS_AS_PROMISE && console.log(`${new Date().getTime()} thisPromise: this`);
+    thisAsPromiseLogger.debug(`${new Date().getTime()} thisPromise: this`);
     return Promise.resolve();
   }
 };
 
 const wait = (millis: number): Promise<void> =>
   new Promise<void>((resolve) => {
-    DEBUG &&
-      DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES &&
-      console.log(
-        `${new Date().getTime()} testController: entering waiting ${millis} seconds`
-      );
+    enterLogger.debug(
+      `${new Date().getTime()} testController: entering waiting ${millis} seconds`
+    );
     setTimeout(resolve, millis);
   });
 

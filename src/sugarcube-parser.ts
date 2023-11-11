@@ -10,15 +10,18 @@ import { setGlobal } from "./internal/set-global";
 import { SugarCubeStoryVariables } from "./internal/declarations/unofficial/userdata";
 import { SugarCubeTemporaryVariables } from "./internal/declarations/twine-sugarcube-copy/userdata";
 import { TestController, testController } from "./test-api/test-controller";
-import { DEBUG, DEBUG_PASSAGES } from "./constants";
 import { waitForPassageEnd } from "./test-api/wait-for-passage-end";
 import { setPassageLoadedHandler } from "./test-api/passage-loaded-handler";
+import { getLogger } from "./logger";
 
 declare global {
   interface Document {
     toPrettyString: () => Promise<string>;
   }
 }
+
+const logger = getLogger('DEFAULT');
+const passagesLogger = getLogger('DEBUG_PASSAGES');
 
 export class SugarcubeParser {
   passages: SimplePassage[];
@@ -132,9 +135,8 @@ export class SugarcubeParser {
     });
     const moduleContents = await Promise.all(
       moduleFiles.map(async (path) => {
-        if (DEBUG && DEBUG_PASSAGES) {
-          console.log(`Found moduleFile: ${path}`);
-        }
+        passagesLogger.debug(`Found moduleFile: ${path}`);
+        
         return (await fs.readFile(path)).toString();
       })
     );
@@ -145,9 +147,8 @@ export class SugarcubeParser {
     );
     const javascriptContents = await Promise.all(
       jsFiles.map(async (path) => {
-        if (DEBUG && DEBUG_PASSAGES) {
-          console.log(`Found jsFile: ${path}`);
-        }
+        passagesLogger.debug(`Found jsFile: ${path}`);
+        
         return (await fs.readFile(path)).toString();
       })
     );
@@ -222,7 +223,7 @@ export class SugarcubeParser {
       Object.assign(globalThis.State.temporary, temporary);
     }
     const currentTitle = globalThis.State.current?.title;
-    DEBUG && console.log(`assignStateAndReload: currentTitle=`, currentTitle);
+    logger.debug(`assignStateAndReload: currentTitle=`, currentTitle);
     if (currentTitle) {
       await testController.goto(currentTitle);
     }

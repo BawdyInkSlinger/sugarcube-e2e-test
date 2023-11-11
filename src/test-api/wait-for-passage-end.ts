@@ -1,20 +1,17 @@
-import {
-  DEBUG,
-  DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES,
-} from '../constants';
+import { getLogger } from '../logger';
+
+const logger = getLogger('DEFAULT');
+const enterLogger = getLogger('DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES');
 
 export function waitForPassageEnd(debugNote = '') {
-  DEBUG &&
-    DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES &&
-    console.log(
-      `${new Date().getTime()} waitForPassageEnd: entering waitForPageLoad debugNote=${debugNote}`
-    );
+  enterLogger.debug(
+    `${new Date().getTime()} waitForPassageEnd: entering waitForPageLoad debugNote=${debugNote}`
+  );
   return new Promise<void>((resolve) => {
     $(document).one(':passageend', function () {
-      DEBUG &&
-        console.log(
-          `${new Date().getTime()} waitForPassageEnd: resolving waitForPassageEnd debugNote=${debugNote}`
-        );
+      logger.debug(
+        `${new Date().getTime()} waitForPassageEnd: resolving waitForPassageEnd debugNote=${debugNote}`
+      );
       resolve();
     });
   });

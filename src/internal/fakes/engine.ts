@@ -3,7 +3,6 @@ import jQuery, { now } from 'jquery';
 import { Alert } from '../alert';
 import { Config } from '../config';
 import { DebugView } from '../debugview';
-import { DEBUG } from '../../constants';
 import { Save } from './save';
 import { Story } from './story';
 import { getErrorMessage } from '../geterrormessage';
@@ -16,6 +15,7 @@ import { setDisplayTitle } from '../setdisplaytitle';
 import { TempStateContainer } from './tempstate';
 import { triggerTimeout } from '../../trigger-timeout';
 import { Util } from '../util';
+import { getLogger } from '../../logger';
 
 /* eslint-disable no-var */
 // copied from sugarcube.js
@@ -25,7 +25,10 @@ export var prerender = {};
 export var postrender = {};
 export var postdisplay = {};
 
-export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var  
+export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var
+    // added by BIS:
+    const logger = getLogger('DEFAULT');
+
 	// Engine state types object.
 	const States = Util.toEnum({
 		Init      : 'init',
@@ -58,11 +61,11 @@ export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var
 		Initialize the core story elements and perform some bookkeeping.
 	*/
 	function engineInit() {
-		if (DEBUG) { console.log(`[Engine/engineInit()] (_state: ${_state})`); }
+		logger.debug(`[Engine/engineInit()] (_state: ${_state})`); 
     
 
 		if (_state !== States.Init) {
-      console.warn(`[Engine/engineInit()] (_state !== States.Init: ${_state})`);
+      logger.warn(`[Engine/engineInit()] (_state !== States.Init: ${_state})`);
 			return;
 		}
 
@@ -78,7 +81,7 @@ export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var
 			const $elems = jQuery(document.createDocumentFragment());
 			const markup = Story.has('StoryInterface') && Story.get('StoryInterface').text.trim();
 
-  		if (DEBUG) { console.log(`[Engine/engineInit()] (StoryInterface markup: ${markup})`); }
+  		logger.debug(`[Engine/engineInit()] (StoryInterface markup: ${markup})`); 
 
 			if (markup) {
 				// Remove the UI bar, its styles, and events.
@@ -138,7 +141,7 @@ export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var
 
 				// Data passage elements updated upon navigation.
 				$dataPassages.each((i, el) => {
-          if (DEBUG) { console.log(`[Engine/engineInit()] ($dataPassages.each((${i}, '${el}'))`); }
+          logger.debug(`[Engine/engineInit()] ($dataPassages.each((${i}, '${el}'))`); 
           
 					if (el.id === 'passages') {
 						throw new Error(`"StoryInterface" element <${el.nodeName.toLowerCase()} id="passages"> must not contain a "data-passage" content attribute`);
@@ -151,7 +154,7 @@ export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var
 					}
           
           const storyHasPassage = Story.has(passage);
-          if (DEBUG) { console.log(`[Engine/engineInit()] (Story.has(\`${passage}\`) === ${storyHasPassage})`); }
+          logger.debug(`[Engine/engineInit()] (Story.has(\`${passage}\`) === ${storyHasPassage})`); 
 
 					if (storyHasPassage) {
 						updating.push({
@@ -180,10 +183,10 @@ export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var
 		Run user scripts (user stylesheet, JavaScript, and widgets).
 	*/
 	function engineRunUserScripts() {
-		if (DEBUG) { console.log(`[Engine/engineRunUserScripts()] (_state=${_state}`); }
+		logger.debug(`[Engine/engineRunUserScripts()] (_state=${_state}`); 
 
 		if (_state !== States.Init) {
-      console.warn(`[Engine/engineRunUserScripts()] (_state !== States.Init: ${_state})`);
+      logger.warn(`[Engine/engineRunUserScripts()] (_state !== States.Init: ${_state})`);
 			return;
 		}
 
@@ -208,7 +211,7 @@ export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var
 		// 		Scripting.evalJavaScript(script.text);
 		// 	}
 		// 	catch (ex: any) {
-		// 		console.error(ex);
+		// 		logger.error(ex);
 		// 		Alert.error(script.name, getErrorMessage(ex));
 		// 	}
 		// });
@@ -219,7 +222,7 @@ export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var
 		// 		Wikifier.wikifyEval(widget.processText());
 		// 	}
 		// 	catch (ex: any) {
-		// 		console.error(ex);
+		// 		logger.error(ex);
 		// 		Alert.error(widget.name, getErrorMessage(ex));
 		// 	}
 		// });
@@ -229,10 +232,10 @@ export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var
 		Run the user init passages.
 	*/
 	function engineRunUserInit() {
-		if (DEBUG) { console.log(`[Engine/engineRunUserInit()] ($_state=${_state})`); }
+		logger.debug(`[Engine/engineRunUserInit()] ($_state=${_state})`); 
 
 		if (_state !== States.Init) {
-      console.warn(`[Engine/engineRunUserInit()] (_state !== States.Init: ${_state})`);
+      logger.warn(`[Engine/engineRunUserInit()] (_state !== States.Init: ${_state})`);
 			return;
 		}
 
@@ -256,7 +259,7 @@ export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var
 		// 		}
 		// 	}
 		// 	catch (ex: any) {
-		// 		console.error(ex);
+		// 		logger.error(ex);
 		// 		Alert.error(`${passage.name} [init-tagged]`, getErrorMessage(ex));
 		// 	}
 		// });
@@ -281,7 +284,7 @@ export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var
 		// 		}
 		// 	}
 		// 	catch (ex: any) {
-		// 		console.error(ex);
+		// 		logger.error(ex);
 		// 		Alert.error('StoryInit', getErrorMessage(ex));
 		// 	}
 		// }
@@ -291,10 +294,10 @@ export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var
 		Starts the story.
 	*/
 	function engineStart(): void {
-		if (DEBUG) { console.log(`[Engine/engineStart()] (_state=${_state})`); }
+		logger.debug(`[Engine/engineStart()] (_state=${_state})`); 
 
 		if (_state !== States.Init) {
-      console.warn(`[Engine/engineStart()] (_state !== States.Init: ${_state})`);
+      logger.warn(`[Engine/engineStart()] (_state !== States.Init: ${_state})`);
 			return;
 		}
 
@@ -342,12 +345,12 @@ export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var
 				// 	reject(); // eslint-disable-line prefer-promise-reject-errors
 				// })
 				// 	.then(() => {
-				// 		if (DEBUG) { console.log('\tattempting autoload of browser continue'); }
+				// 		logger.debug('\tattempting autoload of browser continue'); 
 
 				// 		return Save.browser.continue();
 				// 	})
 				// 	.catch(() => {
-				// 		if (DEBUG) { console.log(`\tstarting passage: "${Config.passages.start}"`); }
+				// 		logger.debug(`\tstarting passage: "${Config.passages.start}"`); 
 
 						// enginePlay(Config.passages.start);
 		// 			});
@@ -359,7 +362,7 @@ export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var
 		Restarts the story.
 	*/
 	function engineRestart() {
-		if (DEBUG) { console.log('[Engine/engineRestart()]'); }
+		logger.debug('[Engine/engineRestart()]'); 
 
 		/*
 			Show the loading screen to hide any unsightly rendering shenanigans during the
@@ -385,7 +388,7 @@ export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var
 		/*
 			Trigger an ':enginerestart' event.
 		*/
-    DEBUG && console.log(`[Engine/engineRestart()] :passageinit Trigger an ':enginerestart' event.`);
+    logger.debug(`[Engine/engineRestart()] :passageinit Trigger an ':enginerestart' event.`);
 		jQuery.event.trigger(':enginerestart');
 
 		/*
@@ -486,12 +489,11 @@ export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var
 		adding a new moment to the history.
 	*/
 	function enginePlay(title: string, noHistory?: boolean) {
-    if (DEBUG) { 
-      console.log(`[Engine/enginePlay(title: "${title}", noHistory: ${noHistory}, _state: ${_state})] Enter`);
-    }
+    logger.debug(`[Engine/enginePlay(title: "${title}", noHistory: ${noHistory}, _state: ${_state})] Enter`);
+    
 
 		if (_state === States.Init) {
-            console.warn(`[Engine/enginePlay(title: "${title}", noHistory: ${noHistory}, _state: ${_state})] (_state === States.Init: ${_state})`);
+            logger.warn(`[Engine/enginePlay(title: "${title}", noHistory: ${noHistory}, _state: ${_state})] (_state === States.Init: ${_state})`);
 			return false;
 		}
 
@@ -526,7 +528,7 @@ export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var
 		// always refer to `passage.name` and never to the others.
 		const passage = Story.get(passageTitle);
 
-    DEBUG && console.log(`[Engine/enginePlay(title: "${title}", noHistory: ${noHistory}, _state: ${_state})] :passageinit Execute the pre-history events and tasks.`)
+    logger.debug(`[Engine/enginePlay(title: "${title}", noHistory: ${noHistory}, _state: ${_state})] :passageinit Execute the pre-history events and tasks.`)
 		jQuery.event.trigger({
 			type : ':passageinit',
 			passage
@@ -566,7 +568,7 @@ export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var
 				passageReadyOutput = Wikifier.wikifyEval(Story.get('PassageReady').text);
 			}
 			catch (ex: any) {
-				console.error(ex);
+				logger.error(ex);
 				Alert.error('PassageReady', ex.message);
 			}
 		}
@@ -596,7 +598,7 @@ export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var
 		jQuery(document.documentElement)
 			.attr('data-tags', dataTags);
 
-    DEBUG && console.log(`[Engine/enginePlay(title: "${title}", noHistory: ${noHistory}, _state: ${_state})] :passagestart Execute pre-render events and tasks.`);
+    logger.debug(`[Engine/enginePlay(title: "${title}", noHistory: ${noHistory}, _state: ${_state})] :passagestart Execute pre-render events and tasks.`);
 		jQuery.event.trigger({
 			type    : ':passagestart',
 			content : passageEl,
@@ -621,7 +623,7 @@ export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var
 			new Wikifier(passageEl, Story.get('PassageFooter').processText());
 		}
 
-    DEBUG && console.log(`[Engine/enginePlay(title: "${title}", noHistory: ${noHistory}, _state: ${_state})] :passagerender Execute post-render events and tasks.`);
+    logger.debug(`[Engine/enginePlay(title: "${title}", noHistory: ${noHistory}, _state: ${_state})] :passagerender Execute post-render events and tasks.`);
 		jQuery.event.trigger({
 			type    : ':passagerender',
 			content : passageEl,
@@ -713,12 +715,12 @@ export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var
 				passageDoneOutput = Wikifier.wikifyEval(Story.get('PassageDone').text);
 			}
 			catch (ex: any) {
-				console.error(ex);
+				logger.error(ex);
 				Alert.error('PassageDone', ex.message);
 			}
 		}
 
-    DEBUG && console.log(`[Engine/enginePlay(title: "${title}", noHistory: ${noHistory}, _state: ${_state})] :passagedisplay`);
+    logger.debug(`[Engine/enginePlay(title: "${title}", noHistory: ${noHistory}, _state: ${_state})] :passagedisplay`);
 		jQuery.event.trigger({
 			type    : ':passagedisplay',
 			content : passageEl,
@@ -798,7 +800,7 @@ export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var
 		// 	Save.browser.auto.save();
 		// }
 
-    DEBUG && console.log(`[Engine/enginePlay(title: "${title}", noHistory: ${noHistory}, _state: ${_state})] :passageend Execute post-play events.`);
+    logger.debug(`[Engine/enginePlay(title: "${title}", noHistory: ${noHistory}, _state: ${_state})] :passageend Execute post-play events.`);
 		jQuery.event.trigger({
 			type    : ':passageend',
 			content : passageEl,
@@ -823,7 +825,7 @@ export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var
 		[DEPRECATED] Play the given passage, optionally without altering the history.
 	*/
 	function engineDisplay(title, link, option) {
-		if (DEBUG) { console.log('[Engine/engineDisplay()]'); }
+		logger.debug('[Engine/engineDisplay()]'); 
 
 		let noHistory = false;
 

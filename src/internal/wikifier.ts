@@ -24,12 +24,12 @@ import { isExternalLink as isExternalLinkImport } from './isexternallink';
 import { convertBreaks } from './convertbreaks';
 import { errorPrologRegExp } from './alert';
 import { cssPropToDOMProp } from './cssproptodomprop';
-import { DEBUG } from '../constants';
 import { Story } from './fakes/story';
 import { TempStateContainer } from './fakes/tempstate';
 import { Node } from './fakes/node';
+import { getLogger } from '../logger';
 
-
+const logger = getLogger('DEFAULT');
 /*
 	TODO: The Wikifier, and associated code, could stand to receive a serious refactoring.
 */
@@ -556,9 +556,7 @@ Object.defineProperty(Wikifier, 'Parser', {
     }
 
     function profilesCompile() {
-      if (DEBUG) {
-        console.log('[Wikifier.Parser/profilesCompile()]');
-      }
+      logger.debug('[Wikifier.Parser/profilesCompile()]');
 
       const all = _parsers;
       const core = all.filter(
@@ -1334,5 +1332,5 @@ Object.defineProperties(Wikifier.helpers, {
 
 export { Wikifier };
 
-// WARNING: this import has side effects
+// WARNING: this import is here for side effects
 import './parserlib'

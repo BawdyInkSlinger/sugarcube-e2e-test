@@ -1,4 +1,6 @@
-import { DEBUG } from '../../constants';
+import { getLogger } from "../../logger";
+
+const logger = getLogger('DEFAULT');
 
 export type StoreValue = object;
 
@@ -12,7 +14,7 @@ export type Adapter = {
 
 export const InMemoryStorageAdapter: Adapter = {
   init: function (storageId: string, persistent: boolean): boolean {
-    DEBUG && console.log('InMemoryStorageAdapter: Function not implemented.');
+    logger.info('InMemoryStorageAdapter: Function not implemented.');
     return true;
   },
 
@@ -21,15 +23,15 @@ export const InMemoryStorageAdapter: Adapter = {
   },
   
   delete: function (value: string): boolean {
-    DEBUG && console.log('InMemoryStorageAdapter: Function not implemented.');
+    logger.info('InMemoryStorageAdapter: Function not implemented.');
     return true;
   },
   set: function (key: string, value: object): boolean {
-    DEBUG && console.log('InMemoryStorageAdapter: Function not implemented.');
+    logger.info('InMemoryStorageAdapter: Function not implemented.');
     return true;
   },
   get: function (key: string): object {
-    DEBUG && console.log('InMemoryStorageAdapter: Function not implemented.');
+    logger.info('InMemoryStorageAdapter: Function not implemented.');
     return null;
   }
 }

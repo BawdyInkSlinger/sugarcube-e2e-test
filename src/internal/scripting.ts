@@ -17,11 +17,12 @@ import { getTypeOf } from './gettypeof';
 import { Patterns } from './patterns';
 import { stringFrom } from './stringfrom';
 import { parseURL } from './parseurl';
-import { DEBUG, DEBUG_HAS_VISITED } from '../constants';
 import { Util } from './util';
 import { objectDefineProperties } from './utils/object-define-properties';
+import { getLogger } from '../logger';
 
 export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
+
 	/* eslint-disable no-unused-vars */
 
 	/*******************************************************************************************************************
@@ -278,6 +279,9 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 		aggregate of the set.
 	*/
 	function hasVisited(/* variadic */) {
+        // added by BIS:
+        const logger = getLogger("DEBUG_HAS_VISITED");
+
 		if (arguments.length === 0) {
 			throw new Error('hasVisited called with insufficient parameters');
 		}
@@ -288,11 +292,11 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 
 		const needles = Array.prototype.concat.apply([], arguments);
 		const played  = State.passages;
-        DEBUG && DEBUG_HAS_VISITED && console.log(`[Scripting/hasVisited()]: needles: '${needles}' played: '${played}'`);
+        logger.debug(`[Scripting/hasVisited()]: needles: '${needles}' played: '${played}'`);
         
 		for (let i = 0, iend = needles.length; i < iend; ++i) {
             if (!played.includes(needles[i])) {
-                DEBUG && DEBUG_HAS_VISITED && console.log(`[Scripting/hasVisited()]: returning false because !played.includes(needles[i]). needles[i]: ${needles[i]}`);
+                logger.debug(`[Scripting/hasVisited()]: returning false because !played.includes(needles[i]). needles[i]: ${needles[i]}`);
 				return false;
 			}
 		}
