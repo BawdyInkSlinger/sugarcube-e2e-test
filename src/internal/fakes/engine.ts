@@ -3,19 +3,16 @@ import jQuery, { now } from 'jquery';
 import { Alert } from '../alert';
 import { Config } from '../config';
 import { DebugView } from '../debugview';
-import { Save } from './save';
 import { Story } from './story';
-import { getErrorMessage } from '../geterrormessage';
 import { Has } from '../has';
-import { Scripting } from '../scripting';
 import { State } from '../state';
 import { Wikifier } from '../wikifier';
 import { objectCreateNull } from '../utils/object-create-null';
-import { setDisplayTitle } from '../setdisplaytitle';
 import { TempStateContainer } from './tempstate';
 import { triggerTimeout } from '../../trigger-timeout';
 import { Util } from '../util';
 import { getLogger } from '../../logger';
+import { setDisplayTitle } from '../helpers';
 
 /* eslint-disable no-var */
 // copied from sugarcube.js
@@ -663,7 +660,7 @@ export const Engine = (() => { // eslint-disable-line no-unused-vars, no-var
 							.addClass('passage-out');
 
 						if (typeof Config.passages.transitionOut === 'string') {
-							$outgoing.on(Has.transitionEndEvent, ev => {
+							$outgoing.on(Has.transitionEndEvent as any, ev => {
 								if ((ev as any).propertyName === Config.passages.transitionOut) {
 									$outgoing.remove();
 								}

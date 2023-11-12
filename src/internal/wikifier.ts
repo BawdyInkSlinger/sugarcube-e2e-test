@@ -15,7 +15,6 @@ import jQuery from 'jquery'
 import { objectCreateNull } from './utils/object-create-null';
 import { Lexer, EOF } from './lexer';
 import { Patterns } from './patterns';
-import { getTypeOf } from './gettypeof';
 import { Config } from './config';
 import { State } from './state';
 import { Engine } from './fakes/engine';
@@ -440,7 +439,7 @@ Object.defineProperty(Wikifier, 'Option', {
     function optionPush(options) {
       if (typeof options !== 'object' || options === null) {
         throw new TypeError(
-          `Wikifier.Option.push options parameter must be an object (received: ${getTypeOf(
+          `Wikifier.Option.push options parameter must be an object (received: ${Util.getType(
             options
           )})`
         );

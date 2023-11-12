@@ -14,8 +14,6 @@ import {
   SaveHandler,
 } from "./declarations/twine-sugarcube-copy/save";
 import { Save } from "./fakes/save";
-import { getTypeOf } from "./gettypeof";
-import { State } from "./state";
 import { Util } from "./util";
 
 export const Config = (() => {
