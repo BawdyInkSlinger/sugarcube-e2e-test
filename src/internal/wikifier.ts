@@ -21,13 +21,13 @@ import { State } from './state';
 import { Engine } from './fakes/engine';
 import { Scripting } from './scripting';
 import { isExternalLink as isExternalLinkImport } from './isexternallink';
-import { convertBreaks } from './convertbreaks';
 import { errorPrologRegExp } from './alert';
 import { cssPropToDOMProp } from './cssproptodomprop';
 import { Story } from './fakes/story';
 import { TempStateContainer } from './fakes/tempstate';
 import { Node } from './fakes/node';
 import { getLogger } from '../logger';
+import { convertBreaks } from './helpers';
 
 const logger = getLogger('DEFAULT');
 /*
@@ -1334,3 +1334,4 @@ export { Wikifier };
 
 // WARNING: this import is here for side effects
 import './parserlib'
+
