@@ -19,7 +19,7 @@ import { StorageContainer } from "../fakes/storage";
 import { Story } from "../fakes/story";
 import { TempStateContainer } from "../fakes/tempstate";
 import { Has } from "../has";
-import L10n from "../l10n";
+import {L10n} from "../l10n";
 import { NodeTyper } from "../nodetyper";
 import { Patterns } from "../patterns";
 import { Scripting } from "../scripting";

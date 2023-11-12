@@ -10,11 +10,11 @@
 
 import { Config } from '../config';
 import { SimplePassage } from '../declarations/unofficial/simple-passage';
-import L10n from '../l10n';
 import { State } from '../state';
 import { Wikifier } from '../wikifier';
 import { TWINE1 } from '../../constants';
 import { Util } from '../util';
+import { L10n } from '../l10n';
 
 export const PassageClass = (() => {
   // eslint-disable-line no-unused-vars, no-var

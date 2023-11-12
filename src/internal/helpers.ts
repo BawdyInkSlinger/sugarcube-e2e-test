@@ -10,7 +10,7 @@
 
 import { Config } from "./config";
 import { Story } from "./fakes/story";
-import L10n from "./l10n";
+import {L10n} from "./l10n";
 import { State } from "./state";
 import { Util } from "./util";
 import { objectDefineProperties } from "./utils/object-define-properties";

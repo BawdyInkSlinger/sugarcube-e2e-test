@@ -1,19 +1,17 @@
 import jQuery from 'jquery';
-import L10n from '../l10n';
 import { Macro } from '../macro/macro';
 import { Scripting } from '../scripting';
 import { Wikifier } from '../wikifier';
-import { Config } from '../config';
 import { SimpleStore } from '../simplestore';
 import { InMemoryStorageAdapter } from './in-memory-storage-adapter';
 import { Engine } from './engine';
 import { Passage, PassageClass } from './passage';
 import { SessionContainer } from './session';
 import { StorageContainer } from './storage';
-import { Alert } from '../alert';
 import { SimplePassage } from '../declarations/unofficial/simple-passage';
 import { sameValueZero } from '../samevaluezero';
 import { getLogger } from '../../logger';
+import { L10n } from '../l10n';
 
 let storyPassages: Passage[] = [];
 
