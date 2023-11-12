@@ -2,157 +2,166 @@
 
 	lib/nodetyper.js
 
-	Copyright © 2020–2022 Thomas Michael Edwards <thomasmedwards@gmail.com>. All rights reserved.
+	Copyright © 2020–2021 Thomas Michael Edwards <thomasmedwards@gmail.com>. All rights reserved.
 	Use of this source code is governed by a BSD 2-clause "Simplified" License, which may be found in the LICENSE file.
 
 ***********************************************************************************************************************/
-/* global charAndPosAt, getTypeOf */
+/* global Util */
 
-import { charAndPosAt } from './charandposat';
-import { getTypeOf } from './gettypeof';
+import { Util } from './util';
 
-export const NodeTyper = (() => { // eslint-disable-line no-unused-vars, no-var
-	/*******************************************************************************
+export const NodeTyper = (() => {
+  // eslint-disable-line no-unused-vars, no-var
+  'use strict';
+
+  /*******************************************************************************************************************
 		NodeTyper Class.
-	*******************************************************************************/
-
-	class NodeTyper {
+	*******************************************************************************************************************/
+  class NodeTyper {
     declare node: any;
     declare nodeValue: any;
     declare childNodes: any;
     declare classNames: any;
     declare finished: any;
     declare appendTo: any;
-    
-		constructor(config) {
-			if (typeof config !== 'object' || config === null) {
-				throw new Error(`config parameter must be an object (received: ${getTypeOf(config)})`);
-			}
-			if (!Object.hasOwn(config, 'targetNode') || !(config.targetNode instanceof Node)) {
-				throw new Error('config parameter object "targetNode" property must be a node');
-			}
 
-			Object.defineProperties(this, {
-				node : {
-					value : config.targetNode
-				},
+    constructor(config) {
+      if (typeof config !== 'object' || config === null) {
+        throw new Error(
+          `config parameter must be an object (received: ${Util.getType(
+            config
+          )})`
+        );
+      }
+      if (
+        !config.hasOwnProperty('targetNode') ||
+        !(config.targetNode instanceof Node)
+      ) {
+        throw new Error(
+          'config parameter object "targetNode" property must be a node'
+        );
+      }
 
-				childNodes : {
-					value : []
-				},
+      Object.defineProperties(this, {
+        node: {
+          value: config.targetNode,
+        },
 
-				nodeValue : {
-					writable : true,
-					value    : ''
-				},
+        childNodes: {
+          value: [],
+        },
 
-				appendTo : {
-					writable : true,
-					value    : config.parentNode || null
-				},
+        nodeValue: {
+          writable: true,
+          value: '',
+        },
 
-				classNames : {
-					writable : true,
-					value    : config.classNames || null
-				},
+        appendTo: {
+          writable: true,
+          value: config.parentNode || null,
+        },
 
-				finished : {
-					writable : true,
-					value    : false
-				}
-			});
+        classNames: {
+          writable: true,
+          value: config.classNames || null,
+        },
 
-			const node = this.node;
+        finished: {
+          writable: true,
+          value: false,
+        },
+      });
 
-			if (node.nodeValue) {
-				this.nodeValue = node.nodeValue;
-				node.nodeValue = '';
-			}
+      const node = this.node;
 
-			let childNode;
+      if (node.nodeValue) {
+        this.nodeValue = node.nodeValue;
+        node.nodeValue = '';
+      }
 
-			while ((childNode = node.firstChild) !== null) {
-				this.childNodes.push(new NodeTyper({
-					targetNode : childNode,
-					parentNode : node,
-					classNames : this.classNames
-				}));
+      let childNode;
 
-				node.removeChild(childNode);
-			}
-		}
+      while ((childNode = node.firstChild) !== null) {
+        this.childNodes.push(
+          new NodeTyper({
+            targetNode: childNode,
+            parentNode: node,
+            classNames: this.classNames,
+          })
+        );
 
-		finish() {
-			while (this.type(true)) /* no-op */;
-			return false;
-		}
+        node.removeChild(childNode);
+      }
+    }
 
-		type(flush?) {
-			if (this.finished) {
-				return false;
-			}
+    finish() {
+      while (this.type(true) /* no-op */);
+      return false;
+    }
 
-			if (this.appendTo) {
-				this.appendTo.appendChild(this.node);
-				this.appendTo = null;
+    type(flush?) {
+      if (this.finished) {
+        return false;
+      }
 
-				// Immediately finish typing this node if….
-				if (
-					// …it's neither a element or text node.
-					this.node.nodeType !== Node.ELEMENT_NODE && this.node.nodeType !== Node.TEXT_NODE
+      if (this.appendTo) {
+        this.appendTo.appendChild(this.node);
+        this.appendTo = null;
 
-					// …or the computed value of its parent node's `display` property is `'none'`.
-					|| jQuery(this.node.parentNode).css('display') === 'none'
-				) {
-					return this.finish();
-				}
+        // Immediately finish typing this node if….
+        if (
+          // …it's neither a element or text node.
+          (this.node.nodeType !== Node.ELEMENT_NODE &&
+            this.node.nodeType !== Node.TEXT_NODE) ||
+          // …or the computed value of its parent node's `display` property is `'none'`.
+          jQuery(this.node.parentNode).css('display') === 'none'
+        ) {
+          return this.finish();
+        }
 
-				if (this.node.parentNode && this.classNames) {
-					jQuery(this.node.parentNode).addClass(this.classNames);
-				}
-			}
+        if (this.node.parentNode && this.classNames) {
+          jQuery(this.node.parentNode).addClass(this.classNames);
+        }
+      }
 
-			if (this.nodeValue) {
-				if (flush) {
-					// Concatenate here in case we've already done some processing.
-					this.node.nodeValue += this.nodeValue;
-					this.nodeValue = '';
-				}
-				else {
-					// Use `charAndPosAt()` here to properly handle Unicode code points
-					// that are comprised of surrogate pairs.
-					const { char, start, end } = charAndPosAt(this.nodeValue, 0);
-					this.node.nodeValue += char;
-					this.nodeValue = this.nodeValue.slice(1 + end - start);
-				}
+      if (this.nodeValue) {
+        if (flush) {
+          // Concatenate here in case we've already done some processing.
+          this.node.nodeValue += this.nodeValue;
+          this.nodeValue = '';
+        } else {
+          // Use `Util.charAndPosAt()` here to properly handle Unicode code points
+          // that are comprised of surrogate pairs.
+          const { char, start, end } = Util.charAndPosAt(this.nodeValue, 0);
+          this.node.nodeValue += char;
+          this.nodeValue = this.nodeValue.slice(1 + end - start);
+        }
 
-				return true;
-			}
+        return true;
+      }
 
-			if (this.classNames) {
-				jQuery(this.node.parentNode).removeClass(this.classNames);
-				this.classNames = null;
-			}
+      if (this.classNames) {
+        jQuery(this.node.parentNode).removeClass(this.classNames);
+        this.classNames = null;
+      }
 
-			const childNodes = this.childNodes;
+      const childNodes = this.childNodes;
 
-			while (childNodes.length > 0) {
-				if (childNodes[0].type()) {
-					return true;
-				}
+      while (childNodes.length > 0) {
+        if (childNodes[0].type()) {
+          return true;
+        }
 
-				childNodes.shift();
-			}
+        childNodes.shift();
+      }
 
-			this.finished = true;
-			return false;
-		}
-	}
+      this.finished = true;
+      return false;
+    }
+  }
 
-
-	/*******************************************************************************
-		Object Exports.
-	*******************************************************************************/
-
-	return NodeTyper;
+  /*******************************************************************************************************************
+		Module Exports.
+	*******************************************************************************************************************/
+  return NodeTyper;
 })();
