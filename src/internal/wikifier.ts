@@ -19,7 +19,6 @@ import { Config } from './config';
 import { State } from './state';
 import { Engine } from './fakes/engine';
 import { Scripting } from './scripting';
-import { isExternalLink as isExternalLinkImport } from './isexternallink';
 import { errorPrologRegExp } from './alert';
 import { Story } from './fakes/story';
 import { TempStateContainer } from './fakes/tempstate';
@@ -57,7 +56,6 @@ class Wikifier {
   declare matchStart: number;
   declare matchLength: number;
   declare matchText: string;
-  declare static isExternalLink: (link: string) => boolean;
 
   declare static Parser: {
     parsers: any[];
@@ -402,6 +400,18 @@ class Wikifier {
     // For legacy-compatibility we must return the DOM node.
     return $link[0];
   }
+
+  		/*
+			Returns whether the given link source is external (probably).
+		*/
+		static isExternalLink(link) {
+			if (Story.has(link)) {
+				return false;
+			}
+
+			const urlRegExp = new RegExp(`^${Patterns.url}`, 'gim');
+			return urlRegExp.test(link) || /[/.?#]/.test(link);
+		}
 }
 
 /*******************************************************************************
@@ -655,7 +665,7 @@ Object.defineProperties(Wikifier, {
   /*
 			Legacy Aliases.
 		*/
-  isExternalLink: { value: isExternalLinkImport },
+  isExternalLink: { value: Wikifier.isExternalLink },
   getValue: { value: State.getVar }, // SEE: `state.js`.
   setValue: { value: State.setVar }, // SEE: `state.js`.
   parse: { value: Scripting.parse }, // SEE: `markup/scripting.js`.
