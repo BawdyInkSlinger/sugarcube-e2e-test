@@ -313,6 +313,7 @@ export interface TestController {
 
   // report(...args: any[]): TestControllerPromise;
   goto(passageTitle: string): TestControllerPromise;
+  consoleLog(...params: unknown[]): TestControllerPromise;
 }
 
 export const testController: TestController = {
@@ -380,6 +381,22 @@ export const testController: TestController = {
       }
     }
     return assertionApi as AssertionApi<A>;
+  },
+  consoleLog: function (
+    this: Promise<void> | TestController,
+    ...params: unknown[]
+  ): TestControllerPromise<void> {
+    enterLogger.debug(
+      `${new Date().getTime()} testController: entering consoleLog params=`,
+      params
+    );
+
+    return Object.assign(
+      thisAsPromise(this).then(() => {
+        console.log(...params);
+      }),
+      testController
+    );
   },
 };
 
