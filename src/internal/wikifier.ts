@@ -22,7 +22,6 @@ import { Engine } from './fakes/engine';
 import { Scripting } from './scripting';
 import { isExternalLink as isExternalLinkImport } from './isexternallink';
 import { errorPrologRegExp } from './alert';
-import { cssPropToDOMProp } from './cssproptodomprop';
 import { Story } from './fakes/story';
 import { TempStateContainer } from './fakes/tempstate';
 import { Node } from './fakes/node';
@@ -692,9 +691,9 @@ Object.defineProperties(Wikifier.helpers, {
 
           if (matched) {
             if (match![1]) {
-              css.styles[cssPropToDOMProp(match![1])] = match![2].trim();
+              css.styles[Util.fromCssProperty(match![1])] = match![2].trim();
             } else if (match![3]) {
-              css.styles[cssPropToDOMProp(match![3])] = match![4].trim();
+              css.styles[Util.fromCssProperty(match![3])] = match![4].trim();
             } else if (match![5]) {
               let subMatch;
 
@@ -1334,4 +1333,5 @@ export { Wikifier };
 
 // WARNING: this import is here for side effects
 import './parserlib'
+import { Util } from './util';
 
