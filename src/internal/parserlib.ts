@@ -15,7 +15,6 @@
 import { Config } from './config';
 import { Engine } from './fakes/engine';
 import { State } from './state';
-
 import { EOF, Lexer } from './lexer';
 import { Patterns } from './patterns';
 import { Wikifier } from './wikifier';
@@ -23,7 +22,6 @@ import { Scripting } from './scripting';
 import { stringFrom } from './stringfrom';
 import jQuery from 'jquery';
 import { DebugView } from './debugview';
-import { appendError } from './appenderror';
 import { MacroContext } from './macro/macrocontext';
 import { Macro } from './macro/macro';
 import { Template } from './template';
