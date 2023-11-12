@@ -1,31 +1,29 @@
 /***********************************************************************************************************************
 
-	storage/simplestore.js
+	lib/simplestore/simplestore.js
 
-	Copyright © 2013–2022 Thomas Michael Edwards <thomasmedwards@gmail.com>. All rights reserved.
+	Copyright © 2013–2021 Thomas Michael Edwards <thomasmedwards@gmail.com>. All rights reserved.
 	Use of this source code is governed by a BSD 2-clause "Simplified" License, which may be found in the LICENSE file.
 
 ***********************************************************************************************************************/
 
 import { Adapter } from './fakes/in-memory-storage-adapter';
-import { objectCreateNull } from './utils/object-create-null';
+import { objectDefineProperties } from './utils/object-define-properties';
 
-export const SimpleStore: {
-  adapters: Adapter[];
-  create: (storageId: string, persistent: boolean) => Adapter;
-} = (() => {
+export const SimpleStore = (() => {
   // eslint-disable-line no-unused-vars, no-var
+  'use strict';
+
   // In-order list of database adapters.
   const _adapters: Adapter[] = [];
 
   // The initialized adapter.
   let _initialized = null;
 
-  /*******************************************************************************
+  /*******************************************************************************************************************
 		SimpleStore Functions.
-	*******************************************************************************/
-
-  function storeCreate(storageId: string, persistent: boolean) {
+	*******************************************************************************************************************/
+    function storeCreate(storageId: string, persistent: boolean) {
     if (_initialized) {
       return _initialized.create(storageId, persistent);
     }
@@ -41,23 +39,25 @@ export const SimpleStore: {
     throw new Error('no valid storage adapters found');
   }
 
-  /*******************************************************************************
-		Object Exports.
-	*******************************************************************************/
-
-  return Object.preventExtensions(
-    objectCreateNull(null, {
-      /*
+  /*******************************************************************************************************************
+		Module Exports.
+	*******************************************************************************************************************/
+  return Object.freeze(
+    objectDefineProperties(
+      {},
+      {
+        /*
 			Adapters List.
 
 			TODO: This should probably have a getter, rather than being exported directly.
 		*/
-      adapters: { value: _adapters },
+        adapters: { value: _adapters },
 
-      /*
+        /*
 			Core Functions.
 		*/
-      create: { value: storeCreate },
-    })
+        create: { value: storeCreate },
+      }
+    )
   );
 })();
