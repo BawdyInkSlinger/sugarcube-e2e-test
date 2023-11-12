@@ -2,7 +2,7 @@
 
 	lib/debugview.js
 
-	Copyright © 2013–2022 Thomas Michael Edwards <thomasmedwards@gmail.com>. All rights reserved.
+	Copyright © 2013–2021 Thomas Michael Edwards <thomasmedwards@gmail.com>. All rights reserved.
 	Use of this source code is governed by a BSD 2-clause "Simplified" License, which may be found in the LICENSE file.
 
 ***********************************************************************************************************************/
@@ -13,10 +13,11 @@ import jQuery from 'jquery';
 */
 export const DebugView = (() => {
   // eslint-disable-line no-unused-vars, no-var
-  /*******************************************************************************
-		DebugView Class.
-	*******************************************************************************/
+  'use strict';
 
+  /*******************************************************************************************************************
+		DebugView Class.
+	*******************************************************************************************************************/
   class DebugView {
     declare parent: any;
     declare view: any;
@@ -129,16 +130,12 @@ export const DebugView = (() => {
 
     static enable() {
       jQuery(document.documentElement).attr('data-debug-view', 'enabled');
-      (jQuery.event as unknown as { trigger: (s: string) => void }).trigger(
-        ':debugviewupdate'
-      );
+      jQuery.event.trigger(':debugviewupdate');
     }
 
     static disable() {
       jQuery(document.documentElement).removeAttr('data-debug-view');
-      (jQuery.event as unknown as { trigger: (s: string) => void }).trigger(
-        ':debugviewupdate'
-      );
+      jQuery.event.trigger(':debugviewupdate');
     }
 
     static toggle() {
@@ -152,9 +149,8 @@ export const DebugView = (() => {
     }
   }
 
-  /*******************************************************************************
-		Object Exports.
-	*******************************************************************************/
-
+  /*******************************************************************************************************************
+		Module Exports.
+	*******************************************************************************************************************/
   return DebugView;
 })();
