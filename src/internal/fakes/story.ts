@@ -9,9 +9,9 @@ import { Passage, PassageClass } from './passage';
 import { SessionContainer } from './session';
 import { StorageContainer } from './storage';
 import { SimplePassage } from '../declarations/unofficial/simple-passage';
-import { sameValueZero } from '../samevaluezero';
 import { getLogger } from '../../logger';
 import { L10n } from '../l10n';
+import { Util } from '../util';
 
 let storyPassages: Passage[] = [];
 
@@ -59,12 +59,12 @@ export const Story = {
         // primitives or arrays.
         return (
           passage[key] instanceof Array &&
-          passage[key].some((m) => sameValueZero(m, value))
+          passage[key].some((m) => Util.sameValueZero(m, value))
         );
       }
 
       // All other types (incl. `null`).
-      return sameValueZero(passage[key], value);
+      return Util.sameValueZero(passage[key], value);
     }).sort((a, b) =>
       a[sortKey] == b[sortKey] ? 0 : a[sortKey] < b[sortKey] ? -1 : +1
     ); // lazy equality for null
