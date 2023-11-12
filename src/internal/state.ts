@@ -15,7 +15,6 @@ import { Config } from './config';
 import { TWINE1 } from '../constants';
 import { Engine } from './fakes/engine';
 import { Scripting } from './scripting';
-import { objectCreateNull } from './utils/object-create-null';
 import { SugarCubeStoryVariables } from './declarations/unofficial/userdata';
 import { SessionContainer } from './fakes/session';
 import { StorageContainer } from './fakes/storage';

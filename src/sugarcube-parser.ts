@@ -79,8 +79,8 @@ export class SugarcubeParser {
     await import("./internal/ecmascript-extensions");
     await import("./internal/jquery-plugins");
 
-    const { clone } = await import("./internal/clone");
-    setGlobal("clone", clone);
+    // const { clone } = await import("./internal/clone");
+    // setGlobal("clone", clone);
 
     await import("./internal/fakes/tempvariables");
 
