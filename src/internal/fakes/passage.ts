@@ -9,7 +9,6 @@
 /* global Config, L10n, State, Wikifier, createSlug, decodeEntities, encodeMarkup, enumFrom */
 
 import { Config } from '../config';
-import { createSlug } from '../createslug';
 import { SimplePassage } from '../declarations/unofficial/simple-passage';
 import L10n from '../l10n';
 import { State } from '../state';
@@ -88,7 +87,7 @@ export const PassageClass = (() => {
         a.localeCompare(b)
       );
 
-      const id = `passage-${createSlug(title)}`;
+      const id = `passage-${Util.slugify(title)}`;
       const name = Util.entityDecode(title);
       this.#construct(id, name, text, sortedAndUniqueTags);
     }
@@ -129,7 +128,7 @@ export const PassageClass = (() => {
                   // Return the sorted list of unique classes.
                   tags
                     .filter((tag) => !_tagsToSkip.test(tag))
-                    .map((tag) => createSlug(tag)))()
+                    .map((tag) => Util.slugify(tag)))()
           ),
         },
 
