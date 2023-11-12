@@ -1,17 +1,16 @@
-/* eslint-disable prefer-rest-params */
 /***********************************************************************************************************************
 
-	extensions/jquery-plugins.js
+	lib/jquery-plugins.js
 
-	Copyright © 2013–2022 Thomas Michael Edwards <thomasmedwards@gmail.com>. All rights reserved.
+	Copyright © 2013–2021 Thomas Michael Edwards <thomasmedwards@gmail.com>. All rights reserved.
 	Use of this source code is governed by a BSD 2-clause "Simplified" License, which may be found in the LICENSE file.
 
 ***********************************************************************************************************************/
-/* global Wikifier, errorPrologRegExp, getActiveElement */
+/* global Wikifier, errorPrologRegExp, safeActiveElement */
 import jQuery from 'jquery'
 import { errorPrologRegExp } from './alert';
-import { getActiveElement } from './getactiveelement';
 import { Wikifier } from './wikifier';
+import { safeActiveElement } from './helpers';
 
 /*
 	WAI-ARIA methods plugin.
@@ -25,10 +24,9 @@ import { Wikifier } from './wikifier';
 	`<jQuery>.ariaIsDisabled()`
 	    Checks the disabled status of the target WAI-ARIA-compatible clickable element(s).
 */
-
-export {} // exporting for side effects only
-
 (() => {
+	'use strict';
+
 	/*
 		Event handler & utility functions.
 
@@ -41,7 +39,7 @@ export {} // exporting for side effects only
 
 			// To allow delegation, attempt to trigger the event on `document.activeElement`,
 			// if possible, elsewise on `this`.
-			jQuery(getActiveElement() || this).trigger('click');
+			jQuery(safeActiveElement() || this).trigger('click');
 		}
 	}
 
@@ -54,7 +52,7 @@ export {} // exporting for side effects only
 			// NOTE: This should only be necessary for elements which are not disableable
 			// per the HTML specification as disableable elements should be made inert
 			// automatically.
-			if (($this as any).ariaIsDisabled()) {
+			if ($this.ariaIsDisabled()) {
 				return;
 			}
 
@@ -80,31 +78,6 @@ export {} // exporting for side effects only
 			// Call the true handler.
 			fn.apply(this, arguments);
 		});
-	}
-
-	function disableTabindex(el) {
-		if (!el.hasAttribute('data-last-tabindex')) {
-			const tabindex = el.getAttribute('tabindex');
-
-			el.setAttribute('data-last-tabindex', tabindex !== null ? tabindex.trim() : '');
-		}
-
-		el.setAttribute('tabindex', -1);
-	}
-
-	function restoreTabindex(el) {
-		const lastTabindex = el.getAttribute('data-last-tabindex');
-
-		if (lastTabindex !== null) {
-			el.removeAttribute('data-last-tabindex');
-
-			if (lastTabindex === '') {
-				el.removeAttribute('tabindex');
-			}
-			else {
-				el.setAttribute('tabindex', lastTabindex);
-			}
-		}
 	}
 
 	jQuery.fn.extend({
@@ -244,7 +217,6 @@ export {} // exporting for side effects only
 				$nonDisableable.each(function () {
 					this.setAttribute('disabled', '');
 					this.setAttribute('aria-disabled', 'true');
-					disableTabindex(this);
 				});
 
 				// Set IDL attribute `disabled` to `true` and set non-boolean content attribute
@@ -252,7 +224,6 @@ export {} // exporting for side effects only
 				$disableable.each(function () {
 					this.disabled = true;
 					this.setAttribute('aria-disabled', 'true');
-					disableTabindex(this);
 				});
 			}
 			else {
@@ -260,7 +231,6 @@ export {} // exporting for side effects only
 				$nonDisableable.each(function () {
 					this.removeAttribute('disabled');
 					this.removeAttribute('aria-disabled');
-					restoreTabindex(this);
 				});
 
 				// Set IDL attribute `disabled` to `false` and remove content attribute `aria-disabled`,
@@ -268,7 +238,6 @@ export {} // exporting for side effects only
 				$disableable.each(function () {
 					this.disabled = false;
 					this.removeAttribute('aria-disabled');
-					restoreTabindex(this);
 				});
 			}
 
@@ -311,6 +280,8 @@ export {} // exporting for side effects only
 	    element(s).
 */
 (() => {
+	'use strict';
+
 	jQuery.extend({
 		/*
 			Extend jQuery's static methods with a `wikiWithOptions()` method.
@@ -326,7 +297,7 @@ export {} // exporting for side effects only
 			sources.forEach(content => new Wikifier(frag, content, options));
 
 			// Gather the text of any error elements within the fragment…
-			const errors = Array.from(frag.querySelectorAll('.error'))
+			const errors = [...frag.querySelectorAll('.error')]
 				.map(errEl => errEl.textContent.replace(errorPrologRegExp, ''));
 
 			// …and throw an exception, if there were any errors.
