@@ -1,8 +1,8 @@
 /***********************************************************************************************************************
 
-	macro/macro.js
+	macros/macro.js
 
-	Copyright © 2013–2022 Thomas Michael Edwards <thomasmedwards@gmail.com>. All rights reserved.
+	Copyright © 2013–2021 Thomas Michael Edwards <thomasmedwards@gmail.com>. All rights reserved.
 	Use of this source code is governed by a BSD 2-clause "Simplified" License, which may be found in the LICENSE file.
 
 ***********************************************************************************************************************/
@@ -11,10 +11,12 @@
 import { macros } from '../macros';
 import { Patterns } from '../patterns';
 import { Scripting } from '../scripting';
-import { objectCreateNull } from '../utils/object-create-null';
+import { objectDefineProperties } from '../utils/object-define-properties';
 
-const Macro = (() => {
+export const Macro = (() => {
   // eslint-disable-line no-unused-vars, no-var
+  'use strict';
+
   // Macro definitions.
   const _macros = {};
 
@@ -24,7 +26,7 @@ const Macro = (() => {
   // Valid macro name regular expression.
   const _validNameRe = new RegExp(`^(?:${Patterns.macroName})$`);
 
-  /*******************************************************************************
+  /*******************************************************************************************************************
 		Macros Functions.
 	*******************************************************************************/
 
@@ -50,6 +52,7 @@ const Macro = (() => {
 
     try {
       if (isObjectDefinition(def)) {
+        // changed by BIS. Original: if (typeof def === 'object') {
         // Add the macro definition.
         //
         // NOTE: Since `macrosGet()` may return legacy macros, we add the `_MACRO_API`
@@ -131,7 +134,7 @@ const Macro = (() => {
   }
 
   function macrosHas(name: string) {
-    return Object.hasOwn(_macros, name);
+    return _macros.hasOwnProperty(name);
   }
 
   function macrosGet(name: string) {
@@ -141,7 +144,7 @@ const Macro = (() => {
       macro = _macros[name];
     } else if (
       /* legacy macro support */
-      Object.hasOwn(macros, name) &&
+      macros.hasOwnProperty(name) &&
       typeof macros[name].handler === 'function'
     ) {
       macro = macros[name];
@@ -168,10 +171,9 @@ const Macro = (() => {
     /* /legacy macro support */
   }
 
-  /*******************************************************************************
+  /*******************************************************************************************************************
 		Tags Functions.
-	*******************************************************************************/
-
+	*******************************************************************************************************************/
   function tagsRegister(parent, bodyTags?) {
     if (!parent) {
       throw new Error('no parent specified');
@@ -216,61 +218,61 @@ const Macro = (() => {
     });
   }
 
-  function tagsHas(name) {
-    return Object.hasOwn(_tags, name);
+  function tagsHas(name: string) {
+    return _tags.hasOwnProperty(name);
   }
 
-  function tagsGet(name) {
+  function tagsGet(name: string) {
     return tagsHas(name) ? _tags[name] : null;
   }
 
-  /*******************************************************************************
-		Object Exports.
-	*******************************************************************************/
-
-  return Object.preventExtensions(
-    objectCreateNull(null, {
-      /*
+  /*******************************************************************************************************************
+		Module Exports.
+	*******************************************************************************************************************/
+  return Object.freeze(
+    objectDefineProperties(
+      {},
+      {
+        /*
 			Macro Functions.
 		*/
-      add: { value: macrosAdd },
-      delete: { value: macrosDelete },
-      isEmpty: { value: macrosIsEmpty },
-      has: { value: macrosHas },
-      get: { value: macrosGet },
-      init: { value: macrosInit },
+        add: { value: macrosAdd },
+        delete: { value: macrosDelete },
+        isEmpty: { value: macrosIsEmpty },
+        has: { value: macrosHas },
+        get: { value: macrosGet },
+        init: { value: macrosInit },
 
-      /*
+        /*
 			Tags Functions.
 		*/
-      tags: {
-        value: Object.preventExtensions(
-          objectCreateNull(null, {
-            register: { value: tagsRegister },
-            unregister: { value: tagsUnregister },
-            has: { value: tagsHas },
-            get: { value: tagsGet },
-          })
-        ),
-      },
+        tags: {
+          value: Object.freeze(
+            objectDefineProperties(
+              {},
+              {
+                register: { value: tagsRegister },
+                unregister: { value: tagsUnregister },
+                has: { value: tagsHas },
+                get: { value: tagsGet },
+              }
+            )
+          ),
+        },
 
-      /*
+        /*
 			Legacy Aliases.
 		*/
-      evalStatements: {
-        value: (...args) =>
-          Scripting.evalJavaScript(
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            ...args
-          ),
-      }, // SEE: `markup/scripting.js`.
-    })
+        // Commented by BIS
+        // evalStatements: {
+        //   value: (...args) => Scripting.evalJavaScript(...args),
+        // }, // SEE: `markup/scripting.js`.
+      }
+    )
   );
 })();
 
+// added by BIS
 function isObjectDefinition<T>(def: T | string): def is T {
   return typeof def !== 'string';
 }
-
-export { Macro };
