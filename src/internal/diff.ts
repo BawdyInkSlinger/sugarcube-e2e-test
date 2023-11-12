@@ -8,6 +8,7 @@
 ***********************************************************************************************************************/
 /* global Util, clone */
 
+import { clone } from "./helpers";
 import { Util } from "./util";
 import { objectDefineProperties } from "./utils/object-define-properties";
 
