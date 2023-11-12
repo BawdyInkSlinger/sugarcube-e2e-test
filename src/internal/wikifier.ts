@@ -1359,5 +1359,3 @@ export const Wikifier = (() => {
 /* eslint-enable max-len */
 
 export type Wikifier = InstanceType<typeof Wikifier>;
-// BIS WARNING: this import is here for side effects
-import './parserlib'

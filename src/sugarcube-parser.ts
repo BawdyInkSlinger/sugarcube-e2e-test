@@ -98,6 +98,7 @@ export class SugarcubeParser {
 
     const { Wikifier }: any = await import("./internal/wikifier");
     setGlobal("Wikifier", Wikifier);
+    await import("./internal/parserlib");
 
     const { Setting } = await import("./internal/fakes/setting");
     setGlobal("Setting", Setting);
