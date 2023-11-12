@@ -75,7 +75,6 @@ export class SugarcubeParser {
     setGlobal("$", jQuery.default);
     setGlobal("jQuery", jQuery.default);
 
-    await import("./internal/ecmascript-polyfills");
     await import("./internal/extensions");
     await import("./internal/jquery-plugins");
 
