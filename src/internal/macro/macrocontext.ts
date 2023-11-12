@@ -1,27 +1,27 @@
-/* eslint-disable @typescript-eslint/no-this-alias */
 /***********************************************************************************************************************
 
-	macro/macrocontext.js
+	macros/macrocontext.js
 
-	Copyright © 2013–2022 Thomas Michael Edwards <thomasmedwards@gmail.com>. All rights reserved.
+	Copyright © 2013–2021 Thomas Michael Edwards <thomasmedwards@gmail.com>. All rights reserved.
 	Use of this source code is governed by a BSD 2-clause "Simplified" License, which may be found in the LICENSE file.
 
 ***********************************************************************************************************************/
-/* global Config, DebugView, Patterns, State, Wikifier, appendError */
+/* global Config, DebugView, Patterns, State, Wikifier, throwError */
 
-import { appendError } from '../appenderror';
 import { Config } from '../config';
 import { DebugView } from '../debugview';
+import { throwError } from '../helpers';
 import { Patterns } from '../patterns';
 import { State } from '../state';
 import { Wikifier } from '../wikifier';
 
 export const MacroContext = (() => {
   // eslint-disable-line no-unused-vars, no-var
-  /*******************************************************************************
-		MacroContext Class.
-	*******************************************************************************/
+  'use strict';
 
+  /*******************************************************************************************************************
+		MacroContext Class.
+	*******************************************************************************************************************/
   class MacroContext {
     declare parent: typeof this;
     declare _debugView: any;
@@ -126,15 +126,15 @@ export const MacroContext = (() => {
     }
 
     get shadows() {
-      return Array.from(this._shadows);
+      return [...this._shadows];
     }
 
-    get shadowView(): string[] {
-      const view = new Set<string>();
-      this.contextFilter((ctx) => ctx._shadows).forEach((ctx) =>
+    get shadowView() {
+      const view = new Set();
+      this.contextSelectAll((ctx) => ctx._shadows).forEach((ctx) =>
         ctx._shadows.forEach((name) => view.add(name))
       );
-      return Array.from(view);
+      return [...view];
     }
 
     get debugView() {
@@ -147,39 +147,41 @@ export const MacroContext = (() => {
       return null;
     }
 
-    contextFilter(predicate) {
-      const result = [];
+    contextHas(filter) {
       let context = this;
 
       while ((context = context.parent) !== null) {
-        if (predicate(context)) {
-          result.push(context);
-        }
-      }
-
-      return result;
-    }
-
-    contextFind(predicate): typeof this | void {
-      let context = this;
-
-      while ((context = context.parent) !== null) {
-        if (predicate(context)) {
-          return context;
-        }
-      }
-    }
-
-    contextSome(predicate) {
-      let context = this;
-
-      while ((context = context.parent) !== null) {
-        if (predicate(context)) {
+        if (filter(context)) {
           return true;
         }
       }
 
       return false;
+    }
+
+    contextSelect(filter) {
+      let context = this;
+
+      while ((context = context.parent) !== null) {
+        if (filter(context)) {
+          return context;
+        }
+      }
+
+      return null;
+    }
+
+    contextSelectAll(filter) {
+      const result = [];
+      let context = this;
+
+      while ((context = context.parent) !== null) {
+        if (filter(context)) {
+          result.push(context);
+        }
+      }
+
+      return result;
     }
 
     addShadow(...names) {
@@ -204,7 +206,7 @@ export const MacroContext = (() => {
       });
     }
 
-    shadowHandler<Param>(
+    createShadowWrapper<Param>(
       callback: (...params: Param[]) => void,
       doneCallback?: (...params: Param[]) => void,
       startCallback?: (...params: Param[]) => void
@@ -213,7 +215,7 @@ export const MacroContext = (() => {
       let shadowStore;
 
       if (typeof callback === 'function') {
-        shadowStore = Object.create(null);
+        shadowStore = {};
         this.shadowView.forEach((varName: string) => {
           const varKey = varName.slice(1);
           const store = varName[0] === '$' ? State.variables : State.temporary;
@@ -247,7 +249,7 @@ export const MacroContext = (() => {
               const store =
                 varName[0] === '$' ? State.variables : State.temporary;
 
-              if (Object.hasOwn(store, varKey)) {
+              if (store.hasOwnProperty(varKey)) {
                 valueCache[varKey] = store[varKey];
               }
 
@@ -278,7 +280,7 @@ export const MacroContext = (() => {
 							*/
               shadowStore[varName] = store[varKey];
 
-              if (Object.hasOwn(valueCache, varKey)) {
+              if (valueCache.hasOwnProperty(varKey)) {
                 store[varKey] = valueCache[varKey];
               } else {
                 delete store[varKey];
@@ -318,8 +320,8 @@ export const MacroContext = (() => {
       this._debugViewEnabled = false;
     }
 
-    error(message, source?) {
-      return appendError(
+    error(message, source) {
+      return throwError(
         this._output,
         `<<${this.displayName}>>: ${message}`,
         source ? source : this.source
@@ -327,27 +329,8 @@ export const MacroContext = (() => {
     }
   }
 
-  /* legacy */
-  // Attach legacy aliases.
-  Object.defineProperties(MacroContext.prototype, {
-    contextHas: {
-      value: MacroContext.prototype.contextSome,
-    },
-    contextSelect: {
-      value: MacroContext.prototype.contextFind,
-    },
-    contextSelectAll: {
-      value: MacroContext.prototype.contextFilter,
-    },
-    createShadowWrapper: {
-      value: MacroContext.prototype.shadowHandler,
-    },
-  });
-  /* /legacy */
-
-  /*******************************************************************************
-		Object Exports.
-	*******************************************************************************/
-
+  /*******************************************************************************************************************
+		Module Exports.
+	*******************************************************************************************************************/
   return MacroContext;
 })();
