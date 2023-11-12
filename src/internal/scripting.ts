@@ -14,10 +14,10 @@ import { Engine } from './fakes/engine';
 import { State } from './state';
 import { Story } from './fakes/story';
 import { Patterns } from './patterns';
-import { stringFrom } from './stringfrom';
 import { Util } from './util';
 import { objectDefineProperties } from './utils/object-define-properties';
 import { getLogger } from '../logger';
+import { stringFrom } from './helpers';
 
 export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 
