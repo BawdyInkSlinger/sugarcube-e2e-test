@@ -1,13 +1,3 @@
-/***********************************************************************************************************************
-
-	passage.js
-
-	Copyright © 2013–2022 Thomas Michael Edwards <thomasmedwards@gmail.com>. All rights reserved.
-	Use of this source code is governed by a BSD 2-clause "Simplified" License, which may be found in the LICENSE file.
-
-***********************************************************************************************************************/
-/* global Config, L10n, State, Wikifier, createSlug, decodeEntities, encodeMarkup, enumFrom */
-
 import { Config } from '../config';
 import { SimplePassage } from '../declarations/unofficial/simple-passage';
 import { State } from '../state';
