@@ -1,10 +1,6 @@
 import { JSDOM, ConstructorOptions } from 'jsdom';
 
-const defaultHtml =
-  '<!doctype html><html><head><meta charset="utf-8"></head><body></body></html>';
-
 // define this here so that we only ever dynamically populate KEYS once.
-
 const KEYS = [];
 
 export function setupJsdom(html?: string, options?: ConstructorOptions) {
@@ -36,6 +32,10 @@ export function setupJsdom(html?: string, options?: ConstructorOptions) {
   }
   // eslint-disable-next-line no-return-assign
   KEYS.forEach((key) => (global[key] = window[key]));
+
+  // add properties to help with troubleshooting
+  window.jsdom = true;
+  document.jsdom = true;
 
   // setup document / window / window.console
   global.document = document;
