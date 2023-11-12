@@ -2,16 +2,18 @@
 
 	markup/template.js
 
-	Copyright © 2019–2022 Thomas Michael Edwards <thomasmedwards@gmail.com>. All rights reserved.
+	Copyright © 2019–2021 Thomas Michael Edwards <thomasmedwards@gmail.com>. All rights reserved.
 	Use of this source code is governed by a BSD 2-clause "Simplified" License, which may be found in the LICENSE file.
 
 ***********************************************************************************************************************/
 /* global Patterns */
 
 import { Patterns } from './patterns';
-import { objectCreateNull } from './utils/object-create-null';
+import { objectDefineProperties } from './utils/object-define-properties';
 
 export const Template = (() => { // eslint-disable-line no-unused-vars, no-var
+	'use strict';
+
 	// Template definitions.
 	const _templates = new Map();
 
@@ -31,7 +33,7 @@ export const Template = (() => { // eslint-disable-line no-unused-vars, no-var
 
 	function templateAdd(name, template) {
 		if (
-			!_validType(template)
+			   !_validType(template)
 			&& !(template instanceof Array && template.length > 0 && template.every(_validType))
 		) {
 			throw new TypeError(`invalid template type (${name}); templates must be: functions, strings, or an array of either`);
@@ -70,7 +72,7 @@ export const Template = (() => { // eslint-disable-line no-unused-vars, no-var
 		Object Exports.
 	*******************************************************************************/
 
-	return Object.preventExtensions(objectCreateNull(null, {
+	return Object.freeze(objectDefineProperties({}, {
 		add    : { value : templateAdd },
 		delete : { value : templateDelete },
 		get    : { value : templateGet },
