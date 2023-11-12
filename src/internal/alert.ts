@@ -2,12 +2,12 @@
 
 	lib/alert.js
 
-	Copyright © 2013–2022 Thomas Michael Edwards <thomasmedwards@gmail.com>. All rights reserved.
+	Copyright © 2013–2021 Thomas Michael Edwards <thomasmedwards@gmail.com>. All rights reserved.
 	Use of this source code is governed by a BSD 2-clause "Simplified" License, which may be found in the LICENSE file.
 
 ***********************************************************************************************************************/
 
-import { objectCreateNull } from './utils/object-create-null';
+import { objectDefineProperties } from './utils/object-define-properties';
 
 /*
 	TODO: This regular expression should be elsewhere.
@@ -22,10 +22,11 @@ import { objectCreateNull } from './utils/object-create-null';
 export const errorPrologRegExp = /^(?:(?:uncaught\s+(?:exception:\s+)?)?\w*(?:error|exception|_err):\s+)+/i; // eslint-disable-line no-unused-vars, no-var
 
 export const Alert = (() => { // eslint-disable-line no-unused-vars, no-var
-	/*******************************************************************************
-		Error Functions.
-	*******************************************************************************/
+	'use strict';
 
+	/*******************************************************************************************************************
+		Error Functions.
+	*******************************************************************************************************************/
 	function mesg(where, error, isFatal?, isUncaught?) {
 		let mesg = 'Error';
 		let nice = `A${isFatal ? ' fatal' : 'n'} error has occurred.`;
@@ -75,10 +76,9 @@ export const Alert = (() => { // eslint-disable-line no-unused-vars, no-var
 	}
 
 
-	/*******************************************************************************
+	/*******************************************************************************************************************
 		Error Event.
-	*******************************************************************************/
-
+	*******************************************************************************************************************/
 	/*
 		Set up a global error handler for uncaught exceptions.
 	*/
@@ -97,7 +97,6 @@ export const Alert = (() => { // eslint-disable-line no-unused-vars, no-var
 				window.onerror = origOnError;
 
 				if (typeof window.onerror === 'function') {
-					// eslint-disable-next-line prefer-rest-params
 					window.onerror.apply(this, arguments);
 				}
 			}
@@ -105,11 +104,10 @@ export const Alert = (() => { // eslint-disable-line no-unused-vars, no-var
 	})(window.onerror);
 
 
-	/*******************************************************************************
-		Object Exports.
-	*******************************************************************************/
-
-	return Object.preventExtensions(objectCreateNull(null, {
+	/*******************************************************************************************************************
+		Module Exports.
+	*******************************************************************************************************************/
+	return Object.freeze(objectDefineProperties({}, {
 		error : { value : alertError },
 		fatal : { value : alertFatal }
 	}));
