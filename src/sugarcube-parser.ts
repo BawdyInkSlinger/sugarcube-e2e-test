@@ -53,7 +53,6 @@ export class SugarcubeParser {
   }
 
   static async create(
-    setup: unknown,
     passages: SimplePassage[],
     customPassageLoadedHandler = waitForPassageEnd
   ): Promise<SugarcubeParser> {
@@ -71,15 +70,14 @@ export class SugarcubeParser {
     setGlobal("scroll", () => {});
     setGlobal("_", _);
 
+    setGlobal("setup", {});
+
     const jQuery = await import("jquery");
     setGlobal("$", jQuery.default);
     setGlobal("jQuery", jQuery.default);
 
     await import("./internal/extensions");
     await import("./internal/jquery-plugins");
-
-    // const { clone } = await import("./internal/clone");
-    // setGlobal("clone", clone);
 
     await import("./internal/fakes/tempvariables");
 
@@ -90,9 +88,6 @@ export class SugarcubeParser {
 
     const { Macro } = await import("./internal/macro/macro");
     setGlobal("Macro", Macro);
-
-    setGlobal("setup", setup); // doesn't seem to be required
-    // but if gameSetup isn't manually created, errors. Passing it in prevents tree-shaking(?)
 
     await import("./internal/macro/macrolib");
 
@@ -150,7 +145,7 @@ export class SugarcubeParser {
       })
     );
 
-    globalThis.dataLayer = [];
+    setGlobal("dataLayer", []);
 
     initializeStory({
       passages: passages,
