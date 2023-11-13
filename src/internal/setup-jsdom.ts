@@ -39,8 +39,6 @@ export function setupJsdom(html?: string, options?: ConstructorOptions) {
 
   // setup document / window / window.console
   global.document = document;
-  (global as any).window = window;
-  window.console = global.console;
 
   return jsdom;
 }

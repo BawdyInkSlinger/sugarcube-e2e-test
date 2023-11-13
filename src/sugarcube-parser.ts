@@ -59,9 +59,9 @@ export class SugarcubeParser {
     setPassageLoadedHandler(customPassageLoadedHandler);
 
     const { document, window } = await SugarcubeParser.load();
-    // console.log('*************************************')
-    // console.log(document);
-    // console.log('*************************************')
+    setGlobal("console", console);
+    setGlobal("window", window);
+    setGlobal("document", document);
 
     window.alert = (s: string) => {
       console.error(`ALERT: \`${s}\``);
