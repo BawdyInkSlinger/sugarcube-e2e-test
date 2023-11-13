@@ -107,41 +107,36 @@ function filter(predicate: (passage: Passage) => boolean, thisArg?: undefined) {
 const logger = getLogger('DEFAULT');
 const passageLogger = getLogger('DEBUG_PASSAGES');
 
-let storyScripts: string[] = [];
-let moduleScripts: string[] = [];
-
-type Options = {
-  passages: SimplePassage[];
-  moduleScripts: string[];
-  javascriptScripts: string[];
-};
-export const initialize = ({
-  passages,
-  moduleScripts: localModuleScripts,
-  javascriptScripts,
-}: Options) => {
-  storyPassages = passages.map((simplePassage) => {
-    passageLogger.debug(
-      `Initialize: passage found: \`${simplePassage.title}\` tags: \`${simplePassage.tags}\``
-    );
-    return new PassageClass(simplePassage);
-  });
-  storyScripts = javascriptScripts.map((js: string) => {
-    passageLogger.debug(`Initialize: js found:\n${js}\n`);
-    return js;
-  });
-  moduleScripts = localModuleScripts;
-  storyLoad();
-};
-
 const _inits: Passage[] = [];
 const _widgets: Passage[] = [];
 const _passages: Passage[] = [];
 const _styles: Passage[] = [];
 const _scripts: Passage[] = [];
 
+type Script = { path: string; content: string };
+
+type Options = {
+  passages: SimplePassage[];
+  moduleScripts: Script[];
+  nonmoduleScripts: Script[];
+};
+export const initialize = ({
+  passages,
+  moduleScripts,
+  nonmoduleScripts,
+}: Options) => {
+  storyPassages = passages.map((simplePassage) => {
+    passageLogger.debug(
+      `Twee passage found: \`${simplePassage.title}\` tags: \`${simplePassage.tags}\``
+    );
+    return new PassageClass(simplePassage);
+  });
+
+  storyLoad(moduleScripts, nonmoduleScripts);
+};
+
 // copied and modified from story.js
-function storyLoad() {
+function storyLoad(moduleScripts: Script[], storyScripts: Script[]) {
   logger.debug('[Story/storyLoad()]');
 
   _inits.length = 0;
@@ -209,18 +204,22 @@ function storyLoad() {
 
   _styles.push(
     ...storyPassages.filter((p) => {
-      return p.tags.includes('style');
+      const match = p.tags.includes('style');
+      if (match) {
+        passageLogger.info(`assigning ${p.title} to _style`);
+      }
+
+      return match;
     })
   );
   _scripts.push(
     ...storyPassages.filter((p) => {
-      passageLogger.debug(
-        `title ${p.title}    p.tags.includes('script') ${p.tags.includes(
-          'script'
-        )}`
-      );
+      const match = p.tags.includes('script');
+      if (match) {
+        passageLogger.info(`assigning ${p.title} to _scripts`);
+      }
 
-      return p.tags.includes('script');
+      return match;
     })
   );
 
@@ -233,31 +232,35 @@ function storyLoad() {
     .forEach((passage) => {
       if (passage.tags.includes('init')) {
         validateSpecialPassages(passage, 'init');
+        passageLogger.info(`assigning ${passage.title} to _inits`);
         _inits.push(passage);
       } else if (passage.tags.includes('widget')) {
         validateSpecialPassages(passage, 'widget');
+        passageLogger.info(`assigning ${passage.title} to _widgets`);
         _widgets.push(passage);
       }
 
       // All other passages.
       else {
+        passageLogger.debug(`assigning ${passage.title} to _passage`);
         _passages.push(passage);
       }
     });
 
-  start();
+  start(moduleScripts, storyScripts);
 }
 
-function start() {
+function start(moduleScripts: Script[], storyScripts: Script[]) {
   SimpleStore.adapters.push(InMemoryStorageAdapter);
   StorageContainer.storage = SimpleStore.create(Story.id, true); // eslint-disable-line no-undef
   SessionContainer.session = SimpleStore.create(Story.id, false); // eslint-disable-line no-undef
 
   moduleScripts.forEach((script) => {
+    passageLogger.info(`evaluating moduleScripts element named ${script.path}`);
     jQuery(function () {
       jQuery('<script>')
         .attr('type', 'text/javascript')
-        .text(script)
+        .text(script.content)
         .appendTo('head');
     });
     // Scripting.evalJavaScript(script);
@@ -266,17 +269,19 @@ function start() {
   // primarily deals with StoryInterface Dom modifications
   Engine.init();
 
+  // Run story scripts (dialog.js, click-to-proceed.js, speech.js).
   storyScripts.forEach((script) => {
-    // console.trace(`eval user script:\n`, script);
-    Scripting.evalJavaScript(script);
+    passageLogger.info(`evaluating storyScripts element named ${script.path}`);
+    Scripting.evalJavaScript(script.content);
   });
   // Run user scripts (user stylesheet, JavaScript, and widgets).
   // Engine.runUserScripts();
   _scripts.forEach((script) => {
-    // console.trace(`eval script tag:\n`, script.text);
+    passageLogger.info(`evaluating _scripts element named ${script.title}`);
     Scripting.evalJavaScript(script.text);
   });
   _widgets.forEach((widget) => {
+    passageLogger.info(`evaluating _widget element named ${widget.title}`);
     Wikifier.wikifyEval(widget.processText());
   });
 
@@ -291,12 +296,13 @@ export function runStoryInit() {
   // Run the user init passages.
   // Engine.runUserInit();
   _inits.forEach((passage) => {
+    passageLogger.info(`evaluating _inits element named ${passage.title}`);
     Wikifier.wikifyEval(passage.text);
   });
 
   const storyInit = storyPassages.find((p) => p.title.trim() === 'StoryInit');
   if (storyInit) {
-    // console.log(`############################################################################`, storyInit.text);
+    passageLogger.info(`evaluating StoryInit`);
     Wikifier.wikifyEval(storyInit.text);
   }
 

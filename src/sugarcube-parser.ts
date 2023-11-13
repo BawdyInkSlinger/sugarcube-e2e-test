@@ -1,18 +1,18 @@
-import _ from "lodash";
-import fs from "fs/promises";
-import { DOMWindow } from "jsdom";
-import seedrandom from "seedrandom";
-import { glob } from "glob";
-import { SimplePassage } from "./internal/declarations/unofficial/simple-passage";
-import prettier from "prettier";
-import { setupJsdom } from "./internal/setup-jsdom";
-import { setGlobal } from "./internal/set-global";
-import { SugarCubeStoryVariables } from "./internal/declarations/unofficial/userdata";
-import { SugarCubeTemporaryVariables } from "./internal/declarations/twine-sugarcube-copy/userdata";
-import { TestController, testController } from "./test-api/test-controller";
-import { waitForPassageEnd } from "./test-api/wait-for-passage-end";
-import { setPassageLoadedHandler } from "./test-api/passage-loaded-handler";
-import { getLogger } from "./logger";
+import _ from 'lodash';
+import fs from 'fs/promises';
+import { DOMWindow } from 'jsdom';
+import seedrandom from 'seedrandom';
+import { glob } from 'glob';
+import { SimplePassage } from './internal/declarations/unofficial/simple-passage';
+import prettier from 'prettier';
+import { setupJsdom } from './internal/setup-jsdom';
+import { setGlobal } from './internal/set-global';
+import { SugarCubeStoryVariables } from './internal/declarations/unofficial/userdata';
+import { SugarCubeTemporaryVariables } from './internal/declarations/twine-sugarcube-copy/userdata';
+import { TestController, testController } from './test-api/test-controller';
+import { waitForPassageEnd } from './test-api/wait-for-passage-end';
+import { setPassageLoadedHandler } from './test-api/passage-loaded-handler';
+import { getLogger } from './logger';
 
 declare global {
   interface Document {
@@ -24,7 +24,6 @@ const logger = getLogger('DEFAULT');
 const passagesLogger = getLogger('DEBUG_PASSAGES');
 
 export class SugarcubeParser {
-  passages: SimplePassage[];
   jQuery: JQueryStatic;
   Config: any;
   Macro: any;
@@ -34,11 +33,8 @@ export class SugarcubeParser {
   Save: any;
   Template: any;
   Story: any;
-  initializeStory: any;
-  javascriptContents: string[];
 
-  private constructor(passages: SimplePassage[], javascriptContents: string[]) {
-    this.passages = passages;
+  private constructor() {
     this.jQuery = jQuery;
     this.Config = globalThis.Config;
     this.Macro = globalThis.Macro;
@@ -48,8 +44,6 @@ export class SugarcubeParser {
     this.Save = globalThis.Save;
     this.Template = globalThis.Template;
     this.Story = globalThis.Story;
-    this.initializeStory = globalThis.initializeStory;
-    this.javascriptContents = javascriptContents;
   }
 
   static async create(
@@ -59,101 +53,101 @@ export class SugarcubeParser {
     setPassageLoadedHandler(customPassageLoadedHandler);
 
     const { document, window } = await SugarcubeParser.load();
-    setGlobal("console", console);
-    setGlobal("window", window);
-    setGlobal("document", document);
+    setGlobal('console', console);
+    setGlobal('window', window);
+    setGlobal('document', document);
 
     window.alert = (s: string) => {
       console.error(`ALERT: \`${s}\``);
     };
 
-    setGlobal("scroll", () => {});
-    setGlobal("_", _);
+    setGlobal('scroll', () => {});
+    setGlobal('_', _);
 
-    setGlobal("setup", {});
+    setGlobal('setup', {});
 
-    const jQuery = await import("jquery");
-    setGlobal("$", jQuery.default);
-    setGlobal("jQuery", jQuery.default);
+    const jQuery = await import('jquery');
+    setGlobal('$', jQuery.default);
+    setGlobal('jQuery', jQuery.default);
 
-    await import("./internal/extensions");
-    await import("./internal/jquery-plugins");
+    await import('./internal/extensions');
+    await import('./internal/jquery-plugins');
 
-    await import("./internal/fakes/tempvariables");
+    await import('./internal/fakes/tempvariables');
 
     (Math as any).seedrandom = seedrandom;
 
-    const { Config } = await import("./internal/config");
-    setGlobal("Config", Config);
+    const { Config } = await import('./internal/config');
+    setGlobal('Config', Config);
 
-    const { Macro } = await import("./internal/macro/macro");
-    setGlobal("Macro", Macro);
+    const { Macro } = await import('./internal/macro/macro');
+    setGlobal('Macro', Macro);
 
-    await import("./internal/macro/macrolib");
+    await import('./internal/macro/macrolib');
 
-    const { Wikifier }: any = await import("./internal/wikifier");
-    setGlobal("Wikifier", Wikifier);
-    await import("./internal/parserlib");
+    const { Wikifier }: any = await import('./internal/wikifier');
+    setGlobal('Wikifier', Wikifier);
+    await import('./internal/parserlib');
 
-    const { Setting } = await import("./internal/fakes/setting");
-    setGlobal("Setting", Setting);
+    const { Setting } = await import('./internal/fakes/setting');
+    setGlobal('Setting', Setting);
 
-    const { State } = await import("./internal/state");
-    setGlobal("State", State);
+    const { State } = await import('./internal/state');
+    setGlobal('State', State);
 
-    const { Engine } = await import("./internal/fakes/engine");
-    setGlobal("Engine", Engine);
+    const { Engine } = await import('./internal/fakes/engine');
+    setGlobal('Engine', Engine);
 
-    const { Save } = await import("./internal/fakes/save");
-    setGlobal("Save", Save);
+    const { Save } = await import('./internal/fakes/save');
+    setGlobal('Save', Save);
 
-    const { Template } = await import("./internal/template");
-    setGlobal("Template", Template);
+    const { Template } = await import('./internal/template');
+    setGlobal('Template', Template);
 
-    setGlobal("settings", {});
+    setGlobal('settings', {});
 
     const {
       initialize: initializeStory,
       runStoryInit,
       Story,
-    } = await import("./internal/fakes/story");
+    } = await import('./internal/fakes/story');
 
-    setGlobal("Story", Story);
-    setGlobal("initializeStory", initializeStory);
-    setGlobal("runStoryInit", runStoryInit);
+    setGlobal('Story', Story);
+    setGlobal('initializeStory', initializeStory);
+    setGlobal('runStoryInit', runStoryInit);
 
-    const moduleFiles = await glob(["modules/*.js"], {
-      ignore: "node_modules/**",
+    const moduleFiles = await glob(['modules/*.js'], {
+      ignore: 'node_modules/**',
     });
-    const moduleContents = await Promise.all(
+    const modules = await Promise.all(
       moduleFiles.map(async (path) => {
         passagesLogger.debug(`Found moduleFile: ${path}`);
-        
-        return (await fs.readFile(path)).toString();
+
+        return { path, content: (await fs.readFile(path)).toString() };
       })
     );
 
     const jsFiles = await glob(
-      ["exposed_sugarcube_variables/*.js", "story/*.js"],
-      { ignore: "node_modules/**" }
+      ['exposed_sugarcube_variables/*.js', 'story/*.js'],
+      { ignore: 'node_modules/**' }
     );
-    const javascriptContents = await Promise.all(
+    const javascripts = await Promise.all(
       jsFiles.map(async (path) => {
         passagesLogger.debug(`Found jsFile: ${path}`);
-        
-        return (await fs.readFile(path)).toString();
+
+        return { path, content: (await fs.readFile(path)).toString() };
       })
     );
 
-    setGlobal("dataLayer", []);
+    setGlobal('dataLayer', []);
 
     initializeStory({
       passages: passages,
-      moduleScripts: moduleContents,
-      javascriptScripts: javascriptContents,
+      moduleScripts: modules,
+      nonmoduleScripts: javascripts,
     });
 
-    return new SugarcubeParser(passages, javascriptContents);
+    return new SugarcubeParser();
   }
 
   private static async load(): Promise<{
@@ -164,20 +158,20 @@ export class SugarcubeParser {
       await fs.readFile(`${__dirname}/internal/html.tpl`)
     ).toString();
     const jsdom = setupJsdom(sugarcubeHtml, {
-      url: "http://localhost",
-      runScripts: "dangerously",
-      resources: "usable",
+      url: 'http://localhost',
+      runScripts: 'dangerously',
+      resources: 'usable',
       pretendToBeVisual: true,
     });
 
     return new Promise((resolve) => {
-      jsdom.window.addEventListener("load", () => {
+      jsdom.window.addEventListener('load', () => {
         const { window: jsdomWindow } = jsdom;
         const { document: jsdomDocument } = jsdomWindow;
 
         jsdomDocument.toPrettyString = function (): Promise<string> {
           return prettier.format(document.documentElement.outerHTML, {
-            parser: "html",
+            parser: 'html',
           });
         };
 
