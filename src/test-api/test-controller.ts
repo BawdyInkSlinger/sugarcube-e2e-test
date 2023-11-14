@@ -357,7 +357,10 @@ export const testController: TestController = {
       $(selector.selectorString).trigger('click');
       return pageLoadPromise;
     });
-    return Object.assign(asyncClick, testController);
+    return Object.assign(
+      Promise.race([asyncClick, wait(1500, 'reject')]),
+      testController
+    );
   },
 
   expect<A>(
@@ -410,13 +413,24 @@ const thisAsPromise = (self: Promise<void> | TestController) => {
   }
 };
 
-const wait = (millis: number): Promise<void> =>
-  new Promise<void>((resolve) => {
+const wait = (
+  millis: number,
+  resolveOrReject: 'resolve' | 'reject' = 'resolve'
+): Promise<void> => {
+  const cause = new Error('Timeout');
+  return new Promise<void>((resolve, reject) => {
     enterLogger.debug(
       `${new Date().getTime()} testController: entering waiting ${millis} seconds`
     );
-    setTimeout(resolve, millis);
+    let impl = resolve;
+    if (resolveOrReject === 'reject') {
+      impl = () => {
+        reject(cause);
+      };
+    }
+    setTimeout(impl, millis);
   });
+};
 
 export interface TestControllerPromise<T = void>
   extends TestController,
