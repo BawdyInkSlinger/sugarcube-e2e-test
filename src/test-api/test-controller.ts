@@ -358,7 +358,7 @@ export const testController: TestController = {
       return pageLoadPromise;
     });
     return Object.assign(
-      Promise.race([asyncClick, wait(1500, 'reject')]),
+      asyncClick,
       testController
     );
   },

@@ -263,7 +263,6 @@ function start(moduleScripts: Script[], storyScripts: Script[]) {
         .text(script.content)
         .appendTo('head');
     });
-    // Scripting.evalJavaScript(script);
   });
 
   // primarily deals with StoryInterface Dom modifications
