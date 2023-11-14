@@ -19,7 +19,10 @@ import { objectDefineProperties } from './utils/object-define-properties';
 import { getLogger } from '../logger';
 import { stringFrom } from './helpers';
 
+const evalLogger = getLogger('DEBUG_EVAL');
+
 export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
+    'use strict';
 
 	/* eslint-disable no-unused-vars */
 
@@ -912,6 +915,7 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 		Evaluates the given JavaScript code and returns the result, throwing if there were errors.
 	*/
 	function evalJavaScript(code: string, output?, data?) {
+        evalLogger.debug(`evalJavaScript=${code}`);
 		return (function (code, output, evalJavaScript$Data$) {
 			return eval(code);
 		}).call(output ? { output } : null, String(code), output, data);
@@ -921,6 +925,7 @@ export const Scripting = (() => { // eslint-disable-line no-unused-vars, no-var
 		Evaluates the given TwineScript code and returns the result, throwing if there were errors.
 	*/
 	function evalTwineScript(code: string, output?, data?) {
+        evalLogger.debug(`evalTwineScript=${code}`);
 		// NOTE: Do not move the dollar sign to the front of `evalTwineScript$Data$`,
 		// as `parse()` will break references to it within the code string.
 		return (function (code, output, evalTwineScript$Data$) {
