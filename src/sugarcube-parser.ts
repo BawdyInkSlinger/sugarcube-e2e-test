@@ -4,7 +4,6 @@ import { DOMWindow } from 'jsdom';
 import seedrandom from 'seedrandom';
 import { glob } from 'glob';
 import { SimplePassage } from './internal/declarations/unofficial/simple-passage';
-import prettier from 'prettier';
 import { setupJsdom } from './internal/setup-jsdom';
 import { setGlobal } from './internal/set-global';
 import { SugarCubeStoryVariables } from './internal/declarations/unofficial/userdata';
@@ -13,12 +12,7 @@ import { TestController, testController } from './test-api/test-controller';
 import { waitForPassageEnd } from './test-api/wait-for-passage-end';
 import { setPassageLoadedHandler } from './test-api/passage-loaded-handler';
 import { getLogger } from './logger';
-
-declare global {
-  interface Document {
-    toPrettyString: () => Promise<string>;
-  }
-}
+import { addToPrettyString } from './add-to-pretty-string';
 
 const logger = getLogger('DEFAULT');
 const passagesLogger = getLogger('DEBUG_PASSAGES');
@@ -169,11 +163,7 @@ export class SugarcubeParser {
         const { window: jsdomWindow } = jsdom;
         const { document: jsdomDocument } = jsdomWindow;
 
-        jsdomDocument.toPrettyString = function (): Promise<string> {
-          return prettier.format(document.documentElement.outerHTML, {
-            parser: 'html',
-          });
-        };
+        addToPrettyString(jsdomDocument);
 
         resolve({
           window: jsdomWindow,
