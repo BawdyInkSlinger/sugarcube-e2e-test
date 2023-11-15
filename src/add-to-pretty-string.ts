@@ -4,6 +4,7 @@ declare global {
   interface PrettyStringOptions {
     includeHeadElement: boolean;
     includeSvgBody: boolean;
+    selectorsToRemove: string[];
   }
 
   interface Document {
@@ -17,6 +18,7 @@ export const addToPrettyString = (d: Document): void => {
     {
       includeHeadElement = true,
       includeSvgBody = true,
+      selectorsToRemove = [],
     }: Partial<PrettyStringOptions> = {} /* Does not need to hardcode each option to true */
   ): string {
     let docEl = document.documentElement.cloneNode(true) as HTMLElement;
@@ -28,6 +30,13 @@ export const addToPrettyString = (d: Document): void => {
     if (!includeSvgBody) {
       docEl.querySelectorAll('svg').forEach((svg) => {
         svg.innerHTML = '<!-- Child elements removed by toPrettyString() -->';
+      });
+    }
+    if (selectorsToRemove && selectorsToRemove.length > 0) {
+      selectorsToRemove.forEach((selector) => {
+        docEl.querySelectorAll(selector).forEach((el: HTMLElement) => {
+          el.outerHTML = `<!-- '${selector}' removed by toPrettyString() -->`;
+        });
       });
     }
 
