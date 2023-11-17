@@ -172,7 +172,26 @@ export class StringAssertions implements AssertionApi<string> {
     re: RegExp,
     options?: AssertionOptions
   ): TestControllerPromise<void> {
-    throw new Error('Method not implemented.');
+    const cause = new Error();
+    enterLogger.debug(
+      `${new Date().getTime()} StringAssertions: entering notMatch regexp='${re}' this.actual='${
+        this.actual
+      }'`
+    );
+    return Object.assign(
+      this.currentPromise.then(() => {
+        logger.debug(
+          `${new Date().getTime()} StringAssertions: resolving notMatch then regexp='${re}' this.actual='${
+            this.actual
+          }'`
+        );
+        if (re.test(this.actual)) {
+          cause.message = `\n  Expected:\n${this.actual}\n  To NOT match:\n${re}`;
+          throw cause;
+        }
+      }),
+      testController
+    );
   }
 
   contains<R>(
@@ -297,7 +316,35 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
     re: RegExp,
     options?: AssertionOptions
   ): TestControllerPromise<void> {
-    throw new Error('Method not implemented.');
+    const cause = new Error();
+    enterLogger.debug(
+      `${new Date().getTime()} PromiseAssertions: entering notMatch this.actual=${
+        this.actual
+      }`
+    );
+    return Object.assign(
+      this.currentPromise
+        .then(() => {
+          logger.debug(
+            `${new Date().getTime()} PromiseAssertions: resolving notMatch then regexp='${re}' this.actual=${
+              this.actual
+            }`
+          );
+          return this.actual;
+        })
+        .then((actualValue: A) => {
+          logger.debug(
+            `${new Date().getTime()} PromiseAssertions: resolving notMatch then regexp='${re}' actualValue=${actualValue}`
+          );
+          if (re.test(actualValue + '')) {
+            cause.message = `\n  Expected:\n${this.actual}\n  To NOT match:\n${re}`;
+            return Promise.reject(cause);
+          } else {
+            return Promise.resolve();
+          }
+        }),
+      testController
+    );
   }
 
   contains<R>(
