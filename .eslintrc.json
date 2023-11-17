@@ -5,11 +5,12 @@
     "node": true,
     "jasmine": true
   },
+  "plugins": ["@typescript-eslint"],
   "extends": [
     "eslint:recommended",
     "prettier",
     "plugin:@typescript-eslint/recommended",
-    "plugin:testcafe/recommended"
+    "plugin:prettier/recommended"
   ],
   "globals": {
     "Atomics": "readonly",
@@ -17,53 +18,28 @@
     "State": "writable",
     "setup": "writable"
   },
-  "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2018,
-    "project": [
-      "./tsconfig.json"
-    ]
+    "project": ["./tsconfig.json"]
   },
-  "plugins": [
-    "@typescript-eslint",
-    "testcafe"
-  ],
-  "ignorePatterns": [
-    "src/**/*.js"
-  ],
+  "ignorePatterns": ["src/**/*.js", "dist/**", "**/sugarcube-testapi.reference.d.ts"],
   "rules": {
-    "quotes": [
-      "off"
-    ],
-    "no-plusplus": [
-      "off"
-    ],
-    "@typescript-eslint/no-misused-promises": [
-      2
-    ],
-    "@typescript-eslint/no-floating-promises": [
-      2
-    ],
-    "@typescript-eslint/no-empty-function": [
-      "off"
-    ],
-    "@typescript-eslint/camelcase": [
-      "off"
-    ],
-    "@typescript-eslint/triple-slash-reference": [
-      "off"
-    ],
-    "@typescript-eslint/no-unused-vars": [
-      "off"
-    ],
-    "@typescript-eslint/no-non-null-assertion": [
-      "off"
-    ],
-    "@typescript-eslint/no-non-null-asserted-optional-chain": [
-      "off"
-    ],
-    "prefer-const": [
-      "warn"
-    ]
+    "prettier/prettier": "error",
+    "quotes": ["off"],
+    "no-plusplus": ["off"],
+    "curly": ["error", "all"],
+    "@typescript-eslint/no-misused-promises": [2],
+    "@typescript-eslint/no-floating-promises": [2],
+    "@typescript-eslint/no-empty-function": ["off"],
+    "@typescript-eslint/camelcase": ["off"],
+    "@typescript-eslint/triple-slash-reference": ["off"],
+    "@typescript-eslint/no-unused-vars": ["off"],
+    "@typescript-eslint/no-non-null-assertion": ["off"],
+    "@typescript-eslint/no-non-null-asserted-optional-chain": ["off"],
+    "prefer-const": ["warn"],
+    // TODO: remove these
+    "@typescript-eslint/ban-ts-comment": ["off"],
+    "no-prototype-builtins": ["off"],
+    "prefer-rest-params": ["off"]
   }
 }

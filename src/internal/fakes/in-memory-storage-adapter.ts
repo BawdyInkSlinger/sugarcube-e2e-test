@@ -1,4 +1,4 @@
-import { getLogger } from "../../logger";
+import { getLogger } from '../../logger';
 
 const logger = getLogger('DEFAULT');
 
@@ -21,7 +21,7 @@ export const InMemoryStorageAdapter: Adapter = {
   create: function (storageId: string, persistent: boolean): Adapter {
     return this;
   },
-  
+
   delete: function (value: string): boolean {
     logger.info('InMemoryStorageAdapter: Function not implemented.');
     return true;
@@ -33,5 +33,5 @@ export const InMemoryStorageAdapter: Adapter = {
   get: function (key: string): object {
     logger.info('InMemoryStorageAdapter: Function not implemented.');
     return null;
-  }
-}
+  },
+};

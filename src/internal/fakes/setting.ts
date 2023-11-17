@@ -1,5 +1,10 @@
 import { getLogger } from '../../logger';
-import { ListDefinition, RangeDefinition, SettingsAPI, ToggleDefinition } from '../declarations/twine-sugarcube-copy/settings';
+import {
+  ListDefinition,
+  RangeDefinition,
+  SettingsAPI,
+  ToggleDefinition,
+} from '../declarations/twine-sugarcube-copy/settings';
 
 const logger = getLogger('DEFAULT');
 
@@ -24,5 +29,5 @@ export const Setting: SettingsAPI = {
   },
   save: function (): void {
     logger.info('FAKE SETTING: Function not implemented.');
-  }
-}
+  },
+};

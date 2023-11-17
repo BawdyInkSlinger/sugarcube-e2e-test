@@ -148,6 +148,7 @@ export const MacroContext = (() => {
     }
 
     contextHas(filter) {
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
       let context = this;
 
       while ((context = context.parent) !== null) {
@@ -160,6 +161,7 @@ export const MacroContext = (() => {
     }
 
     contextSelect(filter) {
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
       let context = this;
 
       while ((context = context.parent) !== null) {
@@ -173,6 +175,7 @@ export const MacroContext = (() => {
 
     contextSelectAll(filter) {
       const result = [];
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
       let context = this;
 
       while ((context = context.parent) !== null) {
@@ -211,6 +214,7 @@ export const MacroContext = (() => {
       doneCallback?: (...params: Param[]) => void,
       startCallback?: (...params: Param[]) => void
     ): (...params: Param[]) => void {
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
       const shadowContext = this;
       let shadowStore;
 

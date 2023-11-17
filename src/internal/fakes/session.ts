@@ -11,10 +11,10 @@ globalThis.session = {
   },
   set(val: Adapter) {
     _session = val;
-  }
-}
+  },
+};
 
 // sugarcube reassigns session in some places. You can't reassign to imports. Importing the container is the workaround.
 export const SessionContainer = {
-  session: globalThis.session
+  session: globalThis.session,
 };

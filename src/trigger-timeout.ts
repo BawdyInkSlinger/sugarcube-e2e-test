@@ -42,11 +42,11 @@ export function triggerTimeout<Params extends unknown[]>(
     cancelTimeout: () => {
       clearTimeout(timeoutId);
       logger.debug(
-          `${new Date().getTime()} triggerTimeout: trigger :cleartimeout for '${context.replaceAll(
-            /\r/g,
-            ''
-          )}' delay='${delay}'`
-        );
+        `${new Date().getTime()} triggerTimeout: trigger :cleartimeout for '${context.replaceAll(
+          /\r/g,
+          ''
+        )}' delay='${delay}'`
+      );
       timers.set(result, 'cleared');
       jQuery.event.trigger(':cleartimeout', result);
     },
@@ -68,22 +68,22 @@ export function triggerTimeout<Params extends unknown[]>(
       }
     } finally {
       logger.debug(
-          `${new Date().getTime()} triggerTimeout: trigger :completetimeout for '${context.replaceAll(
-            /\r/g,
-            ''
-          )}' delay='${delay}'`
-        );
+        `${new Date().getTime()} triggerTimeout: trigger :completetimeout for '${context.replaceAll(
+          /\r/g,
+          ''
+        )}' delay='${delay}'`
+      );
       timers.set(result, 'completed');
       jQuery.event.trigger(':completetimeout', result);
     }
   }
 
   logger.debug(
-      `${new Date().getTime()} triggerTimeout: trigger :createtimeout for '${context.replaceAll(
-        /\r/g,
-        ''
-      )}' delay='${delay}'`
-    );
+    `${new Date().getTime()} triggerTimeout: trigger :createtimeout for '${context.replaceAll(
+      /\r/g,
+      ''
+    )}' delay='${delay}'`
+  );
 
   timers.set(result, 'created');
   jQuery.event.trigger(':createtimeout', result);

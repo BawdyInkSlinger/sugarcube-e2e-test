@@ -72,7 +72,7 @@ export const PassageClass = (() => {
     declare tags: string[];
     declare classes: string[];
 
-    constructor({title, text, tags}: SimplePassage) {
+    constructor({ title, text, tags }: SimplePassage) {
       const sortedAndUniqueTags = [...new Set<string>(tags)].sort((a, b) =>
         a.localeCompare(b)
       );
@@ -83,18 +83,13 @@ export const PassageClass = (() => {
     }
 
     // I extracted this private method to rename sortedAndUniqueTags -> tags and prevent the possibility of unsorted tag being used accidentally
-    #construct(
-      id: string,
-      name: string,
-      text: string,
-      tags: string[]
-    ) {
+    #construct(id: string, name: string, text: string, tags: string[]) {
       Object.defineProperties(this, {
         // Passage title.
         name: {
           value: name,
         },
-        
+
         text: {
           value: text,
         },

@@ -30,7 +30,7 @@ export interface NodeSnapshot {
   /**
    * Attributes of the element.
    */
-  attributes?: {[name: string]: string};
+  attributes?: { [name: string]: string };
   /**
    * The size of the element and its position relative to the viewport.
    */
@@ -133,7 +133,7 @@ export interface NodeSnapshot {
   /**
    * The computed values of element's CSS properties.
    */
-  style?: {[prop: string]: string};
+  style?: { [prop: string]: string };
   /**
    * The name of the element.
    * See https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName

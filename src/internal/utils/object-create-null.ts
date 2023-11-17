@@ -15,8 +15,8 @@ export const objectCreateNull = <Obj extends PropertyDescriptorMap>(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Object.create(null, obj) as any;
 
-  // the following can provide useful troubleshooting information when uncommented
-  /*
+// the following can provide useful troubleshooting information when uncommented
+/*
 const fn = () => 'hi';
 const fn2 = (val: string) => {};
 const x = objectCreateNull(null, {

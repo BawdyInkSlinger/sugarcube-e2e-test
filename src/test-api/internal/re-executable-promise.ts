@@ -20,7 +20,9 @@ export default class ReExecutablePromise<T> extends Promise<T> {
   }
 
   private _ensureExecuting(): void {
-    if (this._taskPromise === null) this._taskPromise = new Promise(this._fn);
+    if (this._taskPromise === null) {
+      this._taskPromise = new Promise(this._fn);
+    }
   }
 
   public _reExecute(): ReExecutablePromise<T> {
@@ -58,9 +60,7 @@ export default class ReExecutablePromise<T> extends Promise<T> {
     return this._taskPromise.catch(onrejected);
   }
 
-  public static fromFn<T>(
-    asyncExecutorFn: () => T
-  ): ReExecutablePromise<T> {
+  public static fromFn<T>(asyncExecutorFn: () => T): ReExecutablePromise<T> {
     return new ReExecutablePromise((resolve: Function) =>
       resolve(asyncExecutorFn())
     );

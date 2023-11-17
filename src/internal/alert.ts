@@ -19,96 +19,104 @@ import { objectDefineProperties } from './utils/object-define-properties';
 		Opera (Presto)           → `Uncaught exception: \w*(?:Error|Exception): …`
 		Safari (ca. v5.1)        → `\w*(?:Error|_ERR): …`
 */
-export const errorPrologRegExp = /^(?:(?:uncaught\s+(?:exception:\s+)?)?\w*(?:error|exception|_err):\s+)+/i; // eslint-disable-line no-unused-vars, no-var
+export const errorPrologRegExp =
+  /^(?:(?:uncaught\s+(?:exception:\s+)?)?\w*(?:error|exception|_err):\s+)+/i; // eslint-disable-line no-unused-vars, no-var
 
-export const Alert = (() => { // eslint-disable-line no-unused-vars, no-var
-	'use strict';
+export const Alert = (() => {
+  // eslint-disable-line no-unused-vars, no-var
+  'use strict';
 
-	/*******************************************************************************************************************
+  /*******************************************************************************************************************
 		Error Functions.
 	*******************************************************************************************************************/
-	function mesg(where, error, isFatal?, isUncaught?) {
-		let mesg = 'Error';
-		let nice = `A${isFatal ? ' fatal' : 'n'} error has occurred.`;
+  function mesg(where, error, isFatal?, isUncaught?) {
+    let mesg = 'Error';
+    let nice = `A${isFatal ? ' fatal' : 'n'} error has occurred.`;
 
-		if (isFatal) {
-			nice += ' Aborting.';
-		}
-		else {
-			nice += ' You may be able to continue, but some parts may not work properly.';
-		}
+    if (isFatal) {
+      nice += ' Aborting.';
+    } else {
+      nice +=
+        ' You may be able to continue, but some parts may not work properly.';
+    }
 
-		const isObject = error !== null && typeof error === 'object';
-		const isExLike = isObject && 'message' in error;
-		const what     = (
-			isExLike ? String(error.message).replace(errorPrologRegExp, '') : String(error)
-		).trim() || 'unknown error';
+    const isObject = error !== null && typeof error === 'object';
+    const isExLike = isObject && 'message' in error;
+    const what =
+      (isExLike
+        ? String(error.message).replace(errorPrologRegExp, '')
+        : String(error)
+      ).trim() || 'unknown error';
 
-		if (where != null) { // lazy equality for null
-			mesg += ` [${where}]`;
-		}
+    if (where != null) {
+      // lazy equality for null
+      mesg += ` [${where}]`;
+    }
 
-		mesg += `: ${what}.`;
+    mesg += `: ${what}.`;
 
-		if (isObject && 'stack' in error) {
-			mesg += `\n\nStack Trace:\n${error.stack}`;
-		}
+    if (isObject && 'stack' in error) {
+      mesg += `\n\nStack Trace:\n${error.stack}`;
+    }
 
-		if (mesg) {
-			nice += `\n\n${mesg}`;
-		}
+    if (mesg) {
+      nice += `\n\n${mesg}`;
+    }
 
-		// Log a plain message.
-		if (!isUncaught) {
-			console[isFatal ? 'error' : 'warn'](mesg);
-		}
+    // Log a plain message.
+    if (!isUncaught) {
+      console[isFatal ? 'error' : 'warn'](mesg);
+    }
 
-		// Pop up a nice message.
-		window.alert(nice); // eslint-disable-line no-alert
-	}
+    // Pop up a nice message.
+    window.alert(nice); // eslint-disable-line no-alert
+  }
 
-	function alertError(where, error) {
-		mesg(where, error);
-	}
+  function alertError(where, error) {
+    mesg(where, error);
+  }
 
-	function alertFatal(where, error) {
-		mesg(where, error, true);
-	}
+  function alertFatal(where, error) {
+    mesg(where, error, true);
+  }
 
-
-	/*******************************************************************************************************************
+  /*******************************************************************************************************************
 		Error Event.
 	*******************************************************************************************************************/
-	/*
+  /*
 		Set up a global error handler for uncaught exceptions.
 	*/
-	(origOnError => {
-		window.onerror = function (what, source, lineNum, colNum, error) {
-			// console.error(what, source, lineNum, colNum, error);
+  ((origOnError) => {
+    window.onerror = function (what, source, lineNum, colNum, error) {
+      // console.error(what, source, lineNum, colNum, error);
 
-			// Uncaught exceptions during play may be recoverable/ignorable.
-			if (document.readyState === 'complete') {
-				mesg(null, error != null ? error : what, false, true); // lazy equality for null
-			}
+      // Uncaught exceptions during play may be recoverable/ignorable.
+      if (document.readyState === 'complete') {
+        mesg(null, error != null ? error : what, false, true); // lazy equality for null
+      }
 
-			// Uncaught exceptions during startup should be fatal.
-			else {
-				mesg(null, error != null ? error : what, true, true); // lazy equality for null
-				window.onerror = origOnError;
+      // Uncaught exceptions during startup should be fatal.
+      else {
+        mesg(null, error != null ? error : what, true, true); // lazy equality for null
+        window.onerror = origOnError;
 
-				if (typeof window.onerror === 'function') {
-					window.onerror.apply(this, arguments);
-				}
-			}
-		};
-	})(window.onerror);
+        if (typeof window.onerror === 'function') {
+          window.onerror.apply(this, arguments);
+        }
+      }
+    };
+  })(window.onerror);
 
-
-	/*******************************************************************************************************************
+  /*******************************************************************************************************************
 		Module Exports.
 	*******************************************************************************************************************/
-	return Object.freeze(objectDefineProperties({}, {
-		error : { value : alertError },
-		fatal : { value : alertFatal }
-	}));
+  return Object.freeze(
+    objectDefineProperties(
+      {},
+      {
+        error: { value: alertError },
+        fatal: { value: alertFatal },
+      }
+    )
+  );
 })();

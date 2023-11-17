@@ -12,10 +12,10 @@ globalThis.TempVariables = {
   },
   set(val: typeof _tempVariables) {
     _tempVariables = val;
-  }
-}
+  },
+};
 
 // sugarcube reassigns tempVariables in some places. You can't reassign to imports. Importing the container is the workaround.
 export const TempVariablesContainer = {
-  TempVariables: globalThis.TempVariables
+  TempVariables: globalThis.TempVariables,
 };

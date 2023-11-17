@@ -8,8 +8,8 @@
 ***********************************************************************************************************************/
 /* global Has, Scripting */
 
-import { Has } from "./has";
-import { objectCreateNull } from "./utils/object-create-null";
+import { Has } from './has';
+import { objectCreateNull } from './utils/object-create-null';
 
 export const Util = (() => {
   // eslint-disable-line no-unused-vars, no-var
@@ -31,10 +31,10 @@ export const Util = (() => {
     // a version of `utilGetType()` that contains special cases for them, since
     // they do not have a `[[Class]]` internal slot and the `@@toStringTag`
     // internal property is unavailable to them.
-    if (toString.call(new Map()) === "[object Object]") {
+    if (toString.call(new Map()) === '[object Object]') {
       return function utilGetType(O) {
         if (O === null) {
-          return "null";
+          return 'null';
         }
 
         // Special cases for the `Map` and `Set` polyfills.
@@ -42,25 +42,25 @@ export const Util = (() => {
         // NOTE: We don't special case the `WeakMap` and `WeakSet` polyfills
         // here since they're (a) unlikely to be used and (b) broken anyway.
         if (O instanceof Map) {
-          return "Map";
+          return 'Map';
         }
         if (O instanceof Set) {
-          return "Set";
+          return 'Set';
         }
 
         const baseType = typeof O;
-        return baseType === "object" ? toString.call(O).slice(8, -1) : baseType;
+        return baseType === 'object' ? toString.call(O).slice(8, -1) : baseType;
       };
     }
 
     // Elsewise, return the regular `utilGetType()` function.
     return function utilGetType(O) {
       if (O === null) {
-        return "null";
+        return 'null';
       }
 
       const baseType = typeof O;
-      return baseType === "object" ? toString.call(O).slice(8, -1) : baseType;
+      return baseType === 'object' ? toString.call(O).slice(8, -1) : baseType;
     };
   })();
 
@@ -70,8 +70,8 @@ export const Util = (() => {
 	*/
   function utilIsBoolean(obj) {
     return (
-      typeof obj === "boolean" ||
-      (typeof obj === "string" && (obj === "true" || obj === "false"))
+      typeof obj === 'boolean' ||
+      (typeof obj === 'string' && (obj === 'true' || obj === 'false'))
     );
   }
 
@@ -79,7 +79,7 @@ export const Util = (() => {
 		Returns whether the passed value is iterable.
 	*/
   function utilIsIterable(obj) {
-    return obj != null && typeof obj[Symbol.iterator] === "function"; // lazy equality for null
+    return obj != null && typeof obj[Symbol.iterator] === 'function'; // lazy equality for null
   }
 
   /*
@@ -90,11 +90,11 @@ export const Util = (() => {
     let num;
 
     switch (typeof obj) {
-      case "number":
+      case 'number':
         num = obj;
         break;
 
-      case "string":
+      case 'string':
         num = Number(obj);
         break;
 
@@ -141,14 +141,14 @@ export const Util = (() => {
     } else if (obj instanceof Map) {
       obj.forEach((val, key) => (pEnum[String(key)] = val));
     } else if (
-      typeof obj === "object" &&
+      typeof obj === 'object' &&
       obj !== null &&
       Object.getPrototypeOf(obj) === Object.prototype
     ) {
       Object.assign(pEnum, obj);
     } else {
       throw new TypeError(
-        "Util.toEnum obj parameter must be an Array, Map, Set, or generic object"
+        'Util.toEnum obj parameter must be an Array, Map, Set, or generic object'
       );
     }
 
@@ -188,8 +188,8 @@ export const Util = (() => {
 
     /* legacy */
     const _legacy = base
-      .replace(/[^\w\s\u2013\u2014-]+/g, "")
-      .replace(/[_\s\u2013\u2014-]+/g, "-")
+      .replace(/[^\w\s\u2013\u2014-]+/g, '')
+      .replace(/[_\s\u2013\u2014-]+/g, '-')
       .toLocaleLowerCase();
 
     if (!_isInvalidSlugRe.test(_legacy)) {
@@ -198,8 +198,8 @@ export const Util = (() => {
     /* /legacy */
 
     return base
-      .replace(_illegalSlugCharsRe, "")
-      .replace(/[_\s\u2013\u2014-]+/g, "-");
+      .replace(_illegalSlugCharsRe, '')
+      .replace(/[_\s\u2013\u2014-]+/g, '-');
 
     // For v3.
     // return base.replace(_illegalSlugCharsRe, '-');
@@ -217,7 +217,7 @@ export const Util = (() => {
   const _illegalFilenameCharsRE = /[\x00-\x1f"#$%&'*+,/:;<=>?\\^`|\x7f-\x9f]+/g; // eslint-disable-line no-control-regex
 
   function utilSanitizeFilename(str) {
-    return String(str).trim().replace(_illegalFilenameCharsRE, "");
+    return String(str).trim().replace(_illegalFilenameCharsRE, '');
   }
 
   /*
@@ -230,37 +230,37 @@ export const Util = (() => {
   const _hasMarkupCharsRe = new RegExp(_markupCharsRe.source); // to drop the global flag
   const _markupCharsMap = utilToEnum({
     /* eslint-disable quote-props */
-    "!": "&#33;",
-    '"': "&quot;",
-    "#": "&#35;",
-    $: "&#36;",
-    "&": "&amp;",
-    "'": "&#39;",
-    "*": "&#42;",
-    "-": "&#45;",
-    "/": "&#47;",
-    "<": "&lt;",
-    "=": "&#61;",
-    ">": "&gt;",
-    "?": "&#63;",
-    "@": "&#64;",
-    "[": "&#91;",
-    "\\": "&#92;",
-    "]": "&#93;",
-    "^": "&#94;",
-    _: "&#95;",
-    "`": "&#96;",
-    "{": "&#123;",
-    "|": "&#124;",
-    "}": "&#125;",
-    "~": "&#126;",
+    '!': '&#33;',
+    '"': '&quot;',
+    '#': '&#35;',
+    $: '&#36;',
+    '&': '&amp;',
+    "'": '&#39;',
+    '*': '&#42;',
+    '-': '&#45;',
+    '/': '&#47;',
+    '<': '&lt;',
+    '=': '&#61;',
+    '>': '&gt;',
+    '?': '&#63;',
+    '@': '&#64;',
+    '[': '&#91;',
+    '\\': '&#92;',
+    ']': '&#93;',
+    '^': '&#94;',
+    _: '&#95;',
+    '`': '&#96;',
+    '{': '&#123;',
+    '|': '&#124;',
+    '}': '&#125;',
+    '~': '&#126;',
     /* eslint-enable quote-props */
   });
 
   function utilEscapeMarkup(str) {
     if (str == null) {
       // lazy equality for null
-      return "";
+      return '';
     }
 
     const val = String(str);
@@ -277,18 +277,18 @@ export const Util = (() => {
   const _htmlCharsRe = /[&<>"'`]/g;
   const _hasHtmlCharsRe = new RegExp(_htmlCharsRe.source); // to drop the global flag
   const _htmlCharsMap = utilToEnum({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;",
-    "`": "&#96;",
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+    '`': '&#96;',
   });
 
   function utilEscape(str) {
     if (str == null) {
       // lazy equality for null
-      return "";
+      return '';
     }
 
     const val = String(str);
@@ -305,31 +305,31 @@ export const Util = (() => {
 	*/
   const _escapedHtmlRe =
     /&(?:amp|#38|#x26|lt|#60|#x3c|gt|#62|#x3e|quot|#34|#x22|apos|#39|#x27|#96|#x60);/gi;
-  const _hasEscapedHtmlRe = new RegExp(_escapedHtmlRe.source, "i"); // to drop the global flag
+  const _hasEscapedHtmlRe = new RegExp(_escapedHtmlRe.source, 'i'); // to drop the global flag
   const _escapedHtmlMap = utilToEnum({
-    "&amp;": "&", // ampersand (HTML character entity, XML predefined entity)
-    "&#38;": "&", // ampersand (decimal numeric character reference)
-    "&#x26;": "&", // ampersand (hexadecimal numeric character reference)
-    "&lt;": "<", // less-than (HTML character entity, XML predefined entity)
-    "&#60;": "<", // less-than (decimal numeric character reference)
-    "&#x3c;": "<", // less-than (hexadecimal numeric character reference)
-    "&gt;": ">", // greater-than (HTML character entity, XML predefined entity)
-    "&#62;": ">", // greater-than (decimal numeric character reference)
-    "&#x3e;": ">", // greater-than (hexadecimal numeric character reference)
-    "&quot;": '"', // double quote (HTML character entity, XML predefined entity)
-    "&#34;": '"', // double quote (decimal numeric character reference)
-    "&#x22;": '"', // double quote (hexadecimal numeric character reference)
-    "&apos;": "'", // apostrophe (XML predefined entity)
-    "&#39;": "'", // apostrophe (decimal numeric character reference)
-    "&#x27;": "'", // apostrophe (hexadecimal numeric character reference)
-    "&#96;": "`", // backquote (decimal numeric character reference)
-    "&#x60;": "`", // backquote (hexadecimal numeric character reference)
+    '&amp;': '&', // ampersand (HTML character entity, XML predefined entity)
+    '&#38;': '&', // ampersand (decimal numeric character reference)
+    '&#x26;': '&', // ampersand (hexadecimal numeric character reference)
+    '&lt;': '<', // less-than (HTML character entity, XML predefined entity)
+    '&#60;': '<', // less-than (decimal numeric character reference)
+    '&#x3c;': '<', // less-than (hexadecimal numeric character reference)
+    '&gt;': '>', // greater-than (HTML character entity, XML predefined entity)
+    '&#62;': '>', // greater-than (decimal numeric character reference)
+    '&#x3e;': '>', // greater-than (hexadecimal numeric character reference)
+    '&quot;': '"', // double quote (HTML character entity, XML predefined entity)
+    '&#34;': '"', // double quote (decimal numeric character reference)
+    '&#x22;': '"', // double quote (hexadecimal numeric character reference)
+    '&apos;': "'", // apostrophe (XML predefined entity)
+    '&#39;': "'", // apostrophe (decimal numeric character reference)
+    '&#x27;': "'", // apostrophe (hexadecimal numeric character reference)
+    '&#96;': '`', // backquote (decimal numeric character reference)
+    '&#x60;': '`', // backquote (hexadecimal numeric character reference)
   });
 
   function utilUnescape(str) {
     if (str == null) {
       // lazy equality for null
-      return "";
+      return '';
     }
 
     const val = String(str);
@@ -363,7 +363,7 @@ export const Util = (() => {
 
     // Given position was out-of-bounds.
     if (Number.isNaN(code)) {
-      return { char: "", start: -1, end: -1 };
+      return { char: '', start: -1, end: -1 };
     }
 
     const retval = {
@@ -466,18 +466,18 @@ export const Util = (() => {
 	*/
   function utilToCssTime(msec) {
     if (
-      typeof msec !== "number" ||
+      typeof msec !== 'number' ||
       Number.isNaN(msec) ||
       !Number.isFinite(msec)
     ) {
       let what;
 
       switch (typeof msec) {
-        case "string":
+        case 'string':
           what = `"${msec}"`;
           break;
 
-        case "number":
+        case 'number':
           what = String(msec);
           break;
 
@@ -496,12 +496,12 @@ export const Util = (() => {
 		Returns the DOM property name represented by the passed CSS property name.
 	*/
   function utilFromCssProperty(cssName) {
-    if (!cssName.includes("-")) {
+    if (!cssName.includes('-')) {
       switch (cssName) {
-        case "bgcolor":
-          return "backgroundColor";
-        case "float":
-          return "cssFloat";
+        case 'bgcolor':
+          return 'backgroundColor';
+        case 'float':
+          return 'cssFloat';
         default:
           return cssName;
       }
@@ -509,19 +509,19 @@ export const Util = (() => {
 
     // Strip the leading hyphen from the `-ms-` vendor prefix, so it stays lowercased.
     const normalized =
-      cssName.slice(0, 4) === "-ms-" ? cssName.slice(1) : cssName;
+      cssName.slice(0, 4) === '-ms-' ? cssName.slice(1) : cssName;
 
     return normalized
-      .split("-")
+      .split('-')
       .map((part, i) => (i === 0 ? part : part.toUpperFirst()))
-      .join("");
+      .join('');
   }
 
   /*
 		Returns an object containing the component properties parsed from the passed URL.
 	*/
   function utilParseUrl(url) {
-    const el = document.createElement("a");
+    const el = document.createElement('a');
     const queryObj = Object.create(null);
 
     // Let the `<a>` element parse the URL.
@@ -530,10 +530,10 @@ export const Util = (() => {
     // Populate the `queryObj` object with the query string attributes.
     if (el.search) {
       el.search
-        .replace(/^\?/, "")
+        .replace(/^\?/, '')
         .splitOrEmpty(/(?:&(?:amp;)?|;)/)
         .forEach((query) => {
-          const [key, value] = query.split("=");
+          const [key, value] = query.split('=');
           queryObj[key] = value;
         });
     }
@@ -556,7 +556,7 @@ export const Util = (() => {
 
     // Patch for IE not including the leading slash on `pathname` when required.
     const pathname =
-      el.host && el.pathname[0] !== "/" ? `/${el.pathname}` : el.pathname;
+      el.host && el.pathname[0] !== '/' ? `/${el.pathname}` : el.pathname;
 
     return {
       // The full URL that was originally parsed.
@@ -611,54 +611,54 @@ export const Util = (() => {
 		of a host exception type—e.g. `DOMException` → `Error`.
 	*/
   function utilNewExceptionFrom(original, exceptionType, override) {
-    if (typeof original !== "object" || original === null) {
+    if (typeof original !== 'object' || original === null) {
       throw new Error(
-        "Util.newExceptionFrom original parameter must be an object"
+        'Util.newExceptionFrom original parameter must be an object'
       );
     }
-    if (typeof exceptionType !== "function") {
+    if (typeof exceptionType !== 'function') {
       throw new Error(
-        "Util.newExceptionFrom exceptionType parameter must be an error type constructor"
+        'Util.newExceptionFrom exceptionType parameter must be an error type constructor'
       );
     }
 
     const ex = new exceptionType(original.message); // eslint-disable-line new-cap
 
-    if (typeof original.name !== "undefined") {
+    if (typeof original.name !== 'undefined') {
       ex.name = original.name;
     }
-    if (typeof original.code !== "undefined") {
+    if (typeof original.code !== 'undefined') {
       ex.code = original.code;
     }
-    if (typeof original.columnNumber !== "undefined") {
+    if (typeof original.columnNumber !== 'undefined') {
       ex.columnNumber = original.columnNumber;
     }
-    if (typeof original.description !== "undefined") {
+    if (typeof original.description !== 'undefined') {
       ex.description = original.description;
     }
-    if (typeof original.fileName !== "undefined") {
+    if (typeof original.fileName !== 'undefined') {
       ex.fileName = original.fileName;
     }
-    if (typeof original.lineNumber !== "undefined") {
+    if (typeof original.lineNumber !== 'undefined') {
       ex.lineNumber = original.lineNumber;
     }
-    if (typeof original.number !== "undefined") {
+    if (typeof original.number !== 'undefined') {
       ex.number = original.number;
     }
-    if (typeof original.stack !== "undefined") {
+    if (typeof original.stack !== 'undefined') {
       ex.stack = original.stack;
     }
 
     const overrideType = typeof override;
 
-    if (overrideType !== "undefined") {
-      if (overrideType === "object" && override !== null) {
+    if (overrideType !== 'undefined') {
+      if (overrideType === 'object' && override !== null) {
         Object.assign(ex, override);
-      } else if (overrideType === "string") {
+      } else if (overrideType === 'string') {
         ex.message = override;
       } else {
         throw new Error(
-          "Util.newExceptionFrom override parameter must be an object or string"
+          'Util.newExceptionFrom override parameter must be an object or string'
         );
       }
     }
@@ -678,8 +678,8 @@ export const Util = (() => {
     // Attempt to determine the player's 'Separator' and 'Decimal' key values
     // based on their current locale.
     if (
-      typeof Intl !== "undefined" &&
-      typeof Intl.NumberFormat === "function"
+      typeof Intl !== 'undefined' &&
+      typeof Intl.NumberFormat === 'function'
     ) {
       const match = new Intl.NumberFormat()
         .format(111111.5)
@@ -693,64 +693,64 @@ export const Util = (() => {
 
     // Failover to US-centric values, if using `Intl.NumberFormat` failed.
     if (!separatorKey && !decimalKey) {
-      separatorKey = ",";
-      decimalKey = ".";
+      separatorKey = ',';
+      decimalKey = '.';
     }
 
     // Maps older `KeyboardEvent.key` values to more current/correct ones.
     function utilScrubEventKey(key) {
       switch (key) {
         // case 'OS':                 return 'Meta'; // Unreliable.
-        case "Scroll":
-          return "ScrollLock";
-        case "Spacebar":
-          return "\x20";
-        case "Left":
-          return "ArrowLeft";
-        case "Right":
-          return "ArrowRight";
-        case "Up":
-          return "ArrowUp";
-        case "Down":
-          return "ArrowDown";
-        case "Del":
-          return "Delete";
-        case "Crsel":
-          return "CrSel";
-        case "Exsel":
-          return "ExSel";
-        case "Esc":
-          return "Escape";
-        case "Apps":
-          return "ContextMenu";
-        case "Nonconvert":
-          return "NonConvert";
-        case "MediaNextTrack":
-          return "MediaTrackNext";
-        case "MediaPreviousTrack":
-          return "MediaTrackPrevious";
-        case "VolumeUp":
-          return "AudioVolumeUp";
-        case "VolumeDown":
-          return "AudioVolumeDown";
-        case "VolumeMute":
-          return "AudioVolumeMute";
-        case "Zoom":
-          return "ZoomToggle";
-        case "SelectMedia": /* see below */
-        case "MediaSelect":
-          return "LaunchMediaPlayer";
-        case "Add":
-          return "+";
-        case "Divide":
-          return "/";
-        case "Multiply":
-          return "*";
-        case "Subtract":
-          return "-";
-        case "Decimal":
+        case 'Scroll':
+          return 'ScrollLock';
+        case 'Spacebar':
+          return '\x20';
+        case 'Left':
+          return 'ArrowLeft';
+        case 'Right':
+          return 'ArrowRight';
+        case 'Up':
+          return 'ArrowUp';
+        case 'Down':
+          return 'ArrowDown';
+        case 'Del':
+          return 'Delete';
+        case 'Crsel':
+          return 'CrSel';
+        case 'Exsel':
+          return 'ExSel';
+        case 'Esc':
+          return 'Escape';
+        case 'Apps':
+          return 'ContextMenu';
+        case 'Nonconvert':
+          return 'NonConvert';
+        case 'MediaNextTrack':
+          return 'MediaTrackNext';
+        case 'MediaPreviousTrack':
+          return 'MediaTrackPrevious';
+        case 'VolumeUp':
+          return 'AudioVolumeUp';
+        case 'VolumeDown':
+          return 'AudioVolumeDown';
+        case 'VolumeMute':
+          return 'AudioVolumeMute';
+        case 'Zoom':
+          return 'ZoomToggle';
+        case 'SelectMedia': /* see below */
+        case 'MediaSelect':
+          return 'LaunchMediaPlayer';
+        case 'Add':
+          return '+';
+        case 'Divide':
+          return '/';
+        case 'Multiply':
+          return '*';
+        case 'Subtract':
+          return '-';
+        case 'Decimal':
           return decimalKey;
-        case "Separator":
+        case 'Separator':
           return separatorKey;
       }
 
@@ -769,7 +769,7 @@ export const Util = (() => {
   const utilHasMediaQuery = (() => {
     // If the browser does not support `matchMedia()`, then return
     // a version of `utilHasMediaQuery()` that simply returns `false`.
-    if (typeof window.matchMedia !== "function") {
+    if (typeof window.matchMedia !== 'function') {
       return function utilHasMediaQuery() {
         return false;
       };
@@ -785,79 +785,76 @@ export const Util = (() => {
 		Module Exports.
 	*******************************************************************************************************************/
   return Object.freeze(
-    objectCreateNull(
-      null,
-      {
-        /*
+    objectCreateNull(null, {
+      /*
 			Type Functions.
 		*/
-        getType: { value: utilGetType },
-        isBoolean: { value: utilIsBoolean },
-        isIterable: { value: utilIsIterable },
-        isNumeric: { value: utilIsNumeric },
-        sameValueZero: { value: utilSameValueZero },
-        toEnum: { value: utilToEnum },
-        toStringTag: { value: utilToStringTag },
+      getType: { value: utilGetType },
+      isBoolean: { value: utilIsBoolean },
+      isIterable: { value: utilIsIterable },
+      isNumeric: { value: utilIsNumeric },
+      sameValueZero: { value: utilSameValueZero },
+      toEnum: { value: utilToEnum },
+      toStringTag: { value: utilToStringTag },
 
-        /*
+      /*
 			String Encoding Functions.
 		*/
-        slugify: { value: utilSlugify },
-        sanitizeFilename: { value: utilSanitizeFilename },
-        escapeMarkup: { value: utilEscapeMarkup },
-        escape: { value: utilEscape },
-        unescape: { value: utilUnescape },
-        charAndPosAt: { value: utilCharAndPosAt },
+      slugify: { value: utilSlugify },
+      sanitizeFilename: { value: utilSanitizeFilename },
+      escapeMarkup: { value: utilEscapeMarkup },
+      escape: { value: utilEscape },
+      unescape: { value: utilUnescape },
+      charAndPosAt: { value: utilCharAndPosAt },
 
-        /*
+      /*
 			Time Functions.
 		*/
-        now: { value: utilNow },
+      now: { value: utilNow },
 
-        /*
+      /*
 			Conversion Functions.
 		*/
-        fromCssTime: { value: utilFromCssTime },
-        toCssTime: { value: utilToCssTime },
-        fromCssProperty: { value: utilFromCssProperty },
-        parseUrl: { value: utilParseUrl },
-        newExceptionFrom: { value: utilNewExceptionFrom },
-        scrubEventKey: { value: utilScrubEventKey },
+      fromCssTime: { value: utilFromCssTime },
+      toCssTime: { value: utilToCssTime },
+      fromCssProperty: { value: utilFromCssProperty },
+      parseUrl: { value: utilParseUrl },
+      newExceptionFrom: { value: utilNewExceptionFrom },
+      scrubEventKey: { value: utilScrubEventKey },
 
-        /*
+      /*
 			Browser API Functions.
 		*/
-        hasMediaQuery: { value: utilHasMediaQuery },
+      hasMediaQuery: { value: utilHasMediaQuery },
 
-        /*
+      /*
 			Legacy Aliases.
 		*/
-        random: { value: Math.random },
-        entityEncode: { value: utilEscape },
-        entityDecode: { value: utilUnescape },
+      random: { value: Math.random },
+      entityEncode: { value: utilEscape },
+      entityDecode: { value: utilUnescape },
 
-        /* commented by BIS to prevent cyclical dependency that throws runtime error: 
+      /* commented by BIS to prevent cyclical dependency that throws runtime error: 
 
           Message:
             TypeError: Cannot read properties of undefined (reading 'toEnum')
           Stack:
             at ...sugarcube-e2e-test\dist\internal\diff.js:23:28
         */
-        // evalExpression: {
-        //   value: (...args: unknown[]) =>
-        //     Scripting.evalJavaScript(
-        //       // @ts-ignore
-        //       ...args
-        //     ),
-        // }, // SEE: `markup/scripting.js`.
-        // evalStatements: {
-        //   value: (...args: unknown[]) =>
-        //     Scripting.evalJavaScript(
-        //       // @ts-ignore
-        //       ...args
-        //     ),
-        // }, // SEE: `markup/scripting.js`.
-      }
-    )
+      // evalExpression: {
+      //   value: (...args: unknown[]) =>
+      //     Scripting.evalJavaScript(
+      //       // @ts-ignore
+      //       ...args
+      //     ),
+      // }, // SEE: `markup/scripting.js`.
+      // evalStatements: {
+      //   value: (...args: unknown[]) =>
+      //     Scripting.evalJavaScript(
+      //       // @ts-ignore
+      //       ...args
+      //     ),
+      // }, // SEE: `markup/scripting.js`.
+    })
   );
 })();

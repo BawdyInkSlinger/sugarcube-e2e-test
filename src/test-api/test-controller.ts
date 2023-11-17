@@ -357,10 +357,7 @@ export const testController: TestController = {
       $(selector.selectorString).trigger('click');
       return pageLoadPromise;
     });
-    return Object.assign(
-      asyncClick,
-      testController
-    );
+    return Object.assign(asyncClick, testController);
   },
 
   expect<A>(

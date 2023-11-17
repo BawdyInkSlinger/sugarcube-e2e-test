@@ -16,7 +16,9 @@ export type Category =
 export const getLogger = (categoryName: Category = 'DEFAULT'): Logger => {
   if (getEnvLevelValue('DEFAULT') === undefined) {
     throw new Error(
-      `Logger Configuration Error: Environment Variable '${getEnvLevelKey("DEFAULT")}' does not exist.`
+      `Logger Configuration Error: Environment Variable '${getEnvLevelKey(
+        'DEFAULT'
+      )}' does not exist.`
     );
   }
 
@@ -26,7 +28,9 @@ export const getLogger = (categoryName: Category = 'DEFAULT'): Logger => {
     const configuredLevel = getEnvLevelValue(categoryName);
     if (configuredLevel === undefined) {
       getLogger('DEFAULT').warn(
-        `Environment Variable '${getEnvLevelKey(categoryName)}' does not exist. Defaulting to 'debug'.`
+        `Environment Variable '${getEnvLevelKey(
+          categoryName
+        )}' does not exist. Defaulting to 'debug'.`
       );
     }
 

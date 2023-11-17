@@ -138,7 +138,9 @@ export const Selector: SelectorFactory = (
   // | SelectorPromise,
   // options?: SelectorOptions
 ): Selector => {
-  enterLogger.debug(`${new Date().getTime()} selector: entering init='${init}'`);
+  enterLogger.debug(
+    `${new Date().getTime()} selector: entering init='${init}'`
+  );
   const selectorImpl: Selector & { toString: () => string } = {
     selectorString: init,
     innerText: ReExecutablePromise.fromFn(() => {
@@ -146,8 +148,8 @@ export const Selector: SelectorFactory = (
     }),
     withText: function (text: string): Selector {
       enterLogger.debug(
-          `${new Date().getTime()} selector: entering withText init='${init}' text='${text}'`
-        );
+        `${new Date().getTime()} selector: entering withText init='${init}' text='${text}'`
+      );
       // return Selector(`${init}:contains('${$.escapeSelector(text)}')`);
       return Selector(`${init}:contains(${text})`);
     },

@@ -27,7 +27,6 @@ interface OffsetOptions extends ActionOptions {
 }
 
 interface MouseActionOptions extends OffsetOptions {
-
   /**
    * Indicate which modifier keys are to be pressed during the mouse action.
    */

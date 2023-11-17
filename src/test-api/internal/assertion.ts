@@ -152,7 +152,7 @@ export interface AssertionApi<E = any> {
   //   message?: string,
   //   options?: AssertionOptions
   // ): TestControllerPromise;
-  // notMatch(re: RegExp, options?: AssertionOptions): TestControllerPromise;
+  notMatch(re: RegExp, options?: AssertionOptions): TestControllerPromise;
 }
 
 // added by BIS:
@@ -166,6 +166,13 @@ export class StringAssertions implements AssertionApi<string> {
   constructor(currentPromise: Promise<void>, actual: string) {
     this.actual = actual;
     this.currentPromise = currentPromise;
+  }
+
+  notMatch(
+    re: RegExp,
+    options?: AssertionOptions
+  ): TestControllerPromise<void> {
+    throw new Error('Method not implemented.');
   }
 
   contains<R>(
@@ -285,6 +292,12 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
   constructor(currentPromise: Promise<void>, actual: Promise<A>) {
     this.currentPromise = currentPromise;
     this.actual = actual;
+  }
+  notMatch(
+    re: RegExp,
+    options?: AssertionOptions
+  ): TestControllerPromise<void> {
+    throw new Error('Method not implemented.');
   }
 
   contains<R>(

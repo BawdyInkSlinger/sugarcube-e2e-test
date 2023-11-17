@@ -11,10 +11,10 @@ globalThis.storage = {
   },
   set(val: typeof _storage) {
     _storage = val;
-  }
-}
+  },
+};
 
 // sugarcube reassigns storage in some places. You can't reassign to imports. Importing the container is the workaround.
 export const StorageContainer = {
-  storage: globalThis.storage
+  storage: globalThis.storage,
 };

@@ -21,7 +21,7 @@ export const addToPrettyString = (d: Document): void => {
       selectorsToRemove = [],
     }: Partial<PrettyStringOptions> = {} /* Does not need to hardcode each option to true */
   ): string {
-    let docEl = document.documentElement.cloneNode(true) as HTMLElement;
+    const docEl = document.documentElement.cloneNode(true) as HTMLElement;
 
     if (!includeHeadElement) {
       docEl.querySelector('head').innerHTML =

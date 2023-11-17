@@ -23,7 +23,7 @@ export const SimpleStore = (() => {
   /*******************************************************************************************************************
 		SimpleStore Functions.
 	*******************************************************************************************************************/
-    function storeCreate(storageId: string, persistent: boolean) {
+  function storeCreate(storageId: string, persistent: boolean) {
     if (_initialized) {
       return _initialized.create(storageId, persistent);
     }

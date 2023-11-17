@@ -26,811 +26,860 @@ import { clone } from './helpers';
 
 const logger = getLogger('DEFAULT');
 
-export const State = (() => { // eslint-disable-line no-unused-vars, no-var
-    type History = ReturnType<typeof momentCreate> & { pull?: any};
+export const State = (() => {
+  // eslint-disable-line no-unused-vars, no-var
+  type History = ReturnType<typeof momentCreate> & { pull?: any };
 
-	// History moment stack.
-	let _history: History[] = [];
+  // History moment stack.
+  let _history: History[] = [];
 
-	// Currently active/played moment.
-	let _active: History = momentCreate();
+  // Currently active/played moment.
+  let _active: History = momentCreate();
 
-	// Currently active/played moment index.
-	let _activeIndex = -1;
+  // Currently active/played moment index.
+  let _activeIndex = -1;
 
-	// Titles of all moments which have expired (i.e. fallen off the bottom of the stack).
-	let _expired = [];
+  // Titles of all moments which have expired (i.e. fallen off the bottom of the stack).
+  let _expired = [];
 
-	// (optional) Seedable PRNG object.
-	let _prng = null;
+  // (optional) Seedable PRNG object.
+  let _prng = null;
 
-	// Temporary variables object.
-    // BIS change. Original line: let _tempVariables = {};
-	let _tempVariables: SugarCubeTemporaryVariables = {};
+  // Temporary variables object.
+  // BIS change. Original line: let _tempVariables = {};
+  let _tempVariables: SugarCubeTemporaryVariables = {};
 
-
-	/*******************************************************************************************************************
+  /*******************************************************************************************************************
 		State Functions.
 	*******************************************************************************************************************/
-	/*
+  /*
 		Resets the story state.
 	*/
-	function stateReset() {
-		logger.debug('[State/stateReset()]'); 
+  function stateReset() {
+    logger.debug('[State/stateReset()]');
 
-		// Delete the active session.
-        // BIS change. Original: session.delete('state');
-		SessionContainer.session.delete('state');
+    // Delete the active session.
+    // BIS change. Original: session.delete('state');
+    SessionContainer.session.delete('state');
 
-		/*
+    /*
 			Reset the properties.
 		*/
-		_history     = [];
-		_active      = momentCreate();
-		_activeIndex = -1;
-		_expired     = [];
-		_prng        = _prng === null ? null : new PRNGWrapper(_prng.seed, false);
-	}
+    _history = [];
+    _active = momentCreate();
+    _activeIndex = -1;
+    _expired = [];
+    _prng = _prng === null ? null : new PRNGWrapper(_prng.seed, false);
+  }
 
-	/*
+  /*
 		Restores the story state from the active session.
 	*/
-	function stateRestore() {
-		logger.debug('[State/stateRestore()]'); 
+  function stateRestore() {
+    logger.debug('[State/stateRestore()]');
 
-		/*
+    /*
 			Attempt to restore an active session.
 		*/
-		if (SessionContainer.session.has('state')) {
-			/*
+    if (SessionContainer.session.has('state')) {
+      /*
 				Retrieve the session.
 			*/
-			const stateObj = SessionContainer.session.get('state');
+      const stateObj = SessionContainer.session.get('state');
 
-			logger.debug('\tsession state:', stateObj); 
+      logger.debug('\tsession state:', stateObj);
 
-			if (stateObj == null) { // lazy equality for null
-				return false;
-			}
+      if (stateObj == null) {
+        // lazy equality for null
+        return false;
+      }
 
-			/*
+      /*
 				Restore the session.
 			*/
-			stateUnmarshal(stateObj);
-			return true;
-		}
+      stateUnmarshal(stateObj);
+      return true;
+    }
 
-		return false;
-	}
+    return false;
+  }
 
-	/*
+  /*
 		Returns the current story state marshaled into a serializable object.
 	*/
-	function stateMarshal(noDelta?: boolean): 
-        {
-            history?: typeof _history, 
-            delta?: ReturnType<typeof historyDeltaEncode>,
-            index: number, 
-            expired?: typeof _expired, 
-            seed: typeof _prng.seed
-        } {
-		/*
+  function stateMarshal(noDelta?: boolean): {
+    history?: typeof _history;
+    delta?: ReturnType<typeof historyDeltaEncode>;
+    index: number;
+    expired?: typeof _expired;
+    seed: typeof _prng.seed;
+  } {
+    /*
 			Gather the properties.
 		*/
-		const stateObj = {
-			index : _activeIndex
-		} as ReturnType<typeof stateMarshal>;
+    const stateObj = {
+      index: _activeIndex,
+    } as ReturnType<typeof stateMarshal>;
 
-		if (noDelta) {
-			stateObj.history = clone(_history);
-		}
-		else {
-			stateObj.delta = historyDeltaEncode(_history);
-		}
+    if (noDelta) {
+      stateObj.history = clone(_history);
+    } else {
+      stateObj.delta = historyDeltaEncode(_history);
+    }
 
-		if (_expired.length > 0) {
-			stateObj.expired = [..._expired];
-		}
+    if (_expired.length > 0) {
+      stateObj.expired = [..._expired];
+    }
 
-		if (_prng !== null) {
-			stateObj.seed = _prng.seed;
-		}
+    if (_prng !== null) {
+      stateObj.seed = _prng.seed;
+    }
 
-		return stateObj;
-	}
+    return stateObj;
+  }
 
-	/*
+  /*
 		Restores the story state from a marshaled story state serialization object.
 	*/
-	function stateUnmarshal(stateObj, noDelta?) {
-		if (stateObj == null) { // lazy equality for null
-			throw new Error('state object is null or undefined');
-		}
+  function stateUnmarshal(stateObj, noDelta?) {
+    if (stateObj == null) {
+      // lazy equality for null
+      throw new Error('state object is null or undefined');
+    }
 
-		if (
-			   !stateObj.hasOwnProperty(noDelta ? 'history' : 'delta')
-			|| stateObj[noDelta ? 'history' : 'delta'].length === 0
-		) {
-			throw new Error('state object has no history or history is empty');
-		}
+    if (
+      !stateObj.hasOwnProperty(noDelta ? 'history' : 'delta') ||
+      stateObj[noDelta ? 'history' : 'delta'].length === 0
+    ) {
+      throw new Error('state object has no history or history is empty');
+    }
 
-		if (!stateObj.hasOwnProperty('index')) {
-			throw new Error('state object has no index');
-		}
+    if (!stateObj.hasOwnProperty('index')) {
+      throw new Error('state object has no index');
+    }
 
-		if (_prng !== null && !stateObj.hasOwnProperty('seed')) {
-			throw new Error('state object has no seed, but PRNG is enabled');
-		}
+    if (_prng !== null && !stateObj.hasOwnProperty('seed')) {
+      throw new Error('state object has no seed, but PRNG is enabled');
+    }
 
-		if (_prng === null && stateObj.hasOwnProperty('seed')) {
-			throw new Error('state object has seed, but PRNG is disabled');
-		}
+    if (_prng === null && stateObj.hasOwnProperty('seed')) {
+      throw new Error('state object has seed, but PRNG is disabled');
+    }
 
-		/*
+    /*
 			Restore the properties.
 		*/
-		_history     = noDelta ? clone(stateObj.history) : historyDeltaDecode(stateObj.delta);
-		_activeIndex = stateObj.index;
-		_expired     = stateObj.hasOwnProperty('expired') ? [...stateObj.expired] : [];
+    _history = noDelta
+      ? clone(stateObj.history)
+      : historyDeltaDecode(stateObj.delta);
+    _activeIndex = stateObj.index;
+    _expired = stateObj.hasOwnProperty('expired') ? [...stateObj.expired] : [];
 
-		if (stateObj.hasOwnProperty('seed')) {
-			/*
+    if (stateObj.hasOwnProperty('seed')) {
+      /*
 				We only need to restore the PRNG's seed here as `momentActivate()` will handle
 				fully restoring the PRNG to its proper state.
 			*/
-			_prng.seed = stateObj.seed;
-		}
+      _prng.seed = stateObj.seed;
+    }
 
-		/*
+    /*
 			Activate the current moment (do this only after all properties have been restored).
 		*/
-		momentActivate(_activeIndex);
-	}
+    momentActivate(_activeIndex);
+  }
 
-	/*
+  /*
 		Returns the current story state marshaled into a save-compatible serializable object.
 	*/
-	function stateMarshalForSave() {
-		return stateMarshal(true);
-	}
+  function stateMarshalForSave() {
+    return stateMarshal(true);
+  }
 
-	/*
+  /*
 		Restores the story state from a marshaled save-compatible story state serialization object.
 	*/
-	function stateUnmarshalForSave(stateObj) {
-		return stateUnmarshal(stateObj, true);
-	}
+  function stateUnmarshalForSave(stateObj) {
+    return stateUnmarshal(stateObj, true);
+  }
 
-	/*
+  /*
 		Returns the titles of expired moments.
 	*/
-	function stateExpired() {
-		return _expired;
-	}
+  function stateExpired() {
+    return _expired;
+  }
 
-	/*
+  /*
 		Returns the total number of played moments (expired + in-play history moments).
 	*/
-	function stateTurns() {
-		return _expired.length + historyLength();
-	}
+  function stateTurns() {
+    return _expired.length + historyLength();
+  }
 
-	/*
+  /*
 		Returns the passage titles of all played moments (expired + in-play history moments).
 	*/
-	function stateTitles() {
-		return _expired.concat(_history.slice(0, historyLength()).map(moment => moment.title));
-	}
+  function stateTitles() {
+    return _expired.concat(
+      _history.slice(0, historyLength()).map((moment) => moment.title)
+    );
+  }
 
-	/*
+  /*
 		Returns whether a passage with the given title has been played (expired + in-play history moments).
 	*/
-	function stateHasPlayed(title) {
-		if (title == null || title === '') { // lazy equality for null
-			return false;
-		}
+  function stateHasPlayed(title) {
+    if (title == null || title === '') {
+      // lazy equality for null
+      return false;
+    }
 
-		if (_expired.includes(title)) {
-			return true;
-		}
-		else if (_history.slice(0, historyLength()).some(moment => moment.title === title)) {
-			return true;
-		}
+    if (_expired.includes(title)) {
+      return true;
+    } else if (
+      _history
+        .slice(0, historyLength())
+        .some((moment) => moment.title === title)
+    ) {
+      return true;
+    }
 
-		return false;
-	}
+    return false;
+  }
 
-
-	/*******************************************************************************************************************
+  /*******************************************************************************************************************
 		Moment Functions.
 	*******************************************************************************************************************/
-	/*
+  /*
 		Returns a new moment object created from the given passage title and variables object.
 	*/
-	function momentCreate(title?: string, variables?: SugarCubeStoryVariables): {title: string, variables: SugarCubeStoryVariables} {
-		return {
-			title     : title == null ? '' : String(title),       // lazy equality for null
-			variables : variables == null ? {} : clone(variables) // lazy equality for null
-		};
-	}
+  function momentCreate(
+    title?: string,
+    variables?: SugarCubeStoryVariables
+  ): { title: string; variables: SugarCubeStoryVariables } {
+    return {
+      title: title == null ? '' : String(title), // lazy equality for null
+      variables: variables == null ? {} : clone(variables), // lazy equality for null
+    };
+  }
 
-	/*
+  /*
 		Returns the active (present) moment.
 	*/
-	function momentActive() {
-		return _active;
-	}
+  function momentActive() {
+    return _active;
+  }
 
-	/*
+  /*
 		Returns the index within the history of the active (present) moment.
 	*/
-	function momentActiveIndex() {
-		return _activeIndex;
-	}
+  function momentActiveIndex() {
+    return _activeIndex;
+  }
 
-	/*
+  /*
 		Returns the title from the active (present) moment.
 	*/
-	function momentActiveTitle() {
-		return _active.title;
-	}
+  function momentActiveTitle() {
+    return _active.title;
+  }
 
-	/*
+  /*
 		Returns the variables from the active (present) moment.
 	*/
-	function momentActiveVariables() {
-		return _active.variables;
-	}
+  function momentActiveVariables() {
+    return _active.variables;
+  }
 
-	/*
+  /*
 		Returns the active (present) moment after setting it to either the given moment object
 		or the moment object at the given history index.  Additionally, updates the active session
 		and triggers a history update event.
 	*/
-	function momentActivate(moment) {
-		if (moment == null) { // lazy equality for null
-			throw new Error('moment activation attempted with null or undefined');
-		}
+  function momentActivate(moment) {
+    if (moment == null) {
+      // lazy equality for null
+      throw new Error('moment activation attempted with null or undefined');
+    }
 
-		/*
+    /*
 			Set the active moment.
 		*/
-		switch (typeof moment) {
-		case 'object':
-			_active = clone(moment);
-			break;
+    switch (typeof moment) {
+      case 'object':
+        _active = clone(moment);
+        break;
 
-		case 'number':
-			if (historyIsEmpty()) {
-				throw new Error('moment activation attempted with index on empty history');
-			}
+      case 'number':
+        if (historyIsEmpty()) {
+          throw new Error(
+            'moment activation attempted with index on empty history'
+          );
+        }
 
-			if (moment < 0 || moment >= historySize()) {
-				throw new RangeError(`moment activation attempted with out-of-bounds index; need [0, ${historySize() - 1}], got ${moment}`);
-			}
+        if (moment < 0 || moment >= historySize()) {
+          throw new RangeError(
+            `moment activation attempted with out-of-bounds index; need [0, ${
+              historySize() - 1
+            }], got ${moment}`
+          );
+        }
 
-			_active = clone(_history[moment]);
-			break;
+        _active = clone(_history[moment]);
+        break;
 
-		default:
-			throw new TypeError(`moment activation attempted with a "${typeof moment}"; must be an object or valid history stack index`);
-		}
+      default:
+        throw new TypeError(
+          `moment activation attempted with a "${typeof moment}"; must be an object or valid history stack index`
+        );
+    }
 
-		/*
+    /*
 			Restore the seedable PRNG.
 
 			NOTE: We cannot simply set `_prng.pull` to `_active.pull` as that would
 			not properly mutate the PRNG's internal state.
 		*/
-		if (_prng !== null) {
-			_prng = PRNGWrapper.unmarshal({
-				seed : _prng.seed,
-				pull : _active.pull
-			});
-		}
+    if (_prng !== null) {
+      _prng = PRNGWrapper.unmarshal({
+        seed: _prng.seed,
+        pull: _active.pull,
+      });
+    }
 
-		/*
+    /*
 			Update the active session.
 		*/
-		SessionContainer.session.set('state', stateMarshal());
+    SessionContainer.session.set('state', stateMarshal());
 
-		/*
+    /*
 			Trigger a global `:historyupdate` event.
 
 			NOTE: We do this here because setting a new active moment is a core component
 			of, virtually, all history updates.
 		*/
-		jQuery.event.trigger(':historyupdate');
+    jQuery.event.trigger(':historyupdate');
 
-		return _active;
-	}
+    return _active;
+  }
 
-
-	/*******************************************************************************************************************
+  /*******************************************************************************************************************
 		History Functions.
 	*******************************************************************************************************************/
-	/*
+  /*
 		Returns the moment history.
 	*/
-	function historyGet() {
-		return _history;
-	}
+  function historyGet() {
+    return _history;
+  }
 
-	/*
+  /*
 		Returns the number of active history moments (past only).
 	*/
-	function historyLength() {
-		return _activeIndex + 1;
-	}
+  function historyLength() {
+    return _activeIndex + 1;
+  }
 
-	/*
+  /*
 		Returns the total number of history moments (past + future).
 	*/
-	function historySize() {
-		return _history.length;
-	}
+  function historySize() {
+    return _history.length;
+  }
 
-	/*
+  /*
 		Returns whether the history is empty.
 	*/
-	function historyIsEmpty() {
-		return _history.length === 0;
-	}
+  function historyIsEmpty() {
+    return _history.length === 0;
+  }
 
-	/*
+  /*
 		Returns the current (pre-play version of the active) moment within the history.
 	*/
-	function historyCurrent() {
-		return _history.length > 0 ? _history[_activeIndex] : null;
-	}
+  function historyCurrent() {
+    return _history.length > 0 ? _history[_activeIndex] : null;
+  }
 
-	/*
+  /*
 		Returns the topmost (most recent) moment within the history.
 	*/
-	function historyTop() {
-		return _history.length > 0 ? _history[_history.length - 1] : null;
-	}
+  function historyTop() {
+    return _history.length > 0 ? _history[_history.length - 1] : null;
+  }
 
-	/*
+  /*
 		Returns the bottommost (least recent) moment within the history.
 	*/
-	function historyBottom() {
-		return _history.length > 0 ? _history[0] : null;
-	}
+  function historyBottom() {
+    return _history.length > 0 ? _history[0] : null;
+  }
 
-	/*
+  /*
 		Returns the moment at the given index within the history.
 	*/
-	function historyIndex(index) {
-		if (historyIsEmpty() || index < 0 || index > _activeIndex) {
-			return null;
-		}
+  function historyIndex(index) {
+    if (historyIsEmpty() || index < 0 || index > _activeIndex) {
+      return null;
+    }
 
-		return _history[index];
-	}
+    return _history[index];
+  }
 
-	/*
+  /*
 		Returns the moment at the given offset from the active moment within the history.
 	*/
-	function historyPeek(offset) {
-		if (historyIsEmpty()) {
-			return null;
-		}
+  function historyPeek(offset) {
+    if (historyIsEmpty()) {
+      return null;
+    }
 
-		const lengthOffset = 1 + (offset ? Math.abs(offset) : 0);
+    const lengthOffset = 1 + (offset ? Math.abs(offset) : 0);
 
-		if (lengthOffset > historyLength()) {
-			return null;
-		}
+    if (lengthOffset > historyLength()) {
+      return null;
+    }
 
-		return _history[historyLength() - lengthOffset];
-	}
+    return _history[historyLength() - lengthOffset];
+  }
 
-	/*
+  /*
 		Returns whether a moment with the given title exists within the history.
 	*/
-	function historyHas(title) {
-		if (historyIsEmpty() || title == null || title === '') { // lazy equality for null
-			return false;
-		}
+  function historyHas(title) {
+    if (historyIsEmpty() || title == null || title === '') {
+      // lazy equality for null
+      return false;
+    }
 
-		for (let i = _activeIndex; i >= 0; --i) {
-			if (_history[i].title === title) {
-				return true;
-			}
-		}
+    for (let i = _activeIndex; i >= 0; --i) {
+      if (_history[i].title === title) {
+        return true;
+      }
+    }
 
-		return false;
-	}
+    return false;
+  }
 
-	/*
+  /*
 		Creates a new moment and pushes it onto the history, discarding future moments if necessary.
 	*/
-	function historyCreate(title) {
-		logger.debug(`[State/historyCreate(title: "${title}")]`); 
+  function historyCreate(title) {
+    logger.debug(`[State/historyCreate(title: "${title}")]`);
 
-		/*
+    /*
 			TODO: It might be good to have some assertions about the passage title here.
 		*/
 
-		/*
+    /*
 			If we're not at the top of the stack, discard the future moments.
 		*/
-		if (historyLength() < historySize()) {
-			logger.debug(`\tnon-top push; discarding ${historySize() - historyLength()} future moments`); 
+    if (historyLength() < historySize()) {
+      logger.debug(
+        `\tnon-top push; discarding ${
+          historySize() - historyLength()
+        } future moments`
+      );
 
-			_history.splice(historyLength(), historySize() - historyLength());
-		}
+      _history.splice(historyLength(), historySize() - historyLength());
+    }
 
-		/*
+    /*
 			Push the new moment onto the history stack.
 		*/
-		_history.push(momentCreate(title, _active.variables));
+    _history.push(momentCreate(title, _active.variables));
 
-		if (_prng) {
-			historyTop().pull = _prng.pull;
-		}
+    if (_prng) {
+      historyTop().pull = _prng.pull;
+    }
 
-		/*
+    /*
 			Truncate the history, if necessary, by discarding moments from the bottom.
 		*/
-		while (historySize() > Config.history.maxStates) {
-			_expired.push(_history.shift().title);
-		}
+    while (historySize() > Config.history.maxStates) {
+      _expired.push(_history.shift().title);
+    }
 
-		/*
+    /*
 			Activate the new top moment.
 		*/
-		_activeIndex = historySize() - 1;
-		momentActivate(_activeIndex);
+    _activeIndex = historySize() - 1;
+    momentActivate(_activeIndex);
 
-		return historyLength();
-	}
+    return historyLength();
+  }
 
-	/*
+  /*
 		Activate the moment at the given index within the history.
 	*/
-	function historyGoTo(index) {
-		logger.debug(`[State/historyGoTo(index: ${index})]`); 
+  function historyGoTo(index) {
+    logger.debug(`[State/historyGoTo(index: ${index})]`);
 
-		if (
-			   index == null /* lazy equality for null */
-			|| index < 0
-			|| index >= historySize()
-			|| index === _activeIndex
-		) {
-			return false;
-		}
+    if (
+      index == null /* lazy equality for null */ ||
+      index < 0 ||
+      index >= historySize() ||
+      index === _activeIndex
+    ) {
+      return false;
+    }
 
-		_activeIndex = index;
-		momentActivate(_activeIndex);
+    _activeIndex = index;
+    momentActivate(_activeIndex);
 
-		return true;
-	}
+    return true;
+  }
 
-	/*
+  /*
 		Activate the moment at the given offset from the active moment within the history.
 	*/
-	function historyGo(offset) {
-		logger.debug(`[State/historyGo(offset: ${offset})]`); 
+  function historyGo(offset) {
+    logger.debug(`[State/historyGo(offset: ${offset})]`);
 
-		if (offset == null || offset === 0) { // lazy equality for null
-			return false;
-		}
+    if (offset == null || offset === 0) {
+      // lazy equality for null
+      return false;
+    }
 
-		return historyGoTo(_activeIndex + offset);
-	}
+    return historyGoTo(_activeIndex + offset);
+  }
 
-	/*
+  /*
 		Returns the delta encoded form of the given history array.
 	*/
-	function historyDeltaEncode(historyArr) {
-		if (!Array.isArray(historyArr)) {
-			return null;
-		}
+  function historyDeltaEncode(historyArr) {
+    if (!Array.isArray(historyArr)) {
+      return null;
+    }
 
-		if (historyArr.length === 0) {
-			return [];
-		}
+    if (historyArr.length === 0) {
+      return [];
+    }
 
-		// NOTE: The `clone()` call here is likely unnecessary within the current codebase.
-		// const delta = [clone(historyArr[0])];
-		const delta = [historyArr[0]];
+    // NOTE: The `clone()` call here is likely unnecessary within the current codebase.
+    // const delta = [clone(historyArr[0])];
+    const delta = [historyArr[0]];
 
-		for (let i = 1, iend = historyArr.length; i < iend; ++i) {
-			delta.push(Diff.diff(historyArr[i - 1], historyArr[i]));
-		}
+    for (let i = 1, iend = historyArr.length; i < iend; ++i) {
+      delta.push(Diff.diff(historyArr[i - 1], historyArr[i]));
+    }
 
-		return delta;
-	}
+    return delta;
+  }
 
-	/*
+  /*
 		Returns a history array from the given delta encoded history array.
 	*/
-	function historyDeltaDecode(delta) {
-		if (!Array.isArray(delta)) {
-			return null;
-		}
+  function historyDeltaDecode(delta) {
+    if (!Array.isArray(delta)) {
+      return null;
+    }
 
-		if (delta.length === 0) {
-			return [];
-		}
+    if (delta.length === 0) {
+      return [];
+    }
 
-		const historyArr = [clone(delta[0])];
+    const historyArr = [clone(delta[0])];
 
-		for (let i = 1, iend = delta.length; i < iend; ++i) {
-			historyArr.push(Diff.patch(historyArr[i - 1], delta[i]));
-		}
+    for (let i = 1, iend = delta.length; i < iend; ++i) {
+      historyArr.push(Diff.patch(historyArr[i - 1], delta[i]));
+    }
 
-		return historyArr;
-	}
+    return historyArr;
+  }
 
-
-	/*******************************************************************************************************************
+  /*******************************************************************************************************************
 		PRNG Functions.
 	*******************************************************************************************************************/
-	function prngInit(seed, useEntropy) {
-		logger.debug(`[State/prngInit(seed: ${seed}, useEntropy: ${useEntropy})]`); 
+  function prngInit(seed, useEntropy) {
+    logger.debug(`[State/prngInit(seed: ${seed}, useEntropy: ${useEntropy})]`);
 
-		if (!historyIsEmpty()) {
-			let scriptSection;
+    if (!historyIsEmpty()) {
+      let scriptSection;
 
-			if (TWINE1) { // for Twine 1
-				scriptSection = 'a script-tagged passage';
-			}
-			else { // for Twine 2
-				scriptSection = 'the Story JavaScript';
-			}
+      if (TWINE1) {
+        // for Twine 1
+        scriptSection = 'a script-tagged passage';
+      } else {
+        // for Twine 2
+        scriptSection = 'the Story JavaScript';
+      }
 
-			throw new Error(`State.prng.init must be called during initialization, within either ${scriptSection} or the StoryInit special passage`);
-		}
+      throw new Error(
+        `State.prng.init must be called during initialization, within either ${scriptSection} or the StoryInit special passage`
+      );
+    }
 
-		_prng = new PRNGWrapper(seed, useEntropy);
-		_active.pull = _prng.pull;
-	}
+    _prng = new PRNGWrapper(seed, useEntropy);
+    _active.pull = _prng.pull;
+  }
 
-	function prngIsEnabled() {
-		return _prng !== null;
-	}
+  function prngIsEnabled() {
+    return _prng !== null;
+  }
 
-	function prngPull() {
-		return _prng ? _prng.pull : NaN;
-	}
+  function prngPull() {
+    return _prng ? _prng.pull : NaN;
+  }
 
-	function prngSeed() {
-		return _prng ? _prng.seed : null;
-	}
+  function prngSeed() {
+    return _prng ? _prng.seed : null;
+  }
 
-	function prngRandom() {
-		logger.debug('[State/prngRandom()]'); 
+  function prngRandom() {
+    logger.debug('[State/prngRandom()]');
 
-		return _prng ? _prng.random() : Math.random();
-	}
+    return _prng ? _prng.random() : Math.random();
+  }
 
-
-	/*******************************************************************************************************************
+  /*******************************************************************************************************************
 		Temporary Variables Functions.
 	*******************************************************************************************************************/
-	/*
+  /*
 		Clear the temporary variables.
 	*/
-	function tempVariablesClear() {
-		logger.debug('[State/tempVariablesClear()]'); 
+  function tempVariablesClear() {
+    logger.debug('[State/tempVariablesClear()]');
 
-		_tempVariables = {};
+    _tempVariables = {};
 
-		/* legacy */
-		TempVariablesContainer.TempVariables = _tempVariables; // eslint-disable-line no-undef
-		/* /legacy */
-	}
+    /* legacy */
+    TempVariablesContainer.TempVariables = _tempVariables; // eslint-disable-line no-undef
+    /* /legacy */
+  }
 
-	/*
+  /*
 		Returns the current temporary variables.
 	*/
-	function tempVariables() {
-		return _tempVariables;
-	}
+  function tempVariables() {
+    return _tempVariables;
+  }
 
-
-	/*******************************************************************************************************************
+  /*******************************************************************************************************************
 		Variable Chain Parsing Functions.
 	*******************************************************************************************************************/
-	/*
+  /*
 		Returns the value of the given story/temporary variable.
 	*/
-	function variableGet(varExpression) {
-		try {
-			return Scripting.evalTwineScript(varExpression);
-		}
-		catch (ex) { /* no-op */ }
-	}
+  function variableGet(varExpression) {
+    try {
+      return Scripting.evalTwineScript(varExpression);
+    } catch (ex) {
+      /* no-op */
+    }
+  }
 
-	/*
+  /*
 		Sets the value of the given story/temporary variable.
 	*/
-	function variableSet(varExpression, value) {
-		try {
-			Scripting.evalTwineScript(`${varExpression} = evalTwineScript$Data$`, null, value);
-			return true;
-		}
-		catch (ex) { /* no-op */ }
+  function variableSet(varExpression, value) {
+    try {
+      Scripting.evalTwineScript(
+        `${varExpression} = evalTwineScript$Data$`,
+        null,
+        value
+      );
+      return true;
+    } catch (ex) {
+      /* no-op */
+    }
 
-		return false;
-	}
+    return false;
+  }
 
-
-	/*******************************************************************************************************************
+  /*******************************************************************************************************************
 		Story Metadata Functions.
 	*******************************************************************************************************************/
-	const _METADATA_STORE = 'metadata';
+  const _METADATA_STORE = 'metadata';
 
-	function metadataClear() {
-		StorageContainer.storage.delete(_METADATA_STORE);
-	}
+  function metadataClear() {
+    StorageContainer.storage.delete(_METADATA_STORE);
+  }
 
-	function metadataDelete(key) {
-		if (typeof key !== 'string') {
-			throw new TypeError(`State.metadata.delete key parameter must be a string (received: ${typeof key})`);
-		}
+  function metadataDelete(key) {
+    if (typeof key !== 'string') {
+      throw new TypeError(
+        `State.metadata.delete key parameter must be a string (received: ${typeof key})`
+      );
+    }
 
-		const store = StorageContainer.storage.get(_METADATA_STORE);
+    const store = StorageContainer.storage.get(_METADATA_STORE);
 
-		if (store && store.hasOwnProperty(key)) {
-			if (Object.keys(store).length === 1) {
-				StorageContainer.storage.delete(_METADATA_STORE);
-			}
-			else {
-				delete store[key];
-				StorageContainer.storage.set(_METADATA_STORE, store);
-			}
-		}
-	}
+    if (store && store.hasOwnProperty(key)) {
+      if (Object.keys(store).length === 1) {
+        StorageContainer.storage.delete(_METADATA_STORE);
+      } else {
+        delete store[key];
+        StorageContainer.storage.set(_METADATA_STORE, store);
+      }
+    }
+  }
 
-	function metadataEntries() {
-		const store = StorageContainer.storage.get(_METADATA_STORE);
-		return store && Object.entries(store);
-	}
+  function metadataEntries() {
+    const store = StorageContainer.storage.get(_METADATA_STORE);
+    return store && Object.entries(store);
+  }
 
-	function metadataGet(key) {
-		if (typeof key !== 'string') {
-			throw new TypeError(`State.metadata.get key parameter must be a string (received: ${typeof key})`);
-		}
+  function metadataGet(key) {
+    if (typeof key !== 'string') {
+      throw new TypeError(
+        `State.metadata.get key parameter must be a string (received: ${typeof key})`
+      );
+    }
 
-		const store = StorageContainer.storage.get(_METADATA_STORE);
-		return store && store.hasOwnProperty(key) ? store[key] : undefined;
-	}
+    const store = StorageContainer.storage.get(_METADATA_STORE);
+    return store && store.hasOwnProperty(key) ? store[key] : undefined;
+  }
 
-	function metadataHas(key) {
-		if (typeof key !== 'string') {
-			throw new TypeError(`State.metadata.has key parameter must be a string (received: ${typeof key})`);
-		}
+  function metadataHas(key) {
+    if (typeof key !== 'string') {
+      throw new TypeError(
+        `State.metadata.has key parameter must be a string (received: ${typeof key})`
+      );
+    }
 
-		const store = StorageContainer.storage.get(_METADATA_STORE);
-		return store && store.hasOwnProperty(key);
-	}
+    const store = StorageContainer.storage.get(_METADATA_STORE);
+    return store && store.hasOwnProperty(key);
+  }
 
-	function metadataKeys() {
-		const store = StorageContainer.storage.get(_METADATA_STORE);
-		return store && Object.keys(store);
-	}
+  function metadataKeys() {
+    const store = StorageContainer.storage.get(_METADATA_STORE);
+    return store && Object.keys(store);
+  }
 
-	function metadataSet(key, value) {
-		if (typeof key !== 'string') {
-			throw new TypeError(`State.metadata.set key parameter must be a string (received: ${typeof key})`);
-		}
+  function metadataSet(key, value) {
+    if (typeof key !== 'string') {
+      throw new TypeError(
+        `State.metadata.set key parameter must be a string (received: ${typeof key})`
+      );
+    }
 
-		if (typeof value === 'undefined') {
-			metadataDelete(key);
-		}
-		else {
-			const store = StorageContainer.storage.get(_METADATA_STORE) || {};
-			store[key] = value;
-			StorageContainer.storage.set(_METADATA_STORE, store);
-		}
-	}
+    if (typeof value === 'undefined') {
+      metadataDelete(key);
+    } else {
+      const store = StorageContainer.storage.get(_METADATA_STORE) || {};
+      store[key] = value;
+      StorageContainer.storage.set(_METADATA_STORE, store);
+    }
+  }
 
-	function metadataSize() {
-		const store = StorageContainer.storage.get(_METADATA_STORE);
-		return store ? Object.keys(store).length : 0;
-	}
+  function metadataSize() {
+    const store = StorageContainer.storage.get(_METADATA_STORE);
+    return store ? Object.keys(store).length : 0;
+  }
 
-
-	/*******************************************************************************************************************
+  /*******************************************************************************************************************
 		Module Exports.
 	*******************************************************************************************************************/
-	return Object.freeze(objectDefineProperties({}, {
-		/*
+  return Object.freeze(
+    objectDefineProperties(
+      {},
+      {
+        /*
 			State Functions.
 		*/
-		reset            : { value : stateReset },
-		restore          : { value : stateRestore },
-		marshalForSave   : { value : stateMarshalForSave },
-		unmarshalForSave : { value : stateUnmarshalForSave },
-		expired          : { get : stateExpired },
-		turns            : { get : stateTurns },
-		passages         : { get : stateTitles },
-		hasPlayed        : { value : stateHasPlayed },
+        reset: { value: stateReset },
+        restore: { value: stateRestore },
+        marshalForSave: { value: stateMarshalForSave },
+        unmarshalForSave: { value: stateUnmarshalForSave },
+        expired: { get: stateExpired },
+        turns: { get: stateTurns },
+        passages: { get: stateTitles },
+        hasPlayed: { value: stateHasPlayed },
 
-		/*
+        /*
 			Moment Functions.
 		*/
-		active      : { get : momentActive },
-		activeIndex : { get : momentActiveIndex },
-		passage     : { get : momentActiveTitle },     // shortcut for `State.active.title`
-		variables   : { get : momentActiveVariables }, // shortcut for `State.active.variables`
+        active: { get: momentActive },
+        activeIndex: { get: momentActiveIndex },
+        passage: { get: momentActiveTitle }, // shortcut for `State.active.title`
+        variables: { get: momentActiveVariables }, // shortcut for `State.active.variables`
 
-		/*
+        /*
 			History Functions.
 		*/
-		history     : { get : historyGet },
-		length      : { get : historyLength },
-		size        : { get : historySize },
-		isEmpty     : { value : historyIsEmpty },
-		current     : { get : historyCurrent },
-		top         : { get : historyTop },
-		bottom      : { get : historyBottom },
-		index       : { value : historyIndex },
-		peek        : { value : historyPeek },
-		has         : { value : historyHas },
-		create      : { value : historyCreate },
-		goTo        : { value : historyGoTo },
-		go          : { value : historyGo },
-		deltaEncode : { value : historyDeltaEncode },
-		deltaDecode : { value : historyDeltaDecode },
+        history: { get: historyGet },
+        length: { get: historyLength },
+        size: { get: historySize },
+        isEmpty: { value: historyIsEmpty },
+        current: { get: historyCurrent },
+        top: { get: historyTop },
+        bottom: { get: historyBottom },
+        index: { value: historyIndex },
+        peek: { value: historyPeek },
+        has: { value: historyHas },
+        create: { value: historyCreate },
+        goTo: { value: historyGoTo },
+        go: { value: historyGo },
+        deltaEncode: { value: historyDeltaEncode },
+        deltaDecode: { value: historyDeltaDecode },
 
-		/*
+        /*
 			PRNG Functions.
 		*/
-		prng : {
-			value : Object.freeze(objectDefineProperties({}, {
-				init      : { value : prngInit },
-				isEnabled : { value : prngIsEnabled },
-				pull      : { get : prngPull },
-				seed      : { get : prngSeed }
-			}))
-		},
-		random : { value : prngRandom },
+        prng: {
+          value: Object.freeze(
+            objectDefineProperties(
+              {},
+              {
+                init: { value: prngInit },
+                isEnabled: { value: prngIsEnabled },
+                pull: { get: prngPull },
+                seed: { get: prngSeed },
+              }
+            )
+          ),
+        },
+        random: { value: prngRandom },
 
-		/*
+        /*
 			Temporary Variables Functions.
 		*/
-		clearTemporary : { value : tempVariablesClear },
-		temporary      : { get : tempVariables },
+        clearTemporary: { value: tempVariablesClear },
+        temporary: { get: tempVariables },
 
-		/*
+        /*
 			Variable Chain Parsing Functions.
 		*/
-		getVar : { value : variableGet },
-		setVar : { value : variableSet },
+        getVar: { value: variableGet },
+        setVar: { value: variableSet },
 
-		/*
+        /*
 			Story Metadata Functions.
 		*/
-		metadata : {
-			value : Object.freeze(objectDefineProperties({}, {
-				clear   : { value : metadataClear },
-				delete  : { value : metadataDelete },
-				entries : { value : metadataEntries },
-				get     : { value : metadataGet },
-				has     : { value : metadataHas },
-				keys    : { value : metadataKeys },
-				set     : { value : metadataSet },
-				size    : { get : metadataSize }
-			}))
-		},
+        metadata: {
+          value: Object.freeze(
+            objectDefineProperties(
+              {},
+              {
+                clear: { value: metadataClear },
+                delete: { value: metadataDelete },
+                entries: { value: metadataEntries },
+                get: { value: metadataGet },
+                has: { value: metadataHas },
+                keys: { value: metadataKeys },
+                set: { value: metadataSet },
+                size: { get: metadataSize },
+              }
+            )
+          ),
+        },
 
-		/*
+        /*
 			Legacy Aliases.
 		*/
-		initPRNG : { value : prngInit },
-		restart  : { value : () => Engine.restart() },
-		backward : { value : () => Engine.backward() },
-		forward  : { value : () => Engine.forward() },
+        initPRNG: { value: prngInit },
+        restart: { value: () => Engine.restart() },
+        backward: { value: () => Engine.backward() },
+        forward: { value: () => Engine.forward() },
         // @ts-ignore
-		display  : { value : (...args) => Engine.display(...args) },
+        display: { value: (...args) => Engine.display(...args) },
         // @ts-ignore
-		show     : { value : (...args) => Engine.show(...args) },
+        show: { value: (...args) => Engine.show(...args) },
         // @ts-ignore
-		play     : { value : (...args) => Engine.play(...args) }
-	}));
+        play: { value: (...args) => Engine.play(...args) },
+      }
+    )
+  );
 })();

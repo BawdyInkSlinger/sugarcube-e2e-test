@@ -95,7 +95,8 @@ export const NodeTyper = (() => {
     }
 
     finish() {
-      while (this.type(true) /* no-op */);
+      // eslint-disable-next-line no-empty
+      while (this.type(true) /* no-op */) {}
       return false;
     }
 

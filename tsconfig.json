@@ -33,7 +33,5 @@
     "include": [
         "./src/**/*.ts",
     ],
-    "exclude": [
-        "tsc/sugarcube-parser/test-api/internal/sugarcube-testapi.reference.d.ts"
-    ],
+    "exclude": [],
 }

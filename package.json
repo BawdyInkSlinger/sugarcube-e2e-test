@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "jasmine",
+    "lint": "echo \"lint\" && eslint '**/*.ts' --fix",
     "compile-typescript": "echo \"compile ts\" && tsc && cp -r src/internal/declarations dist/internal/declarations && cp src/internal/html.tpl dist/internal/html.tpl",
     "only-build": "npm run compile-typescript",
     "clean": "rm -rf tscbuild; rm -rf dist"

@@ -1,5 +1,9 @@
 import { getLogger } from '../../logger';
-import { SaveAPI, SaveDetails, SaveObject } from '../declarations/twine-sugarcube-copy/save';
+import {
+  SaveAPI,
+  SaveDetails,
+  SaveObject,
+} from '../declarations/twine-sugarcube-copy/save';
 
 const logger = getLogger('DEFAULT');
 
@@ -27,20 +31,24 @@ export const Save: SaveAPI = {
       logger.info('FAKE SAVE: Function not implemented.');
       return true;
     },
-    size: 0
+    size: 0,
   },
   onSave: {
-    add: function (handler: (save: SaveObject, details: SaveDetails) => void): void {
+    add: function (
+      handler: (save: SaveObject, details: SaveDetails) => void
+    ): void {
       logger.info('FAKE SAVE: Function not implemented.');
     },
     clear: function (): void {
       logger.info('FAKE SAVE: Function not implemented.');
     },
-    delete: function (handler: (save: SaveObject, details: SaveDetails) => void): boolean {
+    delete: function (
+      handler: (save: SaveObject, details: SaveDetails) => void
+    ): boolean {
       logger.info('FAKE SAVE: Function not implemented.');
       return true;
     },
-    size: 0
+    size: 0,
   },
   slots: {
     length: 8,
@@ -72,7 +80,7 @@ export const Save: SaveAPI = {
     },
     save: function (slot: number, title?: string, metadata?: any): void {
       logger.info('FAKE SAVE: Function not implemented.');
-    }
+    },
   },
   autosave: {
     delete: function (): void {
@@ -95,7 +103,7 @@ export const Save: SaveAPI = {
     },
     save: function (title?: string, metadata?: any): void {
       logger.info('FAKE SAVE: Function not implemented.');
-    }
+    },
   },
   export: function (filename?: string, metadata?: any): void {
     logger.info('FAKE SAVE: Function not implemented.');
@@ -105,9 +113,9 @@ export const Save: SaveAPI = {
   },
   serialize: function (metadata?: any): string {
     logger.info('FAKE SAVE: Function not implemented.');
-    return "FAKE SAVE";
+    return 'FAKE SAVE';
   },
   deserialize: function (saveStr: string) {
     logger.info('FAKE SAVE: Function not implemented.');
   },
-}
+};

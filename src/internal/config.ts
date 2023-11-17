@@ -12,13 +12,13 @@ import {
   LoadHandler,
   SaveEventAPI,
   SaveHandler,
-} from "./declarations/twine-sugarcube-copy/save";
-import { Save } from "./fakes/save";
-import { Util } from "./util";
+} from './declarations/twine-sugarcube-copy/save';
+import { Save } from './fakes/save';
+import { Util } from './util';
 
 export const Config = (() => {
   // eslint-disable-line no-unused-vars, no-var
-  "use strict";
+  'use strict';
 
   // General settings.
   let _debug = false;
@@ -37,7 +37,7 @@ export const Config = (() => {
   // Macros settings.
   let _macrosIfAssignmentError = true;
   let _macrosMaxLoopIterations = 1000;
-  let _macrosTypeSkipKey = "\x20"; // Space
+  let _macrosTypeSkipKey = '\x20'; // Space
   let _macrosTypeVisitedPassages = true;
 
   // Navigation settings.
@@ -54,7 +54,7 @@ export const Config = (() => {
   // Saves settings.
   let _savesAutoload;
   let _savesAutosave;
-  let _savesId = "untitled-story";
+  let _savesId = 'untitled-story';
   let _savesIsAllowed;
   let _savesSlots = 8;
   let _savesTryDiskOnMobile = true;
@@ -69,13 +69,13 @@ export const Config = (() => {
 	*******************************************************************************/
 
   const _errHistoryModeDeprecated =
-    "Config.history.mode has been deprecated and is no longer used by SugarCube, please remove it from your code";
+    'Config.history.mode has been deprecated and is no longer used by SugarCube, please remove it from your code';
   const _errHistoryTrackingDeprecated =
-    "Config.history.tracking has been deprecated, use Config.history.maxStates instead";
+    'Config.history.tracking has been deprecated, use Config.history.maxStates instead';
   const _errSavesOnLoadDeprecated =
-    "Config.saves.onLoad has been deprecated, use the Save.onLoad API instead";
+    'Config.saves.onLoad has been deprecated, use the Save.onLoad API instead';
   const _errSavesOnSaveDeprecated =
-    "Config.saves.onSave has been deprecated, use the Save.onSave API instead";
+    'Config.saves.onSave has been deprecated, use the Save.onSave API instead';
 
   /*******************************************************************************
 		Object Exports.
@@ -111,7 +111,7 @@ export const Config = (() => {
     },
     set loadDelay(value) {
       if (!Number.isSafeInteger(value) || value < 0) {
-        throw new RangeError("Config.loadDelay must be a non-negative integer");
+        throw new RangeError('Config.loadDelay must be a non-negative integer');
       }
 
       _loadDelay = value;
@@ -149,7 +149,7 @@ export const Config = (() => {
 
         if (_historyMaxStates === 1 && controls) {
           throw new Error(
-            "Config.history.controls must be false when Config.history.maxStates is 1"
+            'Config.history.controls must be false when Config.history.maxStates is 1'
           );
         }
 
@@ -162,7 +162,7 @@ export const Config = (() => {
       set maxStates(value) {
         if (!Number.isSafeInteger(value) || value < 1) {
           throw new RangeError(
-            "Config.history.maxStates must be a positive integer"
+            'Config.history.maxStates must be a positive integer'
           );
         }
 
@@ -208,7 +208,7 @@ export const Config = (() => {
       set maxLoopIterations(value) {
         if (!Number.isSafeInteger(value) || value < 1) {
           throw new RangeError(
-            "Config.macros.maxLoopIterations must be a positive integer"
+            'Config.macros.maxLoopIterations must be a positive integer'
           );
         }
 
@@ -264,9 +264,9 @@ export const Config = (() => {
           const valueType = Util.getType(value);
 
           if (
-            valueType !== "boolean" &&
-            valueType !== "Object" &&
-            valueType !== "function"
+            valueType !== 'boolean' &&
+            valueType !== 'Object' &&
+            valueType !== 'function'
           ) {
             throw new TypeError(
               `Config.passages.descriptions must be a boolean, object, function, or null/undefined (received: ${valueType})`
@@ -300,7 +300,7 @@ export const Config = (() => {
           // lazy equality for null
           const valueType = Util.getType(value);
 
-          if (valueType !== "function") {
+          if (valueType !== 'function') {
             throw new TypeError(
               `Config.passages.onProcess must be a function or null/undefined (received: ${valueType})`
             );
@@ -319,7 +319,7 @@ export const Config = (() => {
           // lazy equality for null
           const valueType = Util.getType(value);
 
-          if (valueType !== "string") {
+          if (valueType !== 'string') {
             throw new TypeError(
               `Config.passages.start must be a string or null/undefined (received: ${valueType})`
             );
@@ -339,8 +339,8 @@ export const Config = (() => {
           const valueType = Util.getType(value);
 
           if (
-            valueType !== "string" &&
-            (valueType !== "number" ||
+            valueType !== 'string' &&
+            (valueType !== 'number' ||
               !Number.isSafeInteger(value) ||
               value < 0)
           ) {
@@ -367,9 +367,9 @@ export const Config = (() => {
           const valueType = Util.getType(value);
 
           if (
-            valueType !== "boolean" &&
-            valueType !== "string" &&
-            valueType !== "function"
+            valueType !== 'boolean' &&
+            valueType !== 'string' &&
+            valueType !== 'function'
           ) {
             throw new TypeError(
               `Config.saves.autoload must be a boolean, string, function, or null/undefined (received: ${valueType})`
@@ -390,21 +390,21 @@ export const Config = (() => {
 
           // legacy
           // Convert a string value to an Array of string.
-          if (valueType === "string") {
+          if (valueType === 'string') {
             _savesAutosave = [value];
             return;
           }
           // /legacy
 
           if (
-            valueType !== "boolean" &&
-            (valueType !== "Array" ||
-              !value.every((item) => typeof item === "string")) &&
-            valueType !== "function"
+            valueType !== 'boolean' &&
+            (valueType !== 'Array' ||
+              !value.every((item) => typeof item === 'string')) &&
+            valueType !== 'function'
           ) {
             throw new TypeError(
               `Config.saves.autosave must be a boolean, Array<string>, function, or null/undefined (received: ${valueType}${
-                valueType === "Array" ? "<any>" : ""
+                valueType === 'Array' ? '<any>' : ''
               })`
             );
           }
@@ -417,7 +417,7 @@ export const Config = (() => {
         return _savesId;
       },
       set id(value) {
-        if (typeof value !== "string" || value === "") {
+        if (typeof value !== 'string' || value === '') {
           throw new TypeError(
             `Config.saves.id must be a non-empty string (received: ${Util.getType(
               value
@@ -509,8 +509,8 @@ export const Config = (() => {
         const valueType = Util.getType(value);
 
         if (
-          valueType !== "boolean" &&
-          (valueType !== "number" || !Number.isSafeInteger(value) || value < 0)
+          valueType !== 'boolean' &&
+          (valueType !== 'number' || !Number.isSafeInteger(value) || value < 0)
         ) {
           throw new TypeError(
             `Config.ui.stowBarInitially must be a boolean or non-negative integer (received: ${valueType})`
