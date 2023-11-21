@@ -1,7 +1,6 @@
 import {
   AssertionApi,
   PromiseAssertions,
-  StringAssertions,
 } from './internal/assertion';
 import { Selector } from './selector';
 import { getPassageLoadedHandler } from './passage-loaded-handler';
@@ -368,18 +367,10 @@ export const testController: TestController = {
       `${new Date().getTime()} testController: entering expect actual=`,
       actual
     );
-    let assertionApi: AssertionApi<unknown>;
-    if (actual instanceof Promise) {
-      assertionApi = new PromiseAssertions(thisAsPromise(this), actual);
-    } else {
-      switch (typeof actual) {
-        case 'string':
-          assertionApi = new StringAssertions(thisAsPromise(this), actual);
-          break;
-        default:
-          throw new Error(`Can't handle assertions on a ${typeof actual} type`);
-      }
+    if (!(actual instanceof Promise)) {
+        actual = Promise.resolve(actual);
     }
+    const assertionApi = new PromiseAssertions(thisAsPromise(this), actual);
     return assertionApi as AssertionApi<A>;
   },
   consoleLog: function (
