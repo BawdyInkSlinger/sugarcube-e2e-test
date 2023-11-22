@@ -56,11 +56,11 @@ interface SelectorAPI {
   // visible: Promise<boolean>;
   // hasClass(className: string): Promise<boolean>;
   // getStyleProperty(propertyName: string): Promise<string>;
-  // getAttribute(attributeName: string): Promise<string | null>;
+  getAttribute(attributeName: string): Promise<string | null>;
   // getBoundingClientRectProperty(propertyName: string): Promise<number>;
   // hasAttribute(attributeName: string): Promise<boolean>;
   // shadowRoot(): Selector;
-  // nth(index: number): Selector;
+  nth(index: number): Selector;
   withText(text: string): Selector;
   // withText(re: RegExp): Selector;
   // withExactText(text: string): Selector;
@@ -153,18 +153,24 @@ export const Selector: SelectorFactory = (
       executionStepIndex < executionSteps.length;
       executionStepIndex++
     ) {
-      const loopCount = executionStepIndex;
-      let jQuerySelector = '';
-      while (executionSteps[executionStepIndex]?.action === 'jQuerySelector') {
-        jQuerySelector += executionSteps[executionStepIndex].value;
-        executionStepIndex++;
-      }
-      if (jQuerySelector.length > 0) {
-        if (loopCount === 0) {
-          jQueryChain = $(jQuerySelector);
-        } else {
-          jQueryChain.find(jQuerySelector);
+      if (executionSteps[executionStepIndex]?.action === 'jQuerySelector') {
+        const loopCount = executionStepIndex;
+        let jQuerySelector = '';
+        while (
+          executionSteps[executionStepIndex]?.action === 'jQuerySelector'
+        ) {
+          jQuerySelector += executionSteps[executionStepIndex].value;
+          executionStepIndex++;
         }
+        if (jQuerySelector.length > 0) {
+          if (loopCount === 0) {
+            jQueryChain = $(jQuerySelector);
+          } else {
+            jQueryChain = jQueryChain.find(jQuerySelector);
+          }
+        }
+      } else if (executionSteps[executionStepIndex]?.action === 'nth') {
+        jQueryChain = jQueryChain[executionSteps[executionStepIndex].value];
       }
     }
     return jQueryChain;
@@ -175,6 +181,7 @@ export const Selector: SelectorFactory = (
     innerText: ReExecutablePromise.fromFn(() => {
       return execute().text().trim();
     }),
+    exists: ReExecutablePromise.fromFn(() => execute().length > 0),
     withText: function (text: string): Selector {
       enterLogger.debug(
         `${new Date().getTime()} selector: entering withText init='${init}' text='${text}'`
@@ -185,7 +192,13 @@ export const Selector: SelectorFactory = (
       });
       return this;
     },
-    exists: ReExecutablePromise.fromFn(() => execute().length > 0),
+    nth(index: number): Selector {
+      executionSteps.push({ action: 'nth', value: index });
+      return this;
+    },
+    getAttribute(attributeName: string): Promise<string | null> {
+      return ReExecutablePromise.fromFn(() => execute().attr(attributeName));
+    },
     toString: function (): string {
       return `Selector(\`${executionSteps.join('')}\`)`;
     },
