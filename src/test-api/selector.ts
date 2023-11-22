@@ -6,7 +6,7 @@ const enterLogger = getLogger('DEBUG_SELECTOR_ENTER_LOG_MESSAGES');
 
 interface SelectorFactory {
   (
-    init: string,
+    init: string
     // | ((...args: any[]) => Node | Node[] | NodeList | HTMLCollection)
     // | Selector,
     // | NodeSnapshot
@@ -142,8 +142,9 @@ export const Selector: SelectorFactory = (
     `${new Date().getTime()} selector: entering init='${init}'`
   );
 
-  const execute = () => {
-    return $(init);
+  const executionSteps: string[] = [init];
+  const execute: () => JQuery<HTMLElement> = () => {
+    return $(executionSteps.join(""));
   };
 
   const selectorImpl: Selector & { toString: () => string } = {
@@ -155,12 +156,12 @@ export const Selector: SelectorFactory = (
       enterLogger.debug(
         `${new Date().getTime()} selector: entering withText init='${init}' text='${text}'`
       );
-      init = `${init}:contains(${text})`;
+      executionSteps.push(`:contains(${text})`);
       return this;
     },
     exists: ReExecutablePromise.fromFn(() => execute().length > 0),
     toString: function (): string {
-      return `Selector(\`${init}\`)`;
+      return `Selector(\`${executionSteps.join("")}\`)`;
     },
   };
   return selectorImpl;
