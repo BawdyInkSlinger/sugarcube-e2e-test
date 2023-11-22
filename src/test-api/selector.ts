@@ -142,9 +142,32 @@ export const Selector: SelectorFactory = (
     `${new Date().getTime()} selector: entering init='${init}'`
   );
 
-  const executionSteps: string[] = [init];
+  const executionSteps: (
+    | { action: 'jQuerySelector'; value: string }
+    | { action: 'nth'; value: number }
+  )[] = [{ action: 'jQuerySelector', value: init }];
   const execute: () => JQuery<HTMLElement> = () => {
-    return $(executionSteps.join(""));
+    let jQueryChain = $();
+    for (
+      let executionStepIndex = 0;
+      executionStepIndex < executionSteps.length;
+      executionStepIndex++
+    ) {
+      const loopCount = executionStepIndex;
+      let jQuerySelector = '';
+      while (executionSteps[executionStepIndex]?.action === 'jQuerySelector') {
+        jQuerySelector += executionSteps[executionStepIndex].value;
+        executionStepIndex++;
+      }
+      if (jQuerySelector.length > 0) {
+        if (loopCount === 0) {
+          jQueryChain = $(jQuerySelector);
+        } else {
+          jQueryChain.find(jQuerySelector);
+        }
+      }
+    }
+    return jQueryChain;
   };
 
   const selectorImpl: Selector & { toString: () => string } = {
@@ -156,12 +179,15 @@ export const Selector: SelectorFactory = (
       enterLogger.debug(
         `${new Date().getTime()} selector: entering withText init='${init}' text='${text}'`
       );
-      executionSteps.push(`:contains(${text})`);
+      executionSteps.push({
+        action: 'jQuerySelector',
+        value: `:contains(${text})`,
+      });
       return this;
     },
     exists: ReExecutablePromise.fromFn(() => execute().length > 0),
     toString: function (): string {
-      return `Selector(\`${executionSteps.join("")}\`)`;
+      return `Selector(\`${executionSteps.join('')}\`)`;
     },
   };
   return selectorImpl;
