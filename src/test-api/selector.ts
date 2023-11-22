@@ -11,14 +11,14 @@ interface SelectorFactory {
     // | Selector,
     // | NodeSnapshot
     // | SelectorPromise,
-    options?: SelectorOptions
+    // options?: SelectorOptions
   ): Selector;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Selector extends SelectorAPI {
   // (...args: any[]): SelectorPromise;
-  selectorString: string;
+  execute: () => JQuery<HTMLElement>;
 }
 
 interface SelectorAPI {
@@ -141,19 +141,24 @@ export const Selector: SelectorFactory = (
   enterLogger.debug(
     `${new Date().getTime()} selector: entering init='${init}'`
   );
+
+  const execute = () => {
+    return $(init);
+  };
+
   const selectorImpl: Selector & { toString: () => string } = {
-    selectorString: init,
+    execute,
     innerText: ReExecutablePromise.fromFn(() => {
-      return $(init).text().trim();
+      return execute().text().trim();
     }),
     withText: function (text: string): Selector {
       enterLogger.debug(
         `${new Date().getTime()} selector: entering withText init='${init}' text='${text}'`
       );
-      // return Selector(`${init}:contains('${$.escapeSelector(text)}')`);
-      return Selector(`${init}:contains(${text})`);
+      init = `${init}:contains(${text})`;
+      return this;
     },
-    exists: ReExecutablePromise.fromFn(() => $(init).length > 0),
+    exists: ReExecutablePromise.fromFn(() => execute().length > 0),
     toString: function (): string {
       return `Selector(\`${init}\`)`;
     },

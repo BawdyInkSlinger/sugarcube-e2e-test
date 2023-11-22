@@ -352,8 +352,8 @@ export const testController: TestController = {
       const pageLoadPromise = getPassageLoadedHandler()(
         `click ${selector?.toString()}`
       );
-      logger.debug(`$(${selector.selectorString}).trigger('click');`);
-      $(selector.selectorString).trigger('click');
+      logger.debug(`$(${selector}).trigger('click');`);
+      selector.execute().trigger('click');
       return pageLoadPromise;
     });
     return Object.assign(asyncClick, testController);
