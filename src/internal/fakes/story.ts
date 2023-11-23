@@ -292,6 +292,7 @@ function start(moduleScripts: Script[], storyScripts: Script[]) {
 }
 
 export function runStoryInit() {
+  logger.debug(`runStoryInit()`);
   // Run the user init passages.
   // Engine.runUserInit();
   _inits.forEach((passage) => {
@@ -301,7 +302,10 @@ export function runStoryInit() {
 
   const storyInit = storyPassages.find((p) => p.title.trim() === 'StoryInit');
   if (storyInit) {
-    passageLogger.info(`evaluating StoryInit`);
+    passageLogger.info(
+      `evaluating StoryInit passage '${storyInit.title}'` +
+        (passageLogger.isDebugEnabled() ? ` text=\n${storyInit.text}` : '')
+    );
     Wikifier.wikifyEval(storyInit.text);
   }
 

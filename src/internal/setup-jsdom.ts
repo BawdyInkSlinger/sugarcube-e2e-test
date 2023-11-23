@@ -34,8 +34,8 @@ export function setupJsdom(html?: string, options?: ConstructorOptions) {
   KEYS.forEach((key) => (global[key] = window[key]));
 
   // add properties to help with troubleshooting
-  window.jsdom = true;
-  document.jsdom = true;
+  window.isJSDOM = true;
+  document.isJSDOM = true;
 
   // setup document / window / window.console
   global.document = document;

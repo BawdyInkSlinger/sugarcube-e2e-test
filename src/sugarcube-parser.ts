@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import fs from 'fs/promises';
-import { DOMWindow } from 'jsdom';
+import { DOMWindow, JSDOM } from 'jsdom';
 import seedrandom from 'seedrandom';
 import { glob } from 'glob';
 import { SimplePassage } from './internal/declarations/unofficial/simple-passage';
@@ -16,6 +16,7 @@ import { addToPrettyString } from './add-to-pretty-string';
 
 const logger = getLogger('DEFAULT');
 const passagesLogger = getLogger('DEBUG_PASSAGES');
+const baseUrl = 'http://localhost';
 
 export class SugarcubeParser {
   jQuery: JQueryStatic;
@@ -46,10 +47,11 @@ export class SugarcubeParser {
   ): Promise<SugarcubeParser> {
     setPassageLoadedHandler(customPassageLoadedHandler);
 
-    const { document, window } = await SugarcubeParser.load();
+    const { jsdom, document, window } = await SugarcubeParser.load();
     setGlobal('console', console);
     setGlobal('window', window);
     setGlobal('document', document);
+    setGlobal('jsdom', jsdom);
 
     window.alert = (s: string) => {
       console.error(`ALERT: \`${s}\``);
@@ -147,12 +149,13 @@ export class SugarcubeParser {
   private static async load(): Promise<{
     window: DOMWindow;
     document: Document;
+    jsdom: JSDOM;
   }> {
     const sugarcubeHtml = (
       await fs.readFile(`${__dirname}/internal/html.tpl`)
     ).toString();
     const jsdom = setupJsdom(sugarcubeHtml, {
-      url: 'http://localhost',
+      url: baseUrl,
       runScripts: 'dangerously',
       resources: 'usable',
       pretendToBeVisual: true,
@@ -166,6 +169,7 @@ export class SugarcubeParser {
         addToPrettyString(jsdomDocument);
 
         resolve({
+          jsdom,
           window: jsdomWindow,
           document: jsdomDocument,
         });
@@ -185,7 +189,12 @@ export class SugarcubeParser {
     return globalThis.State.temporary;
   }
 
-  resetState(): void {
+  resetState(urlParams = ''): void {
+    logger.debug(`resetState(urlParams=\`${urlParams}\`)`);
+
+    const url = baseUrl + (urlParams.length > 0 ? `?${urlParams}` : '');
+    globalThis.jsdom.reconfigure({ url });
+
     globalThis.Engine.restart();
     globalThis.runStoryInit();
   }
