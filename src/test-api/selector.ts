@@ -143,9 +143,9 @@ export const Selector: SelectorFactory = (
   );
 
   const executionSteps: (
-    | { action: 'jQuerySelector'; value: string }
-    | { action: 'nth'; value: number }
-  )[] = [{ action: 'jQuerySelector', value: init }];
+    | { action: 'jQuerySelector'; value: string; toString: () => string }
+    | { action: 'nth'; value: number; toString: () => string }
+  )[] = [{ action: 'jQuerySelector', value: init, toString: () => init }];
   const execute: () => JQuery<HTMLElement> = () => {
     let jQueryChain = $();
     for (
@@ -189,11 +189,16 @@ export const Selector: SelectorFactory = (
       executionSteps.push({
         action: 'jQuerySelector',
         value: `:contains(${text})`,
+        toString: () => `:contains(${text})`,
       });
       return this;
     },
     nth(index: number): Selector {
-      executionSteps.push({ action: 'nth', value: index });
+      executionSteps.push({
+        action: 'nth',
+        value: index,
+        toString: () => `:nth(${index})`,
+      });
       return this;
     },
     getAttribute(attributeName: string): Promise<string | null> {
