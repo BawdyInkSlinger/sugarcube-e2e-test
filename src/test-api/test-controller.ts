@@ -350,9 +350,9 @@ export const testController: TestController = {
       );
 
       const pageLoadPromise = getPassageLoadedHandler()(
-        `click ${selector?.toString()}`
+        `click ${selector.toString()}`
       );
-      logger.debug(`$(${selector}).trigger('click');`);
+      logger.debug(`$(${selector.toString()}).trigger('click');`);
       selector.execute().trigger('click');
       return pageLoadPromise;
     });
