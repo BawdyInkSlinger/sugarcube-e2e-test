@@ -257,12 +257,7 @@ function start(moduleScripts: Script[], storyScripts: Script[]) {
 
   moduleScripts.forEach((script) => {
     passageLogger.info(`evaluating moduleScripts element named ${script.path}`);
-    jQuery(function () {
-      jQuery('<script>')
-        .attr('type', 'text/javascript')
-        .text(script.content)
-        .appendTo('head');
-    });
+    Scripting.evalJavaScript(script.content);
   });
 
   // primarily deals with StoryInterface Dom modifications
