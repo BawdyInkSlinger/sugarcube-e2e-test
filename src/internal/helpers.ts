@@ -361,7 +361,8 @@ export const {
 
     console.warn(`${mesg}\n\t${source.replace(/\n/g, '\n\t')}`);
 
-    return false;
+    // return false;
+    throw new Error(`Error on passage=\`${State.passage}\``);
   }
 
   /*
