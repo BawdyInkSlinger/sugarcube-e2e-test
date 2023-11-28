@@ -1,7 +1,4 @@
-import {
-  AssertionApi,
-  PromiseAssertions,
-} from './internal/assertion';
+import { AssertionApi, PromiseAssertions } from './internal/assertion';
 import { Selector } from './selector';
 import { getPassageLoadedHandler } from './passage-loaded-handler';
 import { getLogger } from '../logger';
@@ -192,9 +189,7 @@ export interface TestController {
   // pressKey(keys: string, options?: PressActionOptions): TestControllerPromise {
   //   return {} as TestControllerPromise;
   // }
-  // wait(timeout: number): TestControllerPromise {
-  //   return {} as TestControllerPromise;
-  // }
+  wait(timeout: number): TestControllerPromise;
   // navigateTo(url: string): TestControllerPromise {
   //   return {} as TestControllerPromise;
   // }
@@ -368,7 +363,7 @@ export const testController: TestController = {
       actual
     );
     if (!(actual instanceof Promise)) {
-        actual = Promise.resolve(actual);
+      actual = Promise.resolve(actual);
     }
     const assertionApi = new PromiseAssertions(thisAsPromise(this), actual);
     return assertionApi as AssertionApi<A>;
@@ -385,6 +380,34 @@ export const testController: TestController = {
     return Object.assign(
       thisAsPromise(this).then(() => {
         console.log(...params);
+      }),
+      testController
+    );
+  },
+  wait(
+    this: Promise<void> | TestController,
+    millis: number,
+    resolveOrReject: 'resolve' | 'reject' = 'resolve'
+  ): TestControllerPromise {
+    const cause = new Error(
+      `wait(${millis}, '${resolveOrReject}') timeout reached`
+    );
+
+    enterLogger.debug(
+      `${new Date().getTime()} testController: entering wait(${millis}, '${resolveOrReject}')`
+    );
+
+    return Object.assign(
+      thisAsPromise(this).then(() => {
+        return new Promise<void>((resolve, reject) => {
+          let impl = resolve;
+          if (resolveOrReject === 'reject') {
+            impl = () => {
+              reject(cause);
+            };
+          }
+          setTimeout(impl, millis);
+        });
       }),
       testController
     );
