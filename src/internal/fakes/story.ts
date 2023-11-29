@@ -106,6 +106,7 @@ function filter(predicate: (passage: Passage) => boolean, thisArg?: undefined) {
 
 const logger = getLogger('DEFAULT');
 const passageLogger = getLogger('DEBUG_PASSAGES');
+const evalLogger = getLogger('DEBUG_EVAL');
 
 const _inits: Passage[] = [];
 const _widgets: Passage[] = [];
@@ -256,7 +257,7 @@ function start(moduleScripts: Script[], storyScripts: Script[]) {
   SessionContainer.session = SimpleStore.create(Story.id, false); // eslint-disable-line no-undef
 
   moduleScripts.forEach((script) => {
-    passageLogger.info(`evaluating moduleScripts element named ${script.path}`);
+    evalLogger.info(`evaluating moduleScripts element named ${script.path}`);
     Scripting.evalJavaScript(script.content);
   });
 
@@ -265,17 +266,17 @@ function start(moduleScripts: Script[], storyScripts: Script[]) {
 
   // Run story scripts (dialog.js, click-to-proceed.js, speech.js).
   storyScripts.forEach((script) => {
-    passageLogger.info(`evaluating storyScripts element named ${script.path}`);
+    evalLogger.info(`evaluating storyScripts element named ${script.path}`);
     Scripting.evalJavaScript(script.content);
   });
   // Run user scripts (user stylesheet, JavaScript, and widgets).
   // Engine.runUserScripts();
   _scripts.forEach((script) => {
-    passageLogger.info(`evaluating _scripts element named ${script.title}`);
+    evalLogger.info(`evaluating _scripts element named ${script.title}`);
     Scripting.evalJavaScript(script.text);
   });
   _widgets.forEach((widget) => {
-    passageLogger.info(`evaluating _widget element named ${widget.title}`);
+    evalLogger.info(`evaluating _widget element named ${widget.title}`);
     Wikifier.wikifyEval(widget.processText());
   });
 
