@@ -307,7 +307,10 @@ export interface TestController {
 
   // report(...args: any[]): TestControllerPromise;
   goto(passageTitle: string): TestControllerPromise;
-  consoleLog(...params: unknown[]): TestControllerPromise;
+  consoleLog<T>(
+    this: Promise<void> | TestController,
+    paramCallback: () => T
+  ): TestControllerPromise;
 }
 
 export const testController: TestController = {
@@ -368,18 +371,23 @@ export const testController: TestController = {
     const assertionApi = new PromiseAssertions(thisAsPromise(this), actual);
     return assertionApi as AssertionApi<A>;
   },
-  consoleLog: function (
+  consoleLog<T>(
     this: Promise<void> | TestController,
-    ...params: unknown[]
+    paramCallback: () => T
   ): TestControllerPromise<void> {
     enterLogger.debug(
-      `${new Date().getTime()} testController: entering consoleLog params=`,
-      params
+      `${new Date().getTime()} testController: entering consoleLog paramCallback=`,
+      paramCallback
     );
 
     return Object.assign(
       thisAsPromise(this).then(() => {
-        console.log(...params);
+        const params: T = paramCallback();
+        if (Array.isArray(params)) {
+          console.log(...params);
+        } else {
+          console.log(params);
+        }
       }),
       testController
     );
