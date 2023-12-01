@@ -1,5 +1,14 @@
+import { SugarcubeParser } from '../src';
+
 describe(`innerText`, () => {
-  it(`fails`, () => {
-    expect(true).toEqual(false);
+
+  it(`returns a string`, async () => {
+    const { testController } = await SugarcubeParser.create([
+      {
+        title: 'passage title',
+        tags: ['passage tag'],
+        text: 'passage text',
+      },
+    ]);
   });
 });
