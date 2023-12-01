@@ -37,7 +37,6 @@
     "@typescript-eslint/no-non-null-assertion": ["off"],
     "@typescript-eslint/no-non-null-asserted-optional-chain": ["off"],
     "prefer-const": ["warn"],
-    // TODO: remove these
     "@typescript-eslint/ban-ts-comment": ["off"],
     "no-prototype-builtins": ["off"],
     "prefer-rest-params": ["off"]
