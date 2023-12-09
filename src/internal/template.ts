@@ -16,7 +16,7 @@ export const Template = (() => {
   'use strict';
 
   // Template definitions.
-  const _templates = new Map();
+  let _templates = new Map();
 
   // Valid template name regular expression.
   const _validNameRe = new RegExp(`^(?:${Patterns.templateName})$`);
@@ -88,6 +88,10 @@ export const Template = (() => {
         get: { value: templateGet },
         has: { value: templateHas },
         size: { get: templateSize },
+        // added by BIS
+        reset: { value: () => {
+            _templates = new Map();
+        }}
       }
     )
   );

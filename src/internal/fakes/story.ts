@@ -14,6 +14,15 @@ import { L10n } from '../l10n';
 import { Util } from '../util';
 
 let storyPassages: Passage[] = [];
+const logger = getLogger('DEFAULT');
+const passageLogger = getLogger('DEBUG_PASSAGES');
+const evalLogger = getLogger('DEBUG_EVAL');
+
+const _inits: Passage[] = [];
+const _widgets: Passage[] = [];
+const _passages: Passage[] = [];
+const _styles: Passage[] = [];
+const _scripts: Passage[] = [];
 
 export const Story = {
   id: 'fakeStoryId',
@@ -84,6 +93,19 @@ export const Story = {
     ); // lazy equality for null
     /* eslint-enable eqeqeq, no-nested-ternary, max-len */
   },
+
+  reset() {
+    SimpleStore.adapters.length = 0;
+    SimpleStore.adapters.push(InMemoryStorageAdapter);
+    StorageContainer.storage = SimpleStore.create(Story.id, true); // eslint-disable-line no-undef
+    SessionContainer.session = SimpleStore.create(Story.id, false); // eslint-disable-line no-undef
+  
+    _inits.length = 0;
+    _widgets.length = 0;
+    _passages.length = 0;
+    _styles.length = 0;
+    _scripts.length = 0;
+  }
 };
 
 function filter(predicate: (passage: Passage) => boolean, thisArg?: undefined) {
@@ -104,16 +126,6 @@ function filter(predicate: (passage: Passage) => boolean, thisArg?: undefined) {
   return results;
 }
 
-const logger = getLogger('DEFAULT');
-const passageLogger = getLogger('DEBUG_PASSAGES');
-const evalLogger = getLogger('DEBUG_EVAL');
-
-const _inits: Passage[] = [];
-const _widgets: Passage[] = [];
-const _passages: Passage[] = [];
-const _styles: Passage[] = [];
-const _scripts: Passage[] = [];
-
 type Script = { path: string; content: string };
 
 type Options = {
@@ -126,6 +138,7 @@ export const initialize = ({
   moduleScripts,
   nonmoduleScripts,
 }: Options) => {
+
   storyPassages = passages.map((simplePassage) => {
     passageLogger.debug(
       `Twee passage found: \`${simplePassage.title}\` tags: \`${simplePassage.tags}\``
@@ -139,12 +152,6 @@ export const initialize = ({
 // copied and modified from story.js
 function storyLoad(moduleScripts: Script[], storyScripts: Script[]) {
   logger.debug('[Story/storyLoad()]');
-
-  _inits.length = 0;
-  _widgets.length = 0;
-  _passages.length = 0;
-  _styles.length = 0;
-  _scripts.length = 0;
 
   const validationCodeTags = ['init', 'widget'];
   const validationNoCodeTagPassages = [
@@ -252,10 +259,6 @@ function storyLoad(moduleScripts: Script[], storyScripts: Script[]) {
 }
 
 function start(moduleScripts: Script[], storyScripts: Script[]) {
-  SimpleStore.adapters.push(InMemoryStorageAdapter);
-  StorageContainer.storage = SimpleStore.create(Story.id, true); // eslint-disable-line no-undef
-  SessionContainer.session = SimpleStore.create(Story.id, false); // eslint-disable-line no-undef
-
   moduleScripts.forEach((script) => {
     evalLogger.info(`evaluating moduleScripts element named ${script.path}`);
     Scripting.evalJavaScript(script.content);

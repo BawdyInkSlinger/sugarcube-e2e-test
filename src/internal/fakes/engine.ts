@@ -43,6 +43,7 @@ export const Engine = (() => {
 
   // Current state of the engine.
   let _state = States.Init;
+  logger.debug(`_state = States.Init`);
 
   // Last time `enginePlay()` was called (in milliseconds).
   let _lastPlay = null;
@@ -63,6 +64,13 @@ export const Engine = (() => {
     if (_state !== States.Init) {
       logger.warn(`[Engine/engineInit()] (_state !== States.Init: ${_state})`);
       return;
+    }
+
+    // console.log(`local jquery`, $('html').html());
+    // console.log(`global jquery`, globalThis.$('html').html());
+
+    if ($('#passages').length > 0) {
+        throw new Error('[Engine/engineInit()] document already has #passages');
     }
 
     /*
@@ -183,13 +191,18 @@ export const Engine = (() => {
 
         // Config.ui.updateStoryElements = false;
       } else {
-        $elems.append(
-          '<div id="story" role="main"><div id="passages" aria-live="polite"></div></div>'
-        );
+        logger.debug(
+            `[Engine/engineInit()] (because markup is false): $elems.append('<div id="story" role="main"><div id="passages" aria-live="polite"></div></div>');`
+          );
+        $elems.append('<div id="story" role="main"><div id="passages" aria-live="polite"></div></div>');
       }
 
       // Insert the core UI elements into the page before the main script.
       $elems.insertBefore('body>script#script-sugarcube');
+
+      if ($('#passages').length === 0) {
+        throw new Error('[Engine/engineInit()] document is missing #passages'); 
+      }
     })();
   }
 
@@ -329,6 +342,7 @@ export const Engine = (() => {
 
     // Update the engine state.
     _state = States.Idle;
+    logger.debug(`_state = States.Idle`);
 
     // Focus the document element initially.
     // document.documentElement.focus();
@@ -418,6 +432,7 @@ export const Engine = (() => {
 
     // added by BIS
     _state = States.Init;
+    logger.debug(`_state = States.Init`);
   }
 
   /*
@@ -524,6 +539,7 @@ export const Engine = (() => {
 
     // Update the engine state.
     _state = States.Playing;
+    logger.debug(`_state = States.Playing`);
 
     // Reset the temporary state and variables objects.
     TempStateContainer.TempState = {} as any; // eslint-disable-line no-undef
@@ -600,6 +616,7 @@ export const Engine = (() => {
 
     // Update the engine state.
     _state = States.Rendering;
+    logger.debug(`_state = States.Rendering`);
 
     // Get the passage's tags as a string, or `null` if there aren't any.
     const dataTags = passage.tags.length > 0 ? passage.tags.join(' ') : null;
@@ -666,8 +683,12 @@ export const Engine = (() => {
     // Cache the passage container.
     const containerEl = document.getElementById('passages');
 
+    if (containerEl === undefined || containerEl === null) {
+        throw new Error(`containerEl was ${containerEl}.`);
+    }
+
     // Empty the passage container.
-    if (containerEl.hasChildNodes()) {
+    if (containerEl && containerEl.hasChildNodes()) {
       if (
         typeof Config.passages.transitionOut === 'number' ||
         (typeof Config.passages.transitionOut === 'string' &&
@@ -744,6 +765,7 @@ export const Engine = (() => {
 
     // Update the engine state.
     _state = States.Playing;
+    logger.debug(`_state = States.Playing`);
 
     // Execute post-display events, tasks, and the `PassageDone` special passage.
     if (Story.has('PassageDone')) {
@@ -849,6 +871,7 @@ export const Engine = (() => {
 
     // Reset the engine state.
     _state = States.Idle;
+    logger.debug(`_state = States.Idle`);
 
     // Update the last play time.
     _lastPlay = now();

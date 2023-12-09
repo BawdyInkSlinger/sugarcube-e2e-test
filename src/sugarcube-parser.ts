@@ -5,7 +5,7 @@ import seedrandom from 'seedrandom';
 import { glob } from 'glob';
 import { SimplePassage } from './internal/declarations/unofficial/simple-passage';
 import { setupJsdom } from './internal/setup-jsdom';
-import { setGlobal } from './internal/set-global';
+import { resetGlobal } from './internal/reset-global';
 import { SugarCubeStoryVariables } from './internal/declarations/unofficial/userdata';
 import { SugarCubeTemporaryVariables } from './internal/declarations/twine-sugarcube-copy/userdata';
 import { TestController, testController } from './test-api/test-controller';
@@ -13,6 +13,7 @@ import { waitForPassageEnd } from './test-api/wait-for-passage-end';
 import { setPassageLoadedHandler } from './test-api/passage-loaded-handler';
 import { getLogger } from './logger';
 import { addToPrettyString } from './add-to-pretty-string';
+import { clearTimeouts } from './trigger-timeout';
 
 const logger = getLogger('DEFAULT');
 const passagesLogger = getLogger('DEBUG_PASSAGES');
@@ -45,26 +46,34 @@ export class SugarcubeParser {
     passages: SimplePassage[],
     customPassageLoadedHandler = waitForPassageEnd
   ): Promise<SugarcubeParser> {
+    clearTimeouts(); // This could prevent parallel test runs?
     setPassageLoadedHandler(customPassageLoadedHandler);
 
     const { jsdom, document, window } = await SugarcubeParser.load();
-    setGlobal('console', console);
-    setGlobal('window', window);
-    setGlobal('document', document);
-    setGlobal('jsdom', jsdom);
+    resetGlobal('console', console);
+    resetGlobal('window', window);
+    resetGlobal('document', document);
+    resetGlobal('jsdom', jsdom);
 
     window.alert = (s: string) => {
       console.error(`ALERT: \`${s}\``);
     };
 
-    setGlobal('scroll', () => {});
-    setGlobal('_', _);
+    resetGlobal('scroll', () => {});
+    resetGlobal('_', _);
 
-    setGlobal('setup', {});
+    resetGlobal('setup', {});
 
-    const jQuery = await import('jquery');
-    setGlobal('$', jQuery.default);
-    setGlobal('jQuery', jQuery.default);
+    // if (globalThis.jQuery) {
+    //     console.log('globalThis.jQuery already exists!');
+        
+    //     globalThis.jQuery.noConflict();
+    // }
+
+    const jQuery = (await import('jquery')).default;
+    
+    resetGlobal('$', jQuery);
+    resetGlobal('jQuery', jQuery);
 
     await import('./internal/extensions');
     await import('./internal/jquery-plugins');
@@ -74,33 +83,33 @@ export class SugarcubeParser {
     (Math as any).seedrandom = seedrandom;
 
     const { Config } = await import('./internal/config');
-    setGlobal('Config', Config);
+    resetGlobal('Config', Config);
 
     const { Macro } = await import('./internal/macro/macro');
-    setGlobal('Macro', Macro);
+    resetGlobal('Macro', Macro);
 
     await import('./internal/macro/macrolib');
 
     const { Wikifier }: any = await import('./internal/wikifier');
-    setGlobal('Wikifier', Wikifier);
+    resetGlobal('Wikifier', Wikifier);
     await import('./internal/parserlib');
 
     const { Setting } = await import('./internal/fakes/setting');
-    setGlobal('Setting', Setting);
+    resetGlobal('Setting', Setting);
 
     const { State } = await import('./internal/state');
-    setGlobal('State', State);
+    resetGlobal('State', State);
 
     const { Engine } = await import('./internal/fakes/engine');
-    setGlobal('Engine', Engine);
+    resetGlobal('Engine', Engine);
 
     const { Save } = await import('./internal/fakes/save');
-    setGlobal('Save', Save);
+    resetGlobal('Save', Save);
 
     const { Template } = await import('./internal/template');
-    setGlobal('Template', Template);
+    resetGlobal('Template', Template);
 
-    setGlobal('settings', {});
+    resetGlobal('settings', {});
 
     const {
       initialize: initializeStory,
@@ -108,9 +117,9 @@ export class SugarcubeParser {
       Story,
     } = await import('./internal/fakes/story');
 
-    setGlobal('Story', Story);
-    setGlobal('initializeStory', initializeStory);
-    setGlobal('runStoryInit', runStoryInit);
+    resetGlobal('Story', Story);
+    resetGlobal('initializeStory', initializeStory);
+    resetGlobal('runStoryInit', runStoryInit);
 
     const moduleFiles = await glob(['modules/*.js'], {
       ignore: 'node_modules/**',
@@ -135,7 +144,7 @@ export class SugarcubeParser {
       })
     );
 
-    setGlobal('dataLayer', []);
+    resetGlobal('dataLayer', []);
 
     initializeStory({
       passages: passages,

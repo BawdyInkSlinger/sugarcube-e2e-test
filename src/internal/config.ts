@@ -64,6 +64,52 @@ export const Config = (() => {
   let _uiStowBarInitially = 800;
   let _uiUpdateStoryElements = true;
 
+  // added by BIS
+  function initialize() {
+    _debug = false;
+    _addVisitedLinkClass = false;
+    _cleanupWikifierOutput = false;
+    _loadDelay = 0;
+  
+    // Audio settings.
+    _audioPauseOnFadeToZero = true;
+    _audioPreloadMetadata = true;
+  
+    // State history settings.
+    _historyControls = true;
+    _historyMaxStates = 40;
+  
+    // Macros settings.
+    _macrosIfAssignmentError = true;
+    _macrosMaxLoopIterations = 1000;
+    _macrosTypeSkipKey = '\x20'; // Space
+    _macrosTypeVisitedPassages = true;
+  
+    // Navigation settings.
+    _navigationOverride = undefined;
+  
+    // Passages settings.
+    _passagesDescriptions = undefined;
+    _passagesDisplayTitles = false;
+    _passagesNobr = false;
+    _passagesStart = undefined; // set by `Story.load()`
+    _passagesOnProcess = undefined;
+    _passagesTransitionOut = undefined;
+  
+    // Saves settings.
+    _savesAutoload = undefined;
+    _savesAutosave = undefined;
+    _savesId = 'untitled-story';
+    _savesIsAllowed = undefined;
+    _savesSlots = 8;
+    _savesTryDiskOnMobile = true;
+    _savesVersion = undefined;
+  
+    // UI settings.
+    _uiStowBarInitially = 800;
+    _uiUpdateStoryElements = true;
+  }
+
   /*******************************************************************************
 		Error Constants.
 	*******************************************************************************/
@@ -85,6 +131,9 @@ export const Config = (() => {
     /*
 			General settings.
 		*/
+    get reset() {
+        return initialize;
+    },
     get debug() {
       return _debug;
     },

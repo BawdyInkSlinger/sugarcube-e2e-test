@@ -8,20 +8,22 @@
 ***********************************************************************************************************************/
 /* global Patterns, Scripting, macros */
 
-import { macros } from '../macros';
 import { Patterns } from '../patterns';
 import { Scripting } from '../scripting';
 import { objectDefineProperties } from '../utils/object-define-properties';
+
+// BIS: This comes from sugarcube.js
+let macros: any = {};
 
 export const Macro = (() => {
   // eslint-disable-line no-unused-vars, no-var
   'use strict';
 
   // Macro definitions.
-  const _macros = {};
+  let _macros = {};
 
   // Map of all macro tags and their parents (key: 'tag name' => value: ['list of parent names']).
-  const _tags = {};
+  let _tags = {};
 
   // Valid macro name regular expression.
   const _validNameRe = new RegExp(`^(?:${Patterns.macroName})$`);
@@ -242,6 +244,12 @@ export const Macro = (() => {
         has: { value: macrosHas },
         get: { value: macrosGet },
         init: { value: macrosInit },
+        // added by BIS
+        reset: { value: () => {
+            macros = {};
+            _macros = {};
+            _tags = {};
+        }},
 
         /*
 			Tags Functions.
