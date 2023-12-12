@@ -13,4 +13,3 @@ describe(`innerText`, () => {
     await sugarcubeParser.testController;
   });
 });
-// TODO: remove e2e config
