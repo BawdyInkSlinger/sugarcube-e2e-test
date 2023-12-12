@@ -1,4 +1,5 @@
 import { getLogger } from '../logger';
+import { innerText } from './inner-text';
 import { NodeSnapshot } from './internal/node-snapshot';
 import ReExecutablePromise from './internal/re-executable-promise';
 
@@ -179,7 +180,7 @@ export const Selector: SelectorFactory = (
   const selectorImpl: Selector & { toString: () => string } = {
     execute,
     innerText: ReExecutablePromise.fromFn(() => {
-      return execute().text().trim();
+      return innerText(execute()[0]);
     }),
     exists: ReExecutablePromise.fromFn(() => execute().length > 0),
     withText: function (text: string): Selector {
