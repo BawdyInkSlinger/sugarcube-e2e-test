@@ -14,6 +14,7 @@ import { setPassageLoadedHandler } from './test-api/passage-loaded-handler';
 import { getLogger } from './logger';
 import { addToPrettyString } from './add-to-pretty-string';
 import { clearTimeouts } from './trigger-timeout';
+import jQueryFactory from 'jquery'
 
 const logger = getLogger('DEFAULT');
 const passagesLogger = getLogger('DEBUG_PASSAGES');
@@ -50,11 +51,17 @@ export class SugarcubeParser {
     setPassageLoadedHandler(customPassageLoadedHandler);
 
     const { jsdom, document, window } = await SugarcubeParser.load();
-    resetGlobal('console', console);
+    delete globalThis.window; // if window is undefined and module.exports exists, jQuery will be a factory function instead of an instance
+    const jQuery = jQueryFactory(window);
+    
     resetGlobal('window', window);
+    resetGlobal('console', console);
     resetGlobal('document', document);
     resetGlobal('jsdom', jsdom);
-
+    
+    resetGlobal('$', jQuery);
+    resetGlobal('jQuery', jQuery);
+    
     window.alert = (s: string) => {
       console.error(`ALERT: \`${s}\``);
     };
@@ -63,17 +70,6 @@ export class SugarcubeParser {
     resetGlobal('_', _);
 
     resetGlobal('setup', {});
-
-    // if (globalThis.jQuery) {
-    //     console.log('globalThis.jQuery already exists!');
-        
-    //     globalThis.jQuery.noConflict();
-    // }
-
-    const jQuery = (await import('jquery')).default;
-    
-    resetGlobal('$', jQuery);
-    resetGlobal('jQuery', jQuery);
 
     await import('./internal/extensions');
     await import('./internal/jquery-plugins');

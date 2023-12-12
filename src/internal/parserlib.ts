@@ -19,7 +19,6 @@ import { EOF, Lexer } from './lexer';
 import { Patterns } from './patterns';
 import { Wikifier } from './wikifier';
 import { Scripting } from './scripting';
-import jQuery from 'jquery';
 import { DebugView } from './debugview';
 import { MacroContext } from './macro/macrocontext';
 import { Macro } from './macro/macro';

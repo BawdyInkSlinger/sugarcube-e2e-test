@@ -11,7 +11,6 @@
 	       errorPrologRegExp
 */
 
-import jQuery from 'jquery';
 import { Lexer, EOF } from './lexer';
 import { Patterns } from './patterns';
 import { Config } from './config';

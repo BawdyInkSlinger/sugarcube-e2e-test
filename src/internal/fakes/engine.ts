@@ -1,5 +1,4 @@
 // This is "fake" in the sense that I have heavily edited it, but it started as the real engine.js
-import jQuery, { now } from 'jquery';
 import { Alert } from '../alert';
 import { Config } from '../config';
 import { DebugView } from '../debugview';
@@ -65,9 +64,6 @@ export const Engine = (() => {
       logger.warn(`[Engine/engineInit()] (_state !== States.Init: ${_state})`);
       return;
     }
-
-    // console.log(`local jquery`, $('html').html());
-    // console.log(`global jquery`, globalThis.$('html').html());
 
     if ($('#passages').length > 0) {
         throw new Error('[Engine/engineInit()] document already has #passages');
@@ -594,7 +590,7 @@ export const Engine = (() => {
     // NOTE: This is mostly for event, task, and special passage code,
     // though the likelihood of it being needed this early is low.  This
     // will be updated again later at the end.
-    _lastPlay = now();
+    _lastPlay = Date.now();
 
     // Execute pre-display tasks and the `PassageReady` special passage.
     Object.keys(predisplay).forEach((task) => {
@@ -874,7 +870,7 @@ export const Engine = (() => {
     logger.debug(`_state = States.Idle`);
 
     // Update the last play time.
-    _lastPlay = now();
+    _lastPlay = Date.now();
 
     return passageEl;
   }

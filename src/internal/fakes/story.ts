@@ -1,4 +1,3 @@
-import jQuery from 'jquery';
 import { Macro } from '../macro/macro';
 import { Scripting } from '../scripting';
 import { Wikifier } from '../wikifier';

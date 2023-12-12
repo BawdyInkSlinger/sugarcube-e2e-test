@@ -1,10 +1,8 @@
 import { SugarcubeParser } from '../src';
 
 describe(`innerText`, () => {
-  
-
   it(`returns a string`, async () => {
-  const sugarcubeParser = await SugarcubeParser.create([
+    const sugarcubeParser = await SugarcubeParser.create([
       {
         title: 'passage title',
         tags: ['passage tag'],

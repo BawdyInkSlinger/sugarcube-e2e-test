@@ -8,7 +8,6 @@
 ***********************************************************************************************************************/
 /* global Config, Diff, Engine, PRNGWrapper, Scripting, clone, session, storage */
 
-import jQuery from 'jquery';
 import { SugarCubeTemporaryVariables } from './declarations/twine-sugarcube-copy/userdata';
 import { Diff } from './diff';
 import { Config } from './config';

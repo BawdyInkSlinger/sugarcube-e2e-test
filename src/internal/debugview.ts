@@ -6,7 +6,6 @@
 	Use of this source code is governed by a BSD 2-clause "Simplified" License, which may be found in the LICENSE file.
 
 ***********************************************************************************************************************/
-import jQuery from 'jquery';
 
 /*
 	TODO: Make this use jQuery throughout.

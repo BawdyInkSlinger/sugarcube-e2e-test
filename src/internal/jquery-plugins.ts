@@ -7,7 +7,6 @@
 
 ***********************************************************************************************************************/
 /* global Wikifier, errorPrologRegExp, safeActiveElement */
-import jQuery from 'jquery';
 import { errorPrologRegExp } from './alert';
 import { Wikifier } from './wikifier';
 import { safeActiveElement } from './helpers';

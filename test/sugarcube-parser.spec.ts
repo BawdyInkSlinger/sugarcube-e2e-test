@@ -2,16 +2,6 @@ import { Selector, SugarcubeParser } from '../src';
 
 describe('SugarcubeParser', () => {
 
-  afterEach(() => {
-    console.log(
-      document.toPrettyString({
-        includeHeadElement: false,
-        includeSvgBody: false,
-        // selectorsToRemove: [`#after-passage-container`],
-      })
-    );
-  });
-
   it('can be created and goto a passage', async () => {
     const sugarcubeParser = await SugarcubeParser.create([
       {

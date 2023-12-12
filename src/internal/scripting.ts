@@ -9,7 +9,6 @@
 /* global Engine, Patterns, State, Story, Util, stringFrom */
 
 /* eslint-disable prefer-rest-params */
-import jQuery, { now } from 'jquery';
 import { Engine } from './fakes/engine';
 import { State } from './state';
 import { Story } from './fakes/story';
