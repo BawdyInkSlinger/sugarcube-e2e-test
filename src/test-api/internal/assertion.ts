@@ -155,7 +155,6 @@ export interface AssertionApi<E = any> {
   notMatch(re: RegExp, options?: AssertionOptions): TestControllerPromise;
 }
 
-// added by BIS:
 const logger = getLogger('DEFAULT');
 const enterLogger = getLogger('DEBUG_ASSERTIONS_ENTER_LOG_MESSAGES');
 

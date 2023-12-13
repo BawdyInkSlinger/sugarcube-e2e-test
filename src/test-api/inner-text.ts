@@ -1,6 +1,8 @@
-import { Category, getLogger } from "../logger";
+import { DEBUG_SUGARCUBE_PARSER_TESTS_KEY } from '../../test/init-logger';
+import { Branded } from '../internal/utils/branded';
+import { Category, getLogger } from '../logger';
 
-// const logger = getLogger(`DEBUG_SUGARCUBE_PARSER_TESTS` as Category);
+const testLogger = getLogger(DEBUG_SUGARCUBE_PARSER_TESTS_KEY as Category);
 
 const nodeTypes = {
   1: 'ELEMENT_NODE',
@@ -16,48 +18,128 @@ const nodeTypes = {
 
 type NodeType = (typeof nodeTypes)[keyof typeof nodeTypes];
 
+type DebugDatum = {
+  functionName: string;
+  nodeInfo: string;
+  nodeText: string;
+};
+type DebugData = DebugDatum[];
+
 export const innerText = (el: Node): string => {
-  return [...el.childNodes]
+  const { result, debugDataTable } = innerTextHelper(el);
+
+  if (testLogger.isDebugEnabled()) {
+    console.table(
+      debugDataTable.map((datum) => {
+        return {
+          ...datum,
+          nodeText: JSON.stringify(datum.nodeText).replaceAll(/ /g, '·'),
+        };
+      })
+    );
+  }
+
+  return result;
+};
+
+const innerTextHelper = (
+  el: Node
+): { result: string; debugDataTable: DebugData } => {
+  const debugDataTable: DebugData = [];
+
+  const addToDebugDataTable = (
+    functionName: string,
+    nodeInfo: string,
+    nodeText: string
+  ): void => {
+    debugDataTable.push({ functionName, nodeInfo, nodeText });
+  };
+
+  function handleText(node: Node): string {
+    const text = node.textContent.trim().replaceAll(/ +/g, ' ');
+
+    addToDebugDataTable(handleText.name, node.nodeName, text);
+
+    return text;
+  }
+
+  function handleParentDiv(node: Node): string {
+    let recursed = innerTextHelper(node)
+      .result.replaceAll(/^\s+/g, '')
+      .replaceAll(/\s+$/g, '');
+    recursed = '\n' + recursed + '\n';
+
+    addToDebugDataTable(
+      handleParentDiv.name,
+      `${node.nodeName}.${(node as HTMLElement).classList}`,
+      recursed
+    );
+
+    return recursed;
+  }
+
+  function handleHasChildNodes(node: Node): string {
+    const recursed = innerTextHelper(node).result;
+
+    addToDebugDataTable(
+      handleHasChildNodes.name,
+      `${node.nodeName}.${(node as HTMLElement).classList}`,
+      recursed
+    );
+
+    return recursed;
+  }
+
+  function handleDoubleBr(node: Node): string {
+    const text = `\n\n`;
+
+    addToDebugDataTable(
+      handleDoubleBr.name,
+      `${node.nodeName}.${(node as HTMLElement).classList}`,
+      text
+    );
+
+    return text;
+  }
+
+  function handleDefault(node: Node): string {
+    const text = ' ';
+
+    addToDebugDataTable(
+      handleDefault.name,
+      `${node.nodeName}.${(node as HTMLElement).classList}`,
+      text
+    );
+
+    return text;
+  }
+
+  const result = [...el.childNodes]
     .map((node, index, originalArray) => {
       switch (getType(node)) {
         case 'TEXT_NODE':
-          return node.textContent
-            .trim()
-            .replaceAll(/\r/g, ' ')
-            .replaceAll(/\n/g, ' ')
-            .replaceAll(/ +/g, ' ');
+          return handleText(node);
         case 'ELEMENT_NODE':
           if (
             node.hasChildNodes() &&
             node.nodeName.toLowerCase().trim() === `div`
           ) {
-            const recursed = innerText(node)
-              .replaceAll(/^\s+/g, '')
-              .replaceAll(/\s+$/g, '');
-            return '\n' + recursed + '\n';
+            return handleParentDiv(node);
           } else if (node.hasChildNodes()) {
-            console.log(
-              `added 0 newlines to ${node.nodeName}.${
-                (node as HTMLElement).classList
-              }`
-            );
-            return innerText(node);
+            return handleHasChildNodes(node);
           } else if (
             index - 1 >= 0 &&
             originalArray[index - 1].nodeName.toLowerCase().trim() === `br`
           ) {
-            console.log(
-              `added two newlines before ${originalArray[index + 1].nodeName}.${
-                (originalArray[index + 1] as HTMLElement).classList
-              }`
-            );
-            return '\n\n';
+            return handleDoubleBr(node);
           } else {
-            return '';
+            return handleDefault(node);
           }
       }
     })
     .join('');
+
+  return { result: result.trim(), debugDataTable };
 };
 
 const getType = (node: Node): NodeType => {
