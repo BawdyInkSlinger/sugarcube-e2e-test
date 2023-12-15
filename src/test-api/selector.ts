@@ -1,5 +1,5 @@
 import { getLogger } from '../logger';
-import { innerText } from './inner-text';
+import { innerText } from './internal/inner-text/inner-text';
 import { NodeSnapshot } from './internal/node-snapshot';
 import ReExecutablePromise from './internal/re-executable-promise';
 

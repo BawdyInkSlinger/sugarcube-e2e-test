@@ -1,5 +1,5 @@
-import { DEBUG_SUGARCUBE_PARSER_TESTS_KEY } from '../../test/init-logger';
-import { Category, getLogger } from '../logger';
+import { DEBUG_SUGARCUBE_PARSER_TESTS_KEY } from '../../../../test/init-logger';
+import { Category, getLogger } from '../../../logger';
 
 const testLogger = getLogger(DEBUG_SUGARCUBE_PARSER_TESTS_KEY as Category);
 
