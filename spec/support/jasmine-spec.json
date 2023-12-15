@@ -1,10 +1,10 @@
 {
-  "spec_dir": "test",
-  "spec_files": ["**/*.spec.ts", "!**/*.e2e.spec.ts"],
+  "spec_dir": "",
+  "spec_files": ["**/*.spec.ts"],
   "helpers": [
-    "../spec/support/logger.js",
-    "../spec/support/type-check.js",
-    "../test/init-logger.ts"
+    "spec/support/logger.js",
+    "spec/support/type-check.js",
+    "test/init-logger.ts"
   ],
   "stopSpecOnExpectationFailure": false,
   "random": true

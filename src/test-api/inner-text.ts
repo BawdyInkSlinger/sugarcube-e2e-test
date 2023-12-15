@@ -1,5 +1,4 @@
 import { DEBUG_SUGARCUBE_PARSER_TESTS_KEY } from '../../test/init-logger';
-import { Branded } from '../internal/utils/branded';
 import { Category, getLogger } from '../logger';
 
 const testLogger = getLogger(DEBUG_SUGARCUBE_PARSER_TESTS_KEY as Category);
@@ -56,7 +55,10 @@ const innerTextHelper = (
   };
 
   function handleText(node: Node): string {
-    const text = node.textContent.trim().replaceAll(/ +/g, ' ');
+    const text = node.textContent
+      .replaceAll(/\n/g, '')
+      .replaceAll(/ +/g, ' ')
+      .trim();
 
     addToDebugDataTable(handleText.name, node.nodeName, text);
 
@@ -102,8 +104,20 @@ const innerTextHelper = (
     return text;
   }
 
-  function handleDefault(node: Node): string {
+  function handleSingleBr(node: Node): string {
     const text = ' ';
+
+    addToDebugDataTable(
+      handleDoubleBr.name,
+      `${node.nodeName}.${(node as HTMLElement).classList}`,
+      text
+    );
+
+    return text;
+  }
+
+  function handleDefault(node: Node): string {
+    const text = '';
 
     addToDebugDataTable(
       handleDefault.name,
@@ -128,10 +142,19 @@ const innerTextHelper = (
           } else if (node.hasChildNodes()) {
             return handleHasChildNodes(node);
           } else if (
+              node.nodeName.toLowerCase().trim() === `br` &&
             index - 1 >= 0 &&
             originalArray[index - 1].nodeName.toLowerCase().trim() === `br`
           ) {
             return handleDoubleBr(node);
+          } else if (
+              node.nodeName.toLowerCase().trim() === `br` &&
+            index - 1 >= 0 &&
+            originalArray[index - 1].nodeName.toLowerCase().trim() !== `br` &&
+            index + 1 < originalArray.length &&
+            originalArray[index + 1].nodeName.toLowerCase().trim() !== `br`
+          ) {
+            return handleSingleBr(node);
           } else {
             return handleDefault(node);
           }

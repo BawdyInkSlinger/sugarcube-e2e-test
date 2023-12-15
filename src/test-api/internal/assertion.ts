@@ -1,3 +1,5 @@
+import chalk from 'chalk';
+import { diffChars, diffLines, diffWordsWithSpace } from 'diff';
 import { AssertionOptions } from './assertion-options';
 import ReExecutablePromise from './re-executable-promise';
 import { testController, TestControllerPromise } from '../test-controller';
@@ -346,8 +348,52 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
           logger.debug(
             `${new Date().getTime()} PromiseAssertions: resolving eql then expected='${expected}' actualValue='${actualValue}'`
           );
+        //   console.log(
+        //     `actualValue !== expected`,
+        //     actualValue !== expected,
+        //     typeof actualValue,
+        //     typeof expected,
+        //     (actualValue + '').length,
+        //     (expected + '').length
+        //   );
           if (actualValue !== expected) {
-            cause.message = `\n  Expected:\n${expected}\n  Actual:\n${actualValue}`;
+            // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#escape_sequences
+            const oldStr = (expected + '')
+              .replaceAll(/\n/g, `\\n\n`)
+              .replaceAll(/\t/g, `\\t\t`)
+              .replaceAll(/ /g, '·')
+            const newStr = (actualValue + '')
+              .replaceAll(/\n/g, `\\n\n`)
+              .replaceAll(/\t/g, `\\t\t`)
+              .replaceAll(/ /g, '·')
+            //   const oldStr = expected + '';
+            //   const newStr = actualValue + '';
+            //   const oldStr = encodeURI(expected + '');
+            //   const newStr = encodeURI(actualValue + '');
+            // const oldStr = (expected + '').replace(
+            //     /[^\u0020-\u007f]/g,
+            //     x => '\\u' + ('0000' + x.charCodeAt(0).toString(16)).slice(-4)
+            //   )
+            //   const newStr = (actualValue + '').replace(
+            //     /[^\u0020-\u007f]/g,
+            //     x => '\\u' + ('0000' + x.charCodeAt(0).toString(16)).slice(-4)
+            //   );
+            // const diff = diffWordsWithSpace(oldStr, newStr, )
+            const diff = diffChars(oldStr, newStr)
+              .map((change, index, arr) => {
+                // green for additions, red for deletions
+                // grey for common parts
+                const color = change.added
+                  ? chalk.bgGreen
+                  : change.removed
+                  ? chalk.bgRed
+                  : (x: string): string => x;
+
+                const coloredText = color(change.value);
+                return coloredText;
+              })
+              .join('');
+            cause.message = `\n  Expected:\n${expected}\n  Actual:\n${actualValue}\n  Diff:\n${diff}`;
             return Promise.reject(cause);
           } else {
             return Promise.resolve();
