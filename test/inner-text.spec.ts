@@ -72,9 +72,8 @@ she's determined.`, // note: this newline is converted into a single <br> by sug
       },
     ]);
 
-    await sugarcubeParser.testController.goto('passage title');
-
     await sugarcubeParser.testController
+      .goto('passage title')
       .expect(Selector(`.passage`).innerText)
       .eql(expected1);
   });
@@ -88,9 +87,8 @@ she's determined.`, // note: this newline is converted into a single <br> by sug
       },
     ]);
 
-    await sugarcubeParser.testController.goto('passage title');
-
     await sugarcubeParser.testController
+      .goto('passage title')
       .expect(Selector(`.passage`).innerText)
       .eql(expected2);
   });
