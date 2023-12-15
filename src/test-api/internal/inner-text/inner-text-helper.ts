@@ -12,17 +12,16 @@ const nodeTypes = {
   
   type NodeType = (typeof nodeTypes)[keyof typeof nodeTypes];
   
-  type DebugDatum = {
+  type DebugRow = {
     functionName: string;
     nodeInfo: string;
     nodeText: string;
   };
-  type DebugData = DebugDatum[];
-  
+
 export const innerTextHelper = (
     el: Node
-  ): { result: string; debugDataTable: DebugData } => {
-    const debugDataTable: DebugData = [];
+  ): { result: string; debugDataTable: DebugRow[] } => {
+    const debugDataTable: DebugRow[] = [];
   
     const addToDebugDataTable = (
       functionName: string,
