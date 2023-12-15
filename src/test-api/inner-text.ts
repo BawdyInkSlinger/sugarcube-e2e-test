@@ -54,11 +54,9 @@ const innerTextHelper = (
     debugDataTable.push({ functionName, nodeInfo, nodeText });
   };
 
-  function handleText(node: Node): string {
-    const text = node.textContent
-      .replaceAll(/\n/g, '')
-      .replaceAll(/ +/g, ' ')
-      .trim();
+  function handleText(node: Node, isNextElementInline: boolean): string {
+    let text = node.textContent.replaceAll(/\n/g, '').replaceAll(/ +/g, ' ');
+    text = isNextElementInline ? text.trimStart() : text.trim();
 
     addToDebugDataTable(handleText.name, node.nodeName, text);
 
@@ -132,7 +130,11 @@ const innerTextHelper = (
     .map((node, index, originalArray) => {
       switch (getType(node)) {
         case 'TEXT_NODE':
-          return handleText(node);
+          return handleText(
+            node,
+            index + 1 < originalArray.length &&
+              originalArray[index + 1].nodeName.toLowerCase().trim() === `span`
+          );
         case 'ELEMENT_NODE':
           if (
             node.hasChildNodes() &&
@@ -142,13 +144,13 @@ const innerTextHelper = (
           } else if (node.hasChildNodes()) {
             return handleHasChildNodes(node);
           } else if (
-              node.nodeName.toLowerCase().trim() === `br` &&
+            node.nodeName.toLowerCase().trim() === `br` &&
             index - 1 >= 0 &&
             originalArray[index - 1].nodeName.toLowerCase().trim() === `br`
           ) {
             return handleDoubleBr(node);
           } else if (
-              node.nodeName.toLowerCase().trim() === `br` &&
+            node.nodeName.toLowerCase().trim() === `br` &&
             index - 1 >= 0 &&
             originalArray[index - 1].nodeName.toLowerCase().trim() !== `br` &&
             index + 1 < originalArray.length &&

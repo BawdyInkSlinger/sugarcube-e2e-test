@@ -1,5 +1,5 @@
 import { Selector, SugarcubeParser } from '../src';
-import { expected1, html1 } from './inner-text.inputs';
+import { expected1, expected2, html1, html2 } from './inner-text.inputs';
 
 describe(`innerText`, () => {
   it(`returns text string`, async () => {
@@ -48,6 +48,21 @@ she's determined.`, // note: this newline is converted into a single <br> by sug
       .eql(`You'll give her one thing: she's determined.`);
   });
 
+  it(`squashes space between text and inline elements`, async () => {
+    const sugarcubeParser = await SugarcubeParser.create([
+      {
+        title: 'passage title',
+        tags: ['passage tag'],
+        text: `foo  <span> bar </span> `,
+      },
+    ]);
+
+    await sugarcubeParser.testController
+      .goto('passage title')
+      .expect(Selector(`.passage`).innerText)
+      .eql(`foo bar`);
+  });
+
   it(`returns example1`, async () => {
     const sugarcubeParser = await SugarcubeParser.create([
       {
@@ -62,5 +77,21 @@ she's determined.`, // note: this newline is converted into a single <br> by sug
     await sugarcubeParser.testController
       .expect(Selector(`.passage`).innerText)
       .eql(expected1);
+  });
+
+  it(`returns example2`, async () => {
+    const sugarcubeParser = await SugarcubeParser.create([
+      {
+        title: 'passage title',
+        tags: ['passage tag'],
+        text: html2,
+      },
+    ]);
+
+    await sugarcubeParser.testController.goto('passage title');
+
+    await sugarcubeParser.testController
+      .expect(Selector(`.passage`).innerText)
+      .eql(expected2);
   });
 });
