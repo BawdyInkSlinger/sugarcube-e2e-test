@@ -54,9 +54,10 @@ const innerTextHelper = (
     debugDataTable.push({ functionName, nodeInfo, nodeText });
   };
 
-  function handleText(node: Node, isNextElementInline: boolean): string {
+  function handleText(node: Node, isPreviousElementInline: boolean, isNextElementInline: boolean): string {
     let text = node.textContent.replaceAll(/\n/g, '').replaceAll(/ +/g, ' ');
-    text = isNextElementInline ? text.trimStart() : text.trim();
+    text = isPreviousElementInline ? text : text.trimStart()
+    text = isNextElementInline ? text : text.trimEnd()
 
     addToDebugDataTable(handleText.name, node.nodeName, text);
 
@@ -132,8 +133,10 @@ const innerTextHelper = (
         case 'TEXT_NODE':
           return handleText(
             node,
+            index - 1 >= 0 &&
+            originalArray[index - 1].nodeName.toLowerCase().trim() === `span`,
             index + 1 < originalArray.length &&
-              originalArray[index + 1].nodeName.toLowerCase().trim() === `span`
+              originalArray[index + 1].nodeName.toLowerCase().trim() === `span`,
           );
         case 'ELEMENT_NODE':
           if (
