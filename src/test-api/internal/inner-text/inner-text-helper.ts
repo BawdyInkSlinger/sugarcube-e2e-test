@@ -1,6 +1,6 @@
 import { DebugTable } from './debug-table';
-import { handleText } from './handle-text';
-import { TextAndLog } from './node-handler';
+import { handleText } from './node-handlers/handle-text';
+import { TextAndLog } from './node-handlers/node-handler';
 
 const nodeTypes = {
   1: 'ELEMENT_NODE',

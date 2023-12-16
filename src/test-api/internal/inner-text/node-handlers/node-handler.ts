@@ -1,4 +1,4 @@
-import { DebugRow } from "./debug-table";
+import { DebugRow } from "../debug-table";
 
 export type TextAndLog = {
     text: string;
