@@ -1,4 +1,4 @@
-import { innerTextHelper } from '../inner-text-helper';
+import { innerTextHelper } from '../inner-text';
 import { NodeHandler, TextAndLog, returnWrapper } from './node-handler';
 
 export const handleElement: NodeHandler = (
