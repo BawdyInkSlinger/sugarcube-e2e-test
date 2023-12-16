@@ -1,5 +1,3 @@
-export type LogParameter = {functionName: string, nodeInfo: string, nodeText: string}
-
 type DebugRow = {
   functionName: string;
   nodeInfo: string;
@@ -9,8 +7,8 @@ type DebugRow = {
 export class DebugTable {
   debugDataTable: DebugRow[] = [];
 
-  add(functionName: string, nodeInfo: string, nodeText: string): void {
-    this.debugDataTable.push({ functionName, nodeInfo, nodeText });
+  add(debugRow: DebugRow): void {
+    this.debugDataTable.push(debugRow);
   }
 
   print(): void {

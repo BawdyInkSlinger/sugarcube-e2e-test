@@ -28,7 +28,11 @@ export const innerTextHelper = (
     text = isPreviousElementInline ? text : text.trimStart();
     text = isNextElementInline ? text : text.trimEnd();
 
-    debugDataTable.add(handleText.name, node.nodeName, text);
+    debugDataTable.add({
+      functionName: handleText.name,
+      nodeInfo: node.nodeName,
+      nodeText: text,
+    });
 
     return text;
   }
@@ -39,11 +43,11 @@ export const innerTextHelper = (
       .replaceAll(/\s+$/g, '');
     recursed = '\n' + recursed + '\n';
 
-    debugDataTable.add(
-      handleParentDiv.name,
-      `${node.nodeName}.${(node as HTMLElement).classList}`,
-      recursed
-    );
+    debugDataTable.add({
+      functionName: handleParentDiv.name,
+      nodeInfo: `${node.nodeName}.${(node as HTMLElement).classList}`,
+      nodeText: recursed,
+    });
 
     return recursed;
   }
@@ -51,11 +55,11 @@ export const innerTextHelper = (
   function handleHasChildNodes(node: Node): string {
     const recursed = innerTextHelper(node).result;
 
-    debugDataTable.add(
-      handleHasChildNodes.name,
-      `${node.nodeName}.${(node as HTMLElement).classList}`,
-      recursed
-    );
+    debugDataTable.add({
+      functionName: handleHasChildNodes.name,
+      nodeInfo: `${node.nodeName}.${(node as HTMLElement).classList}`,
+      nodeText: recursed,
+    });
 
     return recursed;
   }
@@ -63,11 +67,11 @@ export const innerTextHelper = (
   function handleDoubleBr(node: Node): string {
     const text = `\n\n`;
 
-    debugDataTable.add(
-      handleDoubleBr.name,
-      `${node.nodeName}.${(node as HTMLElement).classList}`,
-      text
-    );
+    debugDataTable.add({
+      functionName: handleDoubleBr.name,
+      nodeInfo: `${node.nodeName}.${(node as HTMLElement).classList}`,
+      nodeText: text,
+    });
 
     return text;
   }
@@ -75,11 +79,11 @@ export const innerTextHelper = (
   function handleSingleBr(node: Node): string {
     const text = ' ';
 
-    debugDataTable.add(
-      handleDoubleBr.name,
-      `${node.nodeName}.${(node as HTMLElement).classList}`,
-      text
-    );
+    debugDataTable.add({
+      functionName: handleDoubleBr.name,
+      nodeInfo: `${node.nodeName}.${(node as HTMLElement).classList}`,
+      nodeText: text,
+    });
 
     return text;
   }
@@ -87,11 +91,11 @@ export const innerTextHelper = (
   function handleDefault(node: Node): string {
     const text = '';
 
-    debugDataTable.add(
-      handleDefault.name,
-      `${node.nodeName}.${(node as HTMLElement).classList}`,
-      text
-    );
+    debugDataTable.add({
+      functionName: handleDefault.name,
+      nodeInfo: `${node.nodeName}.${(node as HTMLElement).classList}`,
+      nodeText: text,
+    });
 
     return text;
   }
