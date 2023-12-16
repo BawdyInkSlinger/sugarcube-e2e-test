@@ -1,3 +1,5 @@
+export type LogParameter = {functionName: string, nodeInfo: string, nodeText: string}
+
 type DebugRow = {
   functionName: string;
   nodeInfo: string;
