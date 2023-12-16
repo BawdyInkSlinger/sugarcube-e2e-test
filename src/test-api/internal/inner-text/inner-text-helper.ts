@@ -97,7 +97,7 @@ export const innerTextHelper = (
   }
 
   const result = [...el.childNodes]
-    .map((node, index, originalArray) => {
+    .map((node: Node, index: number, originalArray: Node[]) => {
       switch (getType(node)) {
         case 'TEXT_NODE':
           return handleText(
