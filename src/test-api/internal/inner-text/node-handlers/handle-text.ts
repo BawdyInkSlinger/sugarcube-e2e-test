@@ -1,4 +1,4 @@
-import { NodeHandler, TextAndLog } from './node-handler';
+import { NodeHandler, TextAndLog, returnWrapper } from './node-handler';
 
 export const handleText: NodeHandler = (
   node: Node,
@@ -16,12 +16,5 @@ export const handleText: NodeHandler = (
   text = isPreviousElementInline ? text : text.trimStart();
   text = isNextElementInline ? text : text.trimEnd();
 
-  return {
-    text,
-    log: {
-      functionName: handleText.name,
-      nodeInfo: node.nodeName,
-      nodeText: text,
-    },
-  };
+  return returnWrapper(text, handleText.name, node.nodeName, text);
 };
