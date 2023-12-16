@@ -1,4 +1,4 @@
-import { DebugRow } from './debug-table';
+import { DebugTable } from './debug-table';
 
 const nodeTypes = {
   1: 'ELEMENT_NODE',
@@ -16,16 +16,8 @@ type NodeType = (typeof nodeTypes)[keyof typeof nodeTypes];
 
 export const innerTextHelper = (
   el: Node
-): { result: string; debugDataTable: DebugRow[] } => {
-  const debugDataTable: DebugRow[] = [];
-
-  const addToDebugDataTable = (
-    functionName: string,
-    nodeInfo: string,
-    nodeText: string
-  ): void => {
-    debugDataTable.push({ functionName, nodeInfo, nodeText });
-  };
+): { result: string; debugDataTable: DebugTable } => {
+  const debugDataTable = new DebugTable();
 
   function handleText(
     node: Node,
@@ -36,7 +28,7 @@ export const innerTextHelper = (
     text = isPreviousElementInline ? text : text.trimStart();
     text = isNextElementInline ? text : text.trimEnd();
 
-    addToDebugDataTable(handleText.name, node.nodeName, text);
+    debugDataTable.add(handleText.name, node.nodeName, text);
 
     return text;
   }
@@ -47,7 +39,7 @@ export const innerTextHelper = (
       .replaceAll(/\s+$/g, '');
     recursed = '\n' + recursed + '\n';
 
-    addToDebugDataTable(
+    debugDataTable.add(
       handleParentDiv.name,
       `${node.nodeName}.${(node as HTMLElement).classList}`,
       recursed
@@ -59,7 +51,7 @@ export const innerTextHelper = (
   function handleHasChildNodes(node: Node): string {
     const recursed = innerTextHelper(node).result;
 
-    addToDebugDataTable(
+    debugDataTable.add(
       handleHasChildNodes.name,
       `${node.nodeName}.${(node as HTMLElement).classList}`,
       recursed
@@ -71,7 +63,7 @@ export const innerTextHelper = (
   function handleDoubleBr(node: Node): string {
     const text = `\n\n`;
 
-    addToDebugDataTable(
+    debugDataTable.add(
       handleDoubleBr.name,
       `${node.nodeName}.${(node as HTMLElement).classList}`,
       text
@@ -83,7 +75,7 @@ export const innerTextHelper = (
   function handleSingleBr(node: Node): string {
     const text = ' ';
 
-    addToDebugDataTable(
+    debugDataTable.add(
       handleDoubleBr.name,
       `${node.nodeName}.${(node as HTMLElement).classList}`,
       text
@@ -95,7 +87,7 @@ export const innerTextHelper = (
   function handleDefault(node: Node): string {
     const text = '';
 
-    addToDebugDataTable(
+    debugDataTable.add(
       handleDefault.name,
       `${node.nodeName}.${(node as HTMLElement).classList}`,
       text
