@@ -1,4 +1,6 @@
 import { DebugTable } from './debug-table';
+import { handleText } from './handle-text';
+import { TextAndLog } from './node-handler';
 
 const nodeTypes = {
   1: 'ELEMENT_NODE',
@@ -18,24 +20,6 @@ export const innerTextHelper = (
   el: Node
 ): { result: string; debugDataTable: DebugTable } => {
   const debugDataTable = new DebugTable();
-
-  function handleText(
-    node: Node,
-    isPreviousElementInline: boolean,
-    isNextElementInline: boolean
-  ): string {
-    let text = node.textContent.replaceAll(/\n/g, '').replaceAll(/ +/g, ' ');
-    text = isPreviousElementInline ? text : text.trimStart();
-    text = isNextElementInline ? text : text.trimEnd();
-
-    debugDataTable.add({
-      functionName: handleText.name,
-      nodeInfo: node.nodeName,
-      nodeText: text,
-    });
-
-    return text;
-  }
 
   function handleParentDiv(node: Node): string {
     let recursed = innerTextHelper(node)
@@ -101,42 +85,54 @@ export const innerTextHelper = (
   }
 
   const result = [...el.childNodes]
-    .map((node: Node, index: number, originalArray: Node[]) => {
-      switch (getType(node)) {
-        case 'TEXT_NODE':
-          return handleText(
-            node,
-            index - 1 >= 0 &&
-              originalArray[index - 1].nodeName.toLowerCase().trim() === `span`,
-            index + 1 < originalArray.length &&
-              originalArray[index + 1].nodeName.toLowerCase().trim() === `span`
-          );
-        case 'ELEMENT_NODE':
-          if (
-            node.hasChildNodes() &&
-            node.nodeName.toLowerCase().trim() === `div`
-          ) {
-            return handleParentDiv(node);
-          } else if (node.hasChildNodes()) {
-            return handleHasChildNodes(node);
-          } else if (
-            node.nodeName.toLowerCase().trim() === `br` &&
-            index - 1 >= 0 &&
-            originalArray[index - 1].nodeName.toLowerCase().trim() === `br`
-          ) {
-            return handleDoubleBr(node);
-          } else if (
-            node.nodeName.toLowerCase().trim() === `br` &&
-            index - 1 >= 0 &&
-            originalArray[index - 1].nodeName.toLowerCase().trim() !== `br` &&
-            index + 1 < originalArray.length &&
-            originalArray[index + 1].nodeName.toLowerCase().trim() !== `br`
-          ) {
-            return handleSingleBr(node);
-          } else {
-            return handleDefault(node);
-          }
+    .map(
+      (
+        node: Node,
+        index: number,
+        originalArray: Node[]
+      ):
+        | TextAndLog
+        // todo: delete
+        | string => {
+        switch (getType(node)) {
+          case 'TEXT_NODE':
+            return handleText(node, index, originalArray);
+          case 'ELEMENT_NODE':
+            if (
+              node.hasChildNodes() &&
+              node.nodeName.toLowerCase().trim() === `div`
+            ) {
+              return handleParentDiv(node);
+            } else if (node.hasChildNodes()) {
+              return handleHasChildNodes(node);
+            } else if (
+              node.nodeName.toLowerCase().trim() === `br` &&
+              index - 1 >= 0 &&
+              originalArray[index - 1].nodeName.toLowerCase().trim() === `br`
+            ) {
+              return handleDoubleBr(node);
+            } else if (
+              node.nodeName.toLowerCase().trim() === `br` &&
+              index - 1 >= 0 &&
+              originalArray[index - 1].nodeName.toLowerCase().trim() !== `br` &&
+              index + 1 < originalArray.length &&
+              originalArray[index + 1].nodeName.toLowerCase().trim() !== `br`
+            ) {
+              return handleSingleBr(node);
+            } else {
+              return handleDefault(node);
+            }
+        }
       }
+    )
+    .map((textAndLog: TextAndLog) => {
+      //todo: remove
+      if (typeof textAndLog === 'string') {
+        return textAndLog;
+      }
+
+      debugDataTable.add(textAndLog.log);
+      return textAndLog.text;
     })
     .join('');
 
