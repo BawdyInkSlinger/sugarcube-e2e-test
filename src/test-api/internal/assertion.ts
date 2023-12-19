@@ -13,11 +13,11 @@ export type EnsureString<T> = T extends string ? string : never;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface AssertionApi<E = any> {
   currentPromise: Promise<void>;
-  // eql(
-  //   expected: E,
-  //   message?: string,
-  //   options?: AssertionOptions
-  // ): TestControllerPromise;
+  eql(
+    expected: E,
+    message?: string,
+    options?: AssertionOptions
+  ): TestControllerPromise;
   eql(expected: E, options?: AssertionOptions): TestControllerPromise;
   // notEql(
   //   unexpected: E,
@@ -318,7 +318,17 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
     );
   }
 
-  eql(expected: A, options?: AssertionOptions): TestControllerPromise<void> {
+  eql(expected: A, options?: AssertionOptions): TestControllerPromise<void>;
+  eql(
+    expected: A,
+    errorMessage: string,
+    options?: AssertionOptions
+  ): TestControllerPromise<void>;
+  eql(
+    expected: A,
+    messageOrOptions: string | AssertionOptions,
+    options?: AssertionOptions
+  ): TestControllerPromise<void> {
     const cause = new Error();
     enterLogger.debug(
       `${new Date().getTime()} PromiseAssertions: entering eql expected='${expected}' this.actual='${
@@ -348,37 +358,16 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
           logger.debug(
             `${new Date().getTime()} PromiseAssertions: resolving eql then expected='${expected}' actualValue='${actualValue}'`
           );
-        //   console.log(
-        //     `actualValue !== expected`,
-        //     actualValue !== expected,
-        //     typeof actualValue,
-        //     typeof expected,
-        //     (actualValue + '').length,
-        //     (expected + '').length
-        //   );
           if (actualValue !== expected) {
             // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#escape_sequences
             const oldStr = (expected + '')
               .replaceAll(/\n/g, `\\n\n`)
               .replaceAll(/\t/g, `\\t\t`)
-              .replaceAll(/ /g, '·')
+              .replaceAll(/ /g, '·');
             const newStr = (actualValue + '')
               .replaceAll(/\n/g, `\\n\n`)
               .replaceAll(/\t/g, `\\t\t`)
-              .replaceAll(/ /g, '·')
-            //   const oldStr = expected + '';
-            //   const newStr = actualValue + '';
-            //   const oldStr = encodeURI(expected + '');
-            //   const newStr = encodeURI(actualValue + '');
-            // const oldStr = (expected + '').replace(
-            //     /[^\u0020-\u007f]/g,
-            //     x => '\\u' + ('0000' + x.charCodeAt(0).toString(16)).slice(-4)
-            //   )
-            //   const newStr = (actualValue + '').replace(
-            //     /[^\u0020-\u007f]/g,
-            //     x => '\\u' + ('0000' + x.charCodeAt(0).toString(16)).slice(-4)
-            //   );
-            // const diff = diffWordsWithSpace(oldStr, newStr, )
+              .replaceAll(/ /g, '·');
             const diff = diffChars(oldStr, newStr)
               .map((change, index, arr) => {
                 // green for additions, red for deletions
@@ -393,7 +382,9 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
                 return coloredText;
               })
               .join('');
-            cause.message = `\n  Expected:\n${expected}\n  Actual:\n${actualValue}\n  Diff:\n${diff}`;
+            cause.message = `${
+              typeof messageOrOptions === 'string' ? messageOrOptions : ''
+            }\n  Expected:\n${expected}\n  Actual:\n${actualValue}\n  Diff:\n${diff}`;
             return Promise.reject(cause);
           } else {
             return Promise.resolve();

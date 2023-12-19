@@ -80,21 +80,21 @@ she's determined.`, // note: this newline is converted into a single <br> by sug
 
   it(`returns expectations using real examples`, async () => {
     for (let index = 1; index <= 3; index++) {
-        const html = inputs[`html${index}`];
-        const expected = inputs[`expected${index}`];
-        
-        const sugarcubeParser = await SugarcubeParser.create([
-            {
-              title: 'passage title',
-              tags: ['passage tag'],
-              text: html,
-            },
-          ]);
-      
-          await sugarcubeParser.testController
-            .goto('passage title')
-            .expect(Selector(`.passage`).innerText)
-            .eql(expected);
+      const html = inputs[`html${index}`];
+      const expected = inputs[`expected${index}`];
+
+      const sugarcubeParser = await SugarcubeParser.create([
+        {
+          title: 'passage title',
+          tags: ['passage tag'],
+          text: html,
+        },
+      ]);
+
+      await sugarcubeParser.testController
+        .goto('passage title')
+        .expect(Selector(`.passage`).innerText)
+        .eql(expected, `Error in example ${index}`);
     }
   });
 });
