@@ -32,13 +32,13 @@ describe(`innerText`, () => {
       .eql(`a\n\n\n\nb`);
   });
 
-  it(`replaces a single BR with blank`, async () => {
+  it(`replaces newline characters with blank`, async () => {
     const sugarcubeParser = await SugarcubeParser.create([
       {
         title: 'passage title',
         tags: ['passage tag'],
         text: `You'll give her one thing: 
-she's determined.`, // note: this newline is converted into a single <br> by sugarcube
+she's determined.`,
       },
     ]);
 
