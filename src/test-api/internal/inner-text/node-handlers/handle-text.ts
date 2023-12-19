@@ -19,7 +19,36 @@ export const handleText: NodeHandler = (
 };
 
 const isInlineElementName = (elementName: string): boolean => {
-  return [`span`].some((inlineElementName: string) => {
+  return [
+    `a`,
+    `abbr`,
+    `acronym`,
+    `b`,
+    `bdo`,
+    `big`,
+    // `br`, technically true (?), but it causes parser problems
+    `cite`,
+    `code`,
+    `dfn`,
+    `em`,
+    `i`,
+    `img`,
+    `input`,
+    `kbd`,
+    `label`,
+    `mark`,
+    `q`,
+    `s`,
+    `samp`,
+    `small`,
+    `span`,
+    `strong`,
+    `sub`,
+    `sup`,
+    `time`,
+    `u`,
+    `var`,
+  ].some((inlineElementName: string) => {
     return inlineElementName === elementName.toLowerCase().trim();
   });
 };

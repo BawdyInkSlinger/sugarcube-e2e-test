@@ -108,7 +108,7 @@ she's determined.`, // note: this newline is converted into a single <br> by sug
       .eql(expected2);
   });
 
-  xit(`returns example3`, async () => {
+  it(`returns example3`, async () => {
     const sugarcubeParser = await SugarcubeParser.create([
       {
         title: 'passage title',
