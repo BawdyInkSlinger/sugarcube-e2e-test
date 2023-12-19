@@ -1,5 +1,5 @@
 import { Selector, SugarcubeParser } from '../src';
-import { expected1, expected2, expected3, html1, html2, html3 } from './inner-text.inputs';
+import * as inputs from './inner-text.inputs';
 
 describe(`innerText`, () => {
   it(`returns text string`, async () => {
@@ -78,48 +78,23 @@ she's determined.`, // note: this newline is converted into a single <br> by sug
       .eql(`foo bar`);
   });
 
-  it(`returns example1`, async () => {
-    const sugarcubeParser = await SugarcubeParser.create([
-      {
-        title: 'passage title',
-        tags: ['passage tag'],
-        text: html1,
-      },
-    ]);
-
-    await sugarcubeParser.testController
-      .goto('passage title')
-      .expect(Selector(`.passage`).innerText)
-      .eql(expected1);
-  });
-
-  it(`returns example2`, async () => {
-    const sugarcubeParser = await SugarcubeParser.create([
-      {
-        title: 'passage title',
-        tags: ['passage tag'],
-        text: html2,
-      },
-    ]);
-
-    await sugarcubeParser.testController
-      .goto('passage title')
-      .expect(Selector(`.passage`).innerText)
-      .eql(expected2);
-  });
-
-  it(`returns example3`, async () => {
-    const sugarcubeParser = await SugarcubeParser.create([
-      {
-        title: 'passage title',
-        tags: ['passage tag'],
-        text: html3,
-      },
-    ]);
-
-    await sugarcubeParser.testController
-      .goto('passage title')
-      .expect(Selector(`.passage`).innerText)
-      .eql(expected3);
+  it(`returns expectations using real examples`, async () => {
+    for (let index = 1; index <= 3; index++) {
+        const html = inputs[`html${index}`];
+        const expected = inputs[`expected${index}`];
+        
+        const sugarcubeParser = await SugarcubeParser.create([
+            {
+              title: 'passage title',
+              tags: ['passage tag'],
+              text: html,
+            },
+          ]);
+      
+          await sugarcubeParser.testController
+            .goto('passage title')
+            .expect(Selector(`.passage`).innerText)
+            .eql(expected);
+    }
   });
 });
