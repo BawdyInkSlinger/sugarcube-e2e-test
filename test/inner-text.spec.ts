@@ -79,7 +79,7 @@ she's determined.`,
   });
 
   it(`returns expectations using real examples`, async () => {
-    for (let index = 1; index <= 3; index++) {
+    for (let index = 1; index <= 9; index++) {
       const html = inputs[`html${index}`];
       const expected = inputs[`expected${index}`];
 
