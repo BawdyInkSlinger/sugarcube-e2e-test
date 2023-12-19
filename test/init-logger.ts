@@ -1,4 +1,4 @@
-export const DEBUG_SUGARCUBE_PARSER_TESTS_KEY = 'DEBUG_SUGARCUBE_PARSER_TESTS';
+import { DEBUG_SUGARCUBE_PARSER_TESTS_KEY } from '../src/internal/test-logger-key';
 
 const logLevels = new Map<string, 'debug' | 'info' | 'warn' | 'error'>([
   ['DEFAULT', 'warn'],

@@ -1,4 +1,4 @@
-import { DEBUG_SUGARCUBE_PARSER_TESTS_KEY } from '../../../../test/init-logger';
+import { DEBUG_SUGARCUBE_PARSER_TESTS_KEY } from '../../../internal/test-logger-key';
 import { Category, getLogger } from '../../../logger';
 import { DebugTable } from './debug-table';
 import { handleElement } from './node-handlers/handle-element';

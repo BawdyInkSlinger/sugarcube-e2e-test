@@ -24,6 +24,6 @@
     "lib": ["es2022"],
     "types": ["jsdom", "seedrandom", "jasmine"]
   },
-  "include": ["./src/**/*.ts", "./test/**/*.ts"],
-  "exclude": ["./src/test-api/internal/sugarcube-testapi.reference.d.ts"]
+  "references": [{ "path": "./tsconfig.src.json" }],
+  "include": []
 }
