@@ -1376,6 +1376,7 @@ export {}; // imported for side effects only
       }
 
       const slice = Array.prototype.slice;
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
       const fn = this;
       const bound = slice.call(arguments, 0);
 

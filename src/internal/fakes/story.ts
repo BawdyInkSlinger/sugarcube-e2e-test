@@ -98,13 +98,13 @@ export const Story = {
     SimpleStore.adapters.push(InMemoryStorageAdapter);
     StorageContainer.storage = SimpleStore.create(Story.id, true); // eslint-disable-line no-undef
     SessionContainer.session = SimpleStore.create(Story.id, false); // eslint-disable-line no-undef
-  
+
     _inits.length = 0;
     _widgets.length = 0;
     _passages.length = 0;
     _styles.length = 0;
     _scripts.length = 0;
-  }
+  },
 };
 
 function filter(predicate: (passage: Passage) => boolean, thisArg?: undefined) {
@@ -137,7 +137,6 @@ export const initialize = ({
   moduleScripts,
   nonmoduleScripts,
 }: Options) => {
-
   storyPassages = passages.map((simplePassage) => {
     passageLogger.debug(
       `Twee passage found: \`${simplePassage.title}\` tags: \`${simplePassage.tags}\``

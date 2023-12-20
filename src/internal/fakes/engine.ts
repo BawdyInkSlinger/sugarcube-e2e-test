@@ -66,7 +66,7 @@ export const Engine = (() => {
     }
 
     if ($('#passages').length > 0) {
-        throw new Error('[Engine/engineInit()] document already has #passages');
+      throw new Error('[Engine/engineInit()] document already has #passages');
     }
 
     /*
@@ -188,16 +188,18 @@ export const Engine = (() => {
         // Config.ui.updateStoryElements = false;
       } else {
         logger.debug(
-            `[Engine/engineInit()] (because markup is false): $elems.append('<div id="story" role="main"><div id="passages" aria-live="polite"></div></div>');`
-          );
-        $elems.append('<div id="story" role="main"><div id="passages" aria-live="polite"></div></div>');
+          `[Engine/engineInit()] (because markup is false): $elems.append('<div id="story" role="main"><div id="passages" aria-live="polite"></div></div>');`
+        );
+        $elems.append(
+          '<div id="story" role="main"><div id="passages" aria-live="polite"></div></div>'
+        );
       }
 
       // Insert the core UI elements into the page before the main script.
       $elems.insertBefore('body>script#script-sugarcube');
 
       if ($('#passages').length === 0) {
-        throw new Error('[Engine/engineInit()] document is missing #passages'); 
+        throw new Error('[Engine/engineInit()] document is missing #passages');
       }
     })();
   }
@@ -680,7 +682,7 @@ export const Engine = (() => {
     const containerEl = document.getElementById('passages');
 
     if (containerEl === undefined || containerEl === null) {
-        throw new Error(`containerEl was ${containerEl}.`);
+      throw new Error(`containerEl was ${containerEl}.`);
     }
 
     // Empty the passage container.

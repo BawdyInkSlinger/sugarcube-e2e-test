@@ -20,7 +20,7 @@
   },
   "parserOptions": {
     "ecmaVersion": 2018,
-    "project": ["./tsconfig.json"]
+    "project": ["./tsconfig.json", "./tsconfig.src.json", "./tsconfig.test.json"]
   },
   "ignorePatterns": ["src/**/*.js", "dist/**", "**/sugarcube-testapi.reference.d.ts"],
   "rules": {

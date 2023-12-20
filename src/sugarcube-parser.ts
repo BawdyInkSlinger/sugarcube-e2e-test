@@ -14,7 +14,7 @@ import { setPassageLoadedHandler } from './test-api/passage-loaded-handler';
 import { getLogger } from './logger';
 import { addToPrettyString } from './add-to-pretty-string';
 import { clearTimeouts } from './trigger-timeout';
-import jQueryFactory from 'jquery'
+import jQueryFactory from 'jquery';
 
 const logger = getLogger('DEFAULT');
 const passagesLogger = getLogger('DEBUG_PASSAGES');
@@ -53,15 +53,15 @@ export class SugarcubeParser {
     const { jsdom, document, window } = await SugarcubeParser.load();
     delete globalThis.window; // if window is undefined and module.exports exists, jQuery will be a factory function instead of an instance
     const jQuery = jQueryFactory(window);
-    
+
     resetGlobal('window', window);
     resetGlobal('console', console);
     resetGlobal('document', document);
     resetGlobal('jsdom', jsdom);
-    
+
     resetGlobal('$', jQuery);
     resetGlobal('jQuery', jQuery);
-    
+
     window.alert = (s: string) => {
       console.error(`ALERT: \`${s}\``);
     };

@@ -1,4 +1,4 @@
-import {  JSDOM } from 'jsdom';
+import { JSDOM } from 'jsdom';
 
 declare global {
   interface Document {

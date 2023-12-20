@@ -245,11 +245,13 @@ export const Macro = (() => {
         get: { value: macrosGet },
         init: { value: macrosInit },
         // added by BIS
-        reset: { value: () => {
+        reset: {
+          value: () => {
             macros = {};
             _macros = {};
             _tags = {};
-        }},
+          },
+        },
 
         /*
 			Tags Functions.

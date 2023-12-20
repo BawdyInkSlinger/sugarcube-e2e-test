@@ -1,7 +1,6 @@
 import { Selector, SugarcubeParser } from '../src';
 
 describe('SugarcubeParser', () => {
-
   it('can be created and goto a passage', async () => {
     const sugarcubeParser = await SugarcubeParser.create([
       {

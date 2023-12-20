@@ -89,9 +89,11 @@ export const Template = (() => {
         has: { value: templateHas },
         size: { get: templateSize },
         // added by BIS
-        reset: { value: () => {
+        reset: {
+          value: () => {
             _templates = new Map();
-        }}
+          },
+        },
       }
     )
   );
