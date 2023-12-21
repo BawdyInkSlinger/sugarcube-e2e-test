@@ -192,6 +192,8 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
           logger.debug(
             `${new Date().getTime()} PromiseAssertions: resolving notMatch then regexp='${re}' actualValue=${actualValue}`
           );
+        //   const matches = [...(actualValue + '').split(new RegExp(`(${re.source})`, `g`))];
+        //   if (matches.length > 1) {
           if (re.test(actualValue + '')) {
             cause.message = `\n  Expected:\n${actualValue}\n  To NOT match:\n${re}`;
             return Promise.reject(cause);
