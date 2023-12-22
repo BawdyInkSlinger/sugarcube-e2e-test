@@ -51,8 +51,3 @@ export const splitMatches = (haystack: string, re: RegExp): SplitMatchArray => {
 
   return result;
 };
-
-// const propertyDescriptors = (Object.getOwnPropertyNames(currentMatch).map((propName) => {
-//   return propName + ": " + JSON.stringify(currentMatch[propName])
-// }).join(", "));
-// console.log(`propertyDescriptors`, propertyDescriptors);

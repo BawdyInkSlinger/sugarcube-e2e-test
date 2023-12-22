@@ -73,4 +73,21 @@ describe(`splitMatches`, () => {
       },
     ]);
   });
+  
+  it('returns the full match when .* is in the regex', async () => {
+    expect(splitMatches(`foo bar baz`, /o .* b/)).toEqual([
+      {
+        value: `fo`,
+        isMatch: false,
+      },
+      {
+        value: `o bar b`,
+        isMatch: true,
+      },
+      {
+        value: `az`,
+        isMatch: false,
+      },
+    ]);
+  });
 });
