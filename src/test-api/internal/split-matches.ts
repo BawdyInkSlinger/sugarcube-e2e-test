@@ -6,47 +6,39 @@ export type SplitMatchElement = {
 export type SplitMatchArray = SplitMatchElement[];
 
 export const splitMatches = (haystack: string, re: RegExp): SplitMatchArray => {
-  const matchMetadata = [...haystack.matchAll(new RegExp(re.source, `g`))].map(
-    (match) => {
-      return {
-        startIndex: match.index,
-        length: match[0].length,
-      };
-    }
-  );
-
-  if (matchMetadata.length === 0) {
-    return [];
-  }
-
   const result: SplitMatchArray = [];
   let substringStart = 0;
+  [...haystack.matchAll(new RegExp(re.source, `g`))]
+    .map((match) => {
+      return {
+        matchStartIndex: match.index,
+        matchLength: match[0].length,
+      };
+    })
+    .forEach((match) => {
+      if (substringStart < match.matchStartIndex) {
+        result.push({
+          value: haystack.substring(substringStart, match.matchStartIndex),
+          isMatch: false,
+        });
+        substringStart = match.matchStartIndex;
+      }
 
-  for (const match of matchMetadata) {
-    if (substringStart < match.startIndex) {
-      result.push({
-        value: haystack.substring(substringStart, match.startIndex),
-        isMatch: false,
-      });
-      substringStart = match.startIndex;
-    }
+      if (substringStart >= match.matchStartIndex) {
+        result.push({
+          value: haystack.substring(
+            substringStart,
+            match.matchStartIndex + match.matchLength
+          ),
+          isMatch: true,
+        });
+        substringStart = match.matchStartIndex + match.matchLength;
+      }
+    });
 
-    if (substringStart >= match.startIndex) {
-      result.push({
-        value: haystack.substring(
-          substringStart,
-          match.startIndex + match.length
-        ),
-        isMatch: true,
-      });
-      substringStart = match.startIndex + match.length;
-    }
-  }
-
-  const lastMatch = matchMetadata[matchMetadata.length - 1];
-  if (lastMatch.startIndex + lastMatch.length < haystack.length) {
+  if (result.length > 0 && substringStart < haystack.length - 1) {
     result.push({
-      value: haystack.substring(lastMatch.startIndex + lastMatch.length),
+      value: haystack.substring(substringStart),
       isMatch: false,
     });
   }

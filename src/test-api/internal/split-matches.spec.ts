@@ -40,6 +40,37 @@ describe(`splitMatches`, () => {
     ]);
   });
 
-  // multiple matches
-  // regex has groups?
+  it('returns a non-match, match, and non-match when regex matches middle of haystack', async () => {
+    expect(splitMatches(`foo bar baz`, /bar/)).toEqual([
+      {
+        value: `foo `,
+        isMatch: false,
+      },
+      {
+        value: `bar`,
+        isMatch: true,
+      },
+      {
+        value: ` baz`,
+        isMatch: false,
+      },
+    ]);
+  });
+
+  it('returns a match, non-match, and match when regex matches edges of haystack', async () => {
+    expect(splitMatches(`foo bar baz`, /(foo | baz)/)).toEqual([
+      {
+        value: `foo `,
+        isMatch: true,
+      },
+      {
+        value: `bar`,
+        isMatch: false,
+      },
+      {
+        value: ` baz`,
+        isMatch: true,
+      },
+    ]);
+  });
 });
