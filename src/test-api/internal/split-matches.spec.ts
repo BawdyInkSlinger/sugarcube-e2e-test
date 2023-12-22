@@ -90,4 +90,30 @@ describe(`splitMatches`, () => {
       },
     ]);
   });
+  
+  it('works with nested groupings', async () => {
+    expect(splitMatches('foo bar baz', /(b(a)r) baz/)).toEqual([
+      {
+        value: `foo `,
+        isMatch: false,
+      },
+      {
+        value: `bar baz`,
+        isMatch: true,
+      }
+    ]);
+  });
+  
+  it('ignores with non-captured groups', async () => {
+    expect(splitMatches('foo bar baz', /(?:bar) baz/)).toEqual([
+      {
+        value: `foo `,
+        isMatch: false,
+      },
+      {
+        value: `bar baz`,
+        isMatch: true,
+      }
+    ]);
+  });
 });
