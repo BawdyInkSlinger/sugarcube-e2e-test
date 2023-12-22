@@ -7,36 +7,42 @@ export type SplitMatchArray = SplitMatchElement[];
 
 export const splitMatches = (haystack: string, re: RegExp): SplitMatchArray => {
   const result: SplitMatchArray = [];
-  let substringStart = 0;
-  [...haystack.matchAll(new RegExp(re.source, `g`))]
-    .map((match) => {
+  const matchMetadata = [...haystack.matchAll(new RegExp(re.source, `g`))].map(
+    (match) => {
       return {
         matchStartIndex: match.index,
         matchLength: match[0].length,
       };
-    })
-    .forEach(({matchStartIndex, matchLength}) => {
-      if (substringStart < matchStartIndex) {
-        result.push({
-          value: haystack.substring(substringStart, matchStartIndex),
-          isMatch: false,
-        });
-        substringStart = matchStartIndex;
-      }
+    }
+  );
 
-      if (substringStart >= matchStartIndex) {
-        result.push({
-          value: haystack.substring(
-            substringStart,
-            matchStartIndex + matchLength
-          ),
-          isMatch: true,
-        });
-        substringStart = matchStartIndex + matchLength;
-      }
-    });
+  if (matchMetadata.length === 0) {
+    return [];
+  }
 
-  if (result.length > 0 && substringStart < haystack.length - 1) {
+  let substringStart = 0;
+  matchMetadata.forEach(({ matchStartIndex, matchLength }) => {
+    if (substringStart < matchStartIndex) {
+      result.push({
+        value: haystack.substring(substringStart, matchStartIndex),
+        isMatch: false,
+      });
+      substringStart = matchStartIndex;
+    }
+
+    if (substringStart >= matchStartIndex) {
+      result.push({
+        value: haystack.substring(
+          substringStart,
+          matchStartIndex + matchLength
+        ),
+        isMatch: true,
+      });
+      substringStart = matchStartIndex + matchLength;
+    }
+  });
+
+  if (substringStart < haystack.length - 1) {
     result.push({
       value: haystack.substring(substringStart),
       isMatch: false,

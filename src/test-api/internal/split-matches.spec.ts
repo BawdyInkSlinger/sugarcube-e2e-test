@@ -5,7 +5,7 @@ describe(`splitMatches`, () => {
     expect(splitMatches(`foo bar baz`, /qux/)).toEqual([]);
   });
 
-  it('returns a single match if haystack and regex are equivalent', async () => {
+  it('returns a single match if haystack and regex completely overlap', async () => {
     expect(splitMatches(`foo bar baz`, /foo bar baz/)).toEqual([
       {
         value: `foo bar baz`,
