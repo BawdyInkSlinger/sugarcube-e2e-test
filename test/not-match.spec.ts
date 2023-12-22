@@ -10,8 +10,9 @@ describe('Assertion.notMatch', () => {
       },
     ]);
 
+    await sugarcubeParser.testController.goto('SugarcubeParser title');
+
     await sugarcubeParser.testController
-      .goto('SugarcubeParser title')
       .expect(Selector(`.passage`).innerText)
       .notMatch(/unrelated/);
   });
@@ -25,13 +26,15 @@ describe('Assertion.notMatch', () => {
       },
     ]);
 
-    await expectAsync(sugarcubeParser.testController
-        .goto('SugarcubeParser title')
+    await sugarcubeParser.testController.goto('SugarcubeParser title');
+
+    await expectAsync(
+      sugarcubeParser.testController
         .expect(Selector(`.passage`).innerText)
         .notMatch(/Parser/)
     ).toBeRejectedWithError(/To NOT match:/);
-    await expectAsync(sugarcubeParser.testController
-        .goto('SugarcubeParser title')
+    await expectAsync(
+      sugarcubeParser.testController
         .expect(Selector(`.passage`).innerText)
         .notMatch(/Parser/)
     ).toBeRejectedWithError(/\/Parser\//);
@@ -46,13 +49,15 @@ describe('Assertion.notMatch', () => {
       },
     ]);
 
-    await expectAsync(sugarcubeParser.testController
-        .goto('SugarcubeParser title')
+    await sugarcubeParser.testController.goto('SugarcubeParser title');
+
+    await expectAsync(
+      sugarcubeParser.testController
         .expect(Selector(`.passage`).innerText)
         .notMatch(/(Parser|text)/)
     ).toBeRejectedWithError(/To NOT match:/);
-    await expectAsync(sugarcubeParser.testController
-        .goto('SugarcubeParser title')
+    await expectAsync(
+      sugarcubeParser.testController
         .expect(Selector(`.passage`).innerText)
         .notMatch(/(Parser|text)/)
     ).toBeRejectedWithError(/\/\(Parser\|text\)\//);

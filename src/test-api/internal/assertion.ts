@@ -5,6 +5,7 @@ import ReExecutablePromise from './re-executable-promise';
 import { testController, TestControllerPromise } from '../test-controller';
 import _ from 'lodash';
 import { getLogger } from '../../logger';
+import { splitMatches } from './split-matches';
 
 export type ElementOf<T> = T extends (infer E)[] ? E : never;
 export type Extend<T, E> = T extends E ? E : never;
@@ -192,9 +193,8 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
           logger.debug(
             `${new Date().getTime()} PromiseAssertions: resolving notMatch then regexp='${re}' actualValue=${actualValue}`
           );
-        //   const matches = [...(actualValue + '').split(new RegExp(`(${re.source})`, `g`))];
-        //   if (matches.length > 1) {
-          if (re.test(actualValue + '')) {
+          const matches = splitMatches(actualValue + '', re);
+          if (matches.length > 1) {
             cause.message = `\n  Expected:\n${actualValue}\n  To NOT match:\n${re}`;
             return Promise.reject(cause);
           } else {
