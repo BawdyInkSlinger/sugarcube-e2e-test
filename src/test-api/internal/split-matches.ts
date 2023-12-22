@@ -15,24 +15,24 @@ export const splitMatches = (haystack: string, re: RegExp): SplitMatchArray => {
         matchLength: match[0].length,
       };
     })
-    .forEach((match) => {
-      if (substringStart < match.matchStartIndex) {
+    .forEach(({matchStartIndex, matchLength}) => {
+      if (substringStart < matchStartIndex) {
         result.push({
-          value: haystack.substring(substringStart, match.matchStartIndex),
+          value: haystack.substring(substringStart, matchStartIndex),
           isMatch: false,
         });
-        substringStart = match.matchStartIndex;
+        substringStart = matchStartIndex;
       }
 
-      if (substringStart >= match.matchStartIndex) {
+      if (substringStart >= matchStartIndex) {
         result.push({
           value: haystack.substring(
             substringStart,
-            match.matchStartIndex + match.matchLength
+            matchStartIndex + matchLength
           ),
           isMatch: true,
         });
-        substringStart = match.matchStartIndex + match.matchLength;
+        substringStart = matchStartIndex + matchLength;
       }
     });
 
