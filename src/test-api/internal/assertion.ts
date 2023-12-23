@@ -6,6 +6,7 @@ import { testController, TestControllerPromise } from '../test-controller';
 import _ from 'lodash';
 import { getLogger } from '../../logger';
 import { splitMatches } from './split-matches';
+import { highlightMatches } from './highlight-matches';
 
 export type ElementOf<T> = T extends (infer E)[] ? E : never;
 export type Extend<T, E> = T extends E ? E : never;
@@ -195,7 +196,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
           );
           const matches = splitMatches(actualValue + '', re);
           if (matches.length > 1) {
-            cause.message = `\n  Expected:\n${actualValue}\n  To NOT match:\n${re}`;
+            cause.message = `\n  Expected:\n${highlightMatches(matches, chalk.bgRed)}\n  To NOT match:\n${re}`;
             return Promise.reject(cause);
           } else {
             return Promise.resolve();
