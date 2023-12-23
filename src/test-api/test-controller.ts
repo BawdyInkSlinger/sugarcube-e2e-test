@@ -371,7 +371,8 @@ export const testController: TestController = {
     const assertionApi = new PromiseAssertions(thisAsPromise(this), actual);
     return assertionApi as AssertionApi<A>;
   },
-  logDocument<T>(
+
+  logDocument(
     this: Promise<void> | TestController,
     options: Parameters<Document['toPrettyString']>[0]
   ): TestControllerPromise {

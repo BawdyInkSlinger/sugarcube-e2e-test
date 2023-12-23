@@ -4,6 +4,7 @@ import { NodeSnapshot } from './internal/node-snapshot';
 import ReExecutablePromise from './internal/re-executable-promise';
 
 const enterLogger = getLogger('DEBUG_SELECTOR_ENTER_LOG_MESSAGES');
+const executionLogger = getLogger('DEBUG_SELECTOR_EXECUTION_LOG_MESSAGES');
 
 interface SelectorFactory {
   (
@@ -147,7 +148,15 @@ export const Selector: SelectorFactory = (
     | { action: 'jQuerySelector'; value: string; toString: () => string }
     | { action: 'nth'; value: number; toString: () => string }
   )[] = [{ action: 'jQuerySelector', value: init, toString: () => init }];
+
+  function selectorToString(): string {
+    return `Selector(\`${executionSteps.join('')}\`)`;
+  }
+
   const execute: () => JQuery<HTMLElement> = () => {
+    if (executionLogger.isDebugEnabled()) {
+      executionLogger.debug(selectorToString());
+    }
     let jQueryChain = $();
     for (
       let executionStepIndex = 0;
@@ -205,9 +214,7 @@ export const Selector: SelectorFactory = (
     getAttribute(attributeName: string): Promise<string | null> {
       return ReExecutablePromise.fromFn(() => execute().attr(attributeName));
     },
-    toString: function (): string {
-      return `Selector(\`${executionSteps.join('')}\`)`;
-    },
+    toString: selectorToString,
   };
   return selectorImpl;
 };
