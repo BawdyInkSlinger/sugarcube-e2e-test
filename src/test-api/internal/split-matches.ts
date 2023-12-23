@@ -17,7 +17,10 @@ export const splitMatches = (haystack: string, re: RegExp): SplitMatchArray => {
   );
 
   if (matchMetadata.length === 0) {
-    return [];
+    return [{
+        value: haystack,
+        isMatch: false
+    }];
   }
 
   let substringStart = 0;

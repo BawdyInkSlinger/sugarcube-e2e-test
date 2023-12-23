@@ -1,8 +1,10 @@
 import { splitMatches } from './split-matches';
 
 describe(`splitMatches`, () => {
-  it('returns an empty array if there are no matches', async () => {
-    expect(splitMatches(`foo bar baz`, /qux/)).toEqual([]);
+  it('returns a single non-match if there are no matches', async () => {
+    expect(splitMatches(`foo bar baz`, /qux/)).toEqual([
+      { isMatch: false, value: `foo bar baz` },
+    ]);
   });
 
   it('returns a single match if haystack and regex completely overlap', async () => {
@@ -73,7 +75,7 @@ describe(`splitMatches`, () => {
       },
     ]);
   });
-  
+
   it('returns the full match when .* is in the regex', async () => {
     expect(splitMatches(`foo bar baz`, /o .* b/)).toEqual([
       {
@@ -90,7 +92,7 @@ describe(`splitMatches`, () => {
       },
     ]);
   });
-  
+
   it('works with nested groupings', async () => {
     expect(splitMatches('foo bar baz', /(b(a)r) baz/)).toEqual([
       {
@@ -100,10 +102,10 @@ describe(`splitMatches`, () => {
       {
         value: `bar baz`,
         isMatch: true,
-      }
+      },
     ]);
   });
-  
+
   it('ignores with non-captured groups', async () => {
     expect(splitMatches('foo bar baz', /(?:bar) baz/)).toEqual([
       {
@@ -113,7 +115,7 @@ describe(`splitMatches`, () => {
       {
         value: `bar baz`,
         isMatch: true,
-      }
+      },
     ]);
   });
 });
