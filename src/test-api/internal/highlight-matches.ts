@@ -1,9 +1,12 @@
 import { SplitMatchArray } from './split-matches';
 
-export const highlightMatches = (matches: SplitMatchArray): string => {
+export const highlightMatches = (
+  matches: SplitMatchArray,
+  highlightFunction: (input: string) => string
+): string => {
   return matches
-    .map((match) => {
-      return match.value;
+    .map(({ value, isMatch }) => {
+      return isMatch ? highlightFunction(value) : value;
     })
     .join('');
 };
