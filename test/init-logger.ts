@@ -11,6 +11,7 @@ const logLevels = new Map<string, 'debug' | 'info' | 'warn' | 'error'>([
   ['DEBUG_HAS_VISITED', 'warn'],
   ['DEBUG_THIS_AS_PROMISE', 'warn'],
   ['DEBUG_INNER_TEXT', 'debug'],
+  ['DEBUG_INNER_TEXT_TABLE_RECURSIVE', 'debug'],
 ]);
 
 logLevels.forEach((value, key) => {

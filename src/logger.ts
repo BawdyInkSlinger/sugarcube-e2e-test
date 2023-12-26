@@ -13,7 +13,8 @@ export type Category =
   | 'DEBUG_SELECTOR_EXECUTION_LOG_MESSAGES'
   | 'DEBUG_HAS_VISITED'
   | 'DEBUG_THIS_AS_PROMISE'
-  | 'DEBUG_INNER_TEXT';
+  | 'DEBUG_INNER_TEXT'
+  | 'DEBUG_INNER_TEXT_TABLE_RECURSIVE';
 
 export const getLogger = (categoryName: Category = 'DEFAULT'): Logger => {
   if (getEnvLevelValue('DEFAULT') === undefined) {

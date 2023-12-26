@@ -43,7 +43,8 @@ const handleParentDiv: NodeHandler = (
     recursed.result,
     handleParentDiv.name,
     `${node.nodeName}.${(node as HTMLElement).classList}`,
-    recursed.result
+    recursed.result,
+    recursed.debugDataTable
   );
 };
 
@@ -60,7 +61,8 @@ const handleHasChildNodes: NodeHandler = (
     recursed.result,
     handleHasChildNodes.name,
     `${node.nodeName}.${(node as HTMLElement).classList}`,
-    recursed.result
+    recursed.result,
+    recursed.debugDataTable
   );
 };
 

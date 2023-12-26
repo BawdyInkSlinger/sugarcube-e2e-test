@@ -5,6 +5,7 @@ import { handleText } from './node-handlers/handle-text';
 import { TextAndLog } from './node-handlers/node-handler';
 
 const innerTextLogger = getLogger('DEBUG_INNER_TEXT');
+const recursiveLogger = getLogger('DEBUG_INNER_TEXT_TABLE_RECURSIVE');
 
 const nodeTypes = {
   1: 'ELEMENT_NODE',
@@ -46,6 +47,11 @@ export const innerTextHelper = (
     })
     .map((textAndLog: TextAndLog) => {
       debugDataTable.add(textAndLog.log);
+      if (recursiveLogger.isDebugEnabled()) {
+        textAndLog.children.forEach((childRow) => {
+          debugDataTable.add(childRow);
+        });
+      }
       return textAndLog.text;
     })
     .join('');
