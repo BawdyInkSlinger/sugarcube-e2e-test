@@ -4,7 +4,7 @@ import { handleElement } from './node-handlers/handle-element';
 import { handleText } from './node-handlers/handle-text';
 import { TextAndLog } from './node-handlers/node-handler';
 
-const testLogger = getLogger('DEBUG_INNER_TEXT');
+const innerTextLogger = getLogger('DEBUG_INNER_TEXT');
 
 const nodeTypes = {
   1: 'ELEMENT_NODE',
@@ -23,7 +23,7 @@ type NodeType = (typeof nodeTypes)[keyof typeof nodeTypes];
 export const innerText = (el: Node): string => {
   const { result, debugDataTable } = innerTextHelper(el);
 
-  if (testLogger.isDebugEnabled()) {
+  if (innerTextLogger.isDebugEnabled()) {
     debugDataTable.print();
   }
 
