@@ -1,13 +1,13 @@
-export type DebugRow = {
+export type DataRow = {
   functionName: string;
   nodeInfo: string;
   nodeText: string;
 };
 
-export class DebugTable {
-  debugDataTable: DebugRow[] = [];
+export class DataTable {
+  debugDataTable: DataRow[] = [];
 
-  add(debugRow: DebugRow): void {
+  add(debugRow: DataRow): void {
     if (debugRow.functionName === undefined) {
       throw new Error(`functionName was undefined`);
     }

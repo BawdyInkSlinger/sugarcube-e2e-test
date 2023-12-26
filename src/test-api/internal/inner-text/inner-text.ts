@@ -1,5 +1,5 @@
 import { Category, getLogger } from '../../../logger';
-import { DebugTable } from './debug-table';
+import { DataTable } from './data-table';
 import { handleElement } from './node-handlers/handle-element';
 import { handleText } from './node-handlers/handle-text';
 import { TextAndLog } from './node-handlers/node-handler';
@@ -32,8 +32,8 @@ export const innerText = (el: Node): string => {
 
 export const innerTextHelper = (
   el: Node
-): { result: string; debugDataTable: DebugTable } => {
-  const debugDataTable = new DebugTable();
+): { result: string; debugDataTable: DataTable } => {
+  const debugDataTable = new DataTable();
 
   const result = [...el.childNodes]
     .map((node: Node, index: number, originalArray: Node[]): TextAndLog => {

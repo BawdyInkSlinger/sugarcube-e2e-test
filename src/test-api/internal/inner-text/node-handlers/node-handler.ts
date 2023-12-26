@@ -1,8 +1,8 @@
-import { DebugRow } from '../debug-table';
+import { DataRow } from '../data-table';
 
 export type TextAndLog = {
   text: string;
-  log: DebugRow;
+  log: DataRow;
 };
 
 export type NodeHandler = (
