@@ -1,11 +1,10 @@
-import { DEBUG_SUGARCUBE_PARSER_TESTS_KEY } from '../../../internal/test-logger-key';
 import { Category, getLogger } from '../../../logger';
 import { DebugTable } from './debug-table';
 import { handleElement } from './node-handlers/handle-element';
 import { handleText } from './node-handlers/handle-text';
 import { TextAndLog } from './node-handlers/node-handler';
 
-const testLogger = getLogger(DEBUG_SUGARCUBE_PARSER_TESTS_KEY as Category);
+const testLogger = getLogger('DEBUG_INNER_TEXT');
 
 const nodeTypes = {
   1: 'ELEMENT_NODE',

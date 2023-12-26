@@ -161,3 +161,10 @@ Her eyes grow large. "Really? How much will you give me if I tell you where that
 
 Facing her, you walk away from the tree and toss her first treat. She follows you like a zombie for the rest.`;
 export const html9 = `You say, <span class="you-say say">"Remember what happened last time you climbed a tree?"</span><br><br>       <span class="Eva-say say">"...maybe five treats would refresh my memory."</span><br><br>       <span class="you-say say">"You drive a hard bargain but..."</span><br><br>       Her eyes grow large. <span class="Eva-say say">"Really? How much will you give me if I tell you where that mint floss in the trashcan went?"</span><br><br>       Facing her, you walk away from the tree and toss her first treat. She follows you like a zombie for the rest.`;
+
+export const expected10 = `You say, "Sentence one? Sentence two."
+
+"Sentence three."`;
+
+export const html10 = `You say, <span class="you-say say">"Sentence one? 
+Sentence two."</span><br><br>       <span class="Eva-say say">"Sentence three."</span>`;
