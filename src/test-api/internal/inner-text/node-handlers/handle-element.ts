@@ -1,3 +1,4 @@
+import { DataTable } from '../data-table';
 import { innerTextHelper } from '../inner-text';
 import { NodeHandler, TextAndLog, returnWrapper } from './node-handler';
 
@@ -34,16 +35,15 @@ const handleParentDiv: NodeHandler = (
   index: number,
   originalArray: Node[]
 ): TextAndLog => {
-  let recursed = innerTextHelper(node)
-    .result.replaceAll(/^\s+/g, '')
-    .replaceAll(/\s+$/g, '');
-  recursed = '\n' + recursed + '\n';
+  const recursed = recurse(node, (result) => {
+    return '\n' + result.replaceAll(/^\s+/g, '').replaceAll(/\s+$/g, '') + '\n';
+  });
 
   return returnWrapper(
-    recursed,
+    recursed.result,
     handleParentDiv.name,
     `${node.nodeName}.${(node as HTMLElement).classList}`,
-    recursed
+    recursed.result
   );
 };
 
@@ -52,13 +52,15 @@ const handleHasChildNodes: NodeHandler = (
   index: number,
   originalArray: Node[]
 ): TextAndLog => {
-  const recursed = innerTextHelper(node).result;
+  const recursed = recurse(node, (result) => {
+    return result;
+  });
 
   return returnWrapper(
-    recursed,
+    recursed.result,
     handleHasChildNodes.name,
     `${node.nodeName}.${(node as HTMLElement).classList}`,
-    recursed
+    recursed.result
   );
 };
 
@@ -105,4 +107,16 @@ const handleDefault: NodeHandler = (
     `${node.nodeName}.${(node as HTMLElement).classList}`,
     text
   );
+};
+
+const recurse = (
+  node: Node,
+  cb: (value: string) => string
+): { result: string; debugDataTable: DataTable } => {
+  const { result, debugDataTable } = innerTextHelper(node);
+
+  return {
+    result: cb(result),
+    debugDataTable,
+  };
 };

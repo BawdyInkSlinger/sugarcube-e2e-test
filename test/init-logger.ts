@@ -10,7 +10,7 @@ const logLevels = new Map<string, 'debug' | 'info' | 'warn' | 'error'>([
   ['DEBUG_ASSERTIONS_ENTER_LOG_MESSAGES', 'warn'],
   ['DEBUG_HAS_VISITED', 'warn'],
   ['DEBUG_THIS_AS_PROMISE', 'warn'],
-  ['DEBUG_INNER_TEXT', 'warn'],
+  ['DEBUG_INNER_TEXT', 'debug'],
 ]);
 
 logLevels.forEach((value, key) => {

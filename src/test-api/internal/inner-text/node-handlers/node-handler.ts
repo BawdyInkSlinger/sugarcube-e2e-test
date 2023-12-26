@@ -1,8 +1,9 @@
-import { DataRow } from '../data-table';
+import { DataRow, DataTable } from '../data-table';
 
 export type TextAndLog = {
   text: string;
   log: DataRow;
+  children: DataRow[];
 };
 
 export type NodeHandler = (
@@ -15,7 +16,8 @@ export const returnWrapper = (
   text: string,
   functionName: string,
   nodeInfo: string,
-  nodeText: string
+  nodeText: string,
+  childTable: DataTable = new DataTable(),
 ): TextAndLog => {
   return {
     text,
@@ -24,5 +26,6 @@ export const returnWrapper = (
       nodeInfo,
       nodeText,
     },
+    children: childTable.rows,
   };
 };

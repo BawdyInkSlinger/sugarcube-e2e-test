@@ -6,6 +6,10 @@ export type DataRow = {
 
 export class DataTable {
   debugDataTable: DataRow[] = [];
+  
+  get rows () {
+    return this.debugDataTable;
+  }
 
   add(debugRow: DataRow): void {
     if (debugRow.functionName === undefined) {
