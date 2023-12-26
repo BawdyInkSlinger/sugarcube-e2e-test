@@ -79,7 +79,9 @@ she's determined.`,
   });
 
   it(`returns expectations using real examples`, async () => {
-    for (let index = 1; index <= 9; index++) {
+    const exampleCount = Object.getOwnPropertyNames(inputs).length / 2;
+    expect(exampleCount).toBeGreaterThan(0);
+    for (let index = 1; index <= exampleCount; index++) {
       const html = inputs[`html${index}`];
       const expected = inputs[`expected${index}`];
 

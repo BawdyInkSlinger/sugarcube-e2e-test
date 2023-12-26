@@ -197,6 +197,11 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
           const matches = splitMatches(actualValue + '', re);
           if (matches.length > 1) {
             cause.message = `\n  Expected:\n${highlightMatches(matches, chalk.bgRed)}\n  To NOT match:\n${re}`;
+            // console.log($(`.passage main`).html());
+            // console.log(`actualValue`, JSON.stringify(actualValue));
+            // console.log(document.toPrettyString({includeHeadElement: false,
+            //     includeSvgBody: false,
+            //     selectorsToRemove: [`#before-passage-container`, `#after-passage-container`]}));
             return Promise.reject(cause);
           } else {
             return Promise.resolve();

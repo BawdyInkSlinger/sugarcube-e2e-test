@@ -7,6 +7,7 @@ const logLevels = new Map<string, 'debug' | 'info' | 'warn' | 'error'>([
   ['DEBUG_PASSAGES', 'warn'],
   ['DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES', 'warn'],
   ['DEBUG_SELECTOR_ENTER_LOG_MESSAGES', 'warn'],
+  ['DEBUG_SELECTOR_EXECUTION_LOG_MESSAGES', 'warn'],
   ['DEBUG_ASSERTIONS_ENTER_LOG_MESSAGES', 'warn'],
   ['DEBUG_HAS_VISITED', 'warn'],
   ['DEBUG_THIS_AS_PROMISE', 'warn'],

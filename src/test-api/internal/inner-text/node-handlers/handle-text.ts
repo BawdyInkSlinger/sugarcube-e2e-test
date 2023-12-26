@@ -11,7 +11,10 @@ export const handleText: NodeHandler = (
     index + 1 < originalArray.length &&
     isInlineElementName(originalArray[index + 1].nodeName);
 
-  let text = node.textContent.replaceAll(/\n/g, '').replaceAll(/ +/g, ' ');
+  let text = node.textContent
+    .replaceAll(/\r/g, '')
+    .replaceAll(/\n/g, '')
+    .replaceAll(/ +/g, ' ');
   text = isPreviousElementInline ? text : text.trimStart();
   text = isNextElementInline ? text : text.trimEnd();
 
