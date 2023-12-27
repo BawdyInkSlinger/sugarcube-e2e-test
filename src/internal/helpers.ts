@@ -324,6 +324,8 @@ export const {
     const $toggle = jQuery(document.createElement('button'));
     const $source = jQuery(document.createElement('pre'));
     const mesg = `${L10n.get('errorTitle')}: ${message || 'unknown error'}`;
+    
+    console.warn(`${mesg}\n\t${source?.replace(/\n/g, '\n\t')}`);
 
     $toggle
       .addClass('error-toggle')
@@ -358,8 +360,6 @@ export const {
       })
       .appendTo($wrapper);
     $wrapper.addClass('error-view').appendTo(place);
-
-    console.warn(`${mesg}\n\t${source.replace(/\n/g, '\n\t')}`);
 
     // return false;
     throw new Error(`Error on passage=\`${State.passage}\``);
