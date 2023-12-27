@@ -144,47 +144,98 @@ export const Selector: SelectorFactory = (
     `${new Date().getTime()} selector: entering init='${init}'`
   );
 
-  const executionSteps: (
+  type ExecutionStep =
     | { action: 'jQuerySelector'; value: string; toString: () => string }
-    | { action: 'nth'; value: number; toString: () => string }
-  )[] = [{ action: 'jQuerySelector', value: init, toString: () => init }];
+    | { action: 'nth'; value: number; toString: () => string };
+  const executionSteps: ExecutionStep[] = [
+    { action: 'jQuerySelector', value: init, toString: () => init },
+  ];
 
   function selectorToString(): string {
     return `Selector(\`${executionSteps.join('')}\`)`;
   }
 
+  /* NEW */
   const execute: () => JQuery<HTMLElement> = () => {
-    if (executionLogger.isDebugEnabled()) {
-      executionLogger.debug(selectorToString());
+    if (executionLogger.isInfoEnabled()) {
+      executionLogger.info(`execute selector: ${selectorToString()}`);
     }
-    let jQueryChain = $();
-    for (
-      let executionStepIndex = 0;
-      executionStepIndex < executionSteps.length;
-      executionStepIndex++
-    ) {
-      if (executionSteps[executionStepIndex]?.action === 'jQuerySelector') {
-        const loopCount = executionStepIndex;
-        let jQuerySelector = '';
-        while (
-          executionSteps[executionStepIndex]?.action === 'jQuerySelector'
+    let currentJQuery = $(); // noop
+
+    const squashedExecutionSteps = executionSteps.reduce(
+      (prev: ExecutionStep[], curr: ExecutionStep): ExecutionStep[] => {
+        const previousStep =
+          prev.length > 0 ? prev[prev.length - 1] : undefined;
+        if (
+          previousStep?.action === 'jQuerySelector' &&
+          curr.action === 'jQuerySelector'
         ) {
-          jQuerySelector += executionSteps[executionStepIndex].value;
-          executionStepIndex++;
+          previousStep.value = previousStep.value + curr.value;
+          return prev;
         }
-        if (jQuerySelector.length > 0) {
-          if (loopCount === 0) {
-            jQueryChain = $(jQuerySelector);
-          } else {
-            jQueryChain = jQueryChain.find(jQuerySelector);
-          }
+        return prev.concat([curr]);
+      },
+      []
+    );
+
+    squashedExecutionSteps.forEach((executionStep, index) => {
+      executionLogger.debug(`executionSteps index='${index}'`);
+      if (executionStep.action === 'jQuerySelector') {
+        executionLogger.debug(
+          `executionSteps jQuerySelector='${executionStep}'`
+        );
+        if (index === 0) {
+          executionLogger.debug(
+            `executionSteps execute='$(${executionStep.value})'`
+          );
+          currentJQuery = $(executionStep.value);
+        } else {
+          executionLogger.debug(
+            `executionSteps execute='currentJQuery.find(${executionStep.value})'`
+          );
+          currentJQuery = currentJQuery.find(executionStep.value);
         }
-      } else if (executionSteps[executionStepIndex]?.action === 'nth') {
-        jQueryChain = jQueryChain[executionSteps[executionStepIndex].value];
+      } else if (executionStep.action === 'nth') {
+        executionLogger.debug(`executionSteps nth='${executionStep}'`);
+        currentJQuery = $(currentJQuery[executionStep.value]);
       }
-    }
-    return jQueryChain;
+    });
+    return currentJQuery;
   };
+
+  /* Old */
+  //   const execute: () => JQuery<HTMLElement> = () => {
+  //     if (executionLogger.isDebugEnabled()) {
+  //       executionLogger.debug(selectorToString());
+  //     }
+  //     let jQueryChain = $();
+  //     for (
+  //       let executionStepIndex = 0;
+  //       executionStepIndex < executionSteps.length;
+  //       executionStepIndex++
+  //     ) {
+  //       if (executionSteps[executionStepIndex]?.action === 'jQuerySelector') {
+  //         const loopCount = executionStepIndex;
+  //         let jQuerySelector = '';
+  //         while (
+  //           executionSteps[executionStepIndex]?.action === 'jQuerySelector'
+  //         ) {
+  //           jQuerySelector += executionSteps[executionStepIndex].value;
+  //           executionStepIndex++;
+  //         }
+  //         if (jQuerySelector.length > 0) {
+  //           if (loopCount === 0) {
+  //             jQueryChain = $(jQuerySelector);
+  //           } else {
+  //             jQueryChain = jQueryChain.find(jQuerySelector);
+  //           }
+  //         }
+  //       } else if (executionSteps[executionStepIndex]?.action === 'nth') {
+  //         jQueryChain = jQueryChain[executionSteps[executionStepIndex].value];
+  //       }
+  //     }
+  //     return jQueryChain;
+  //   };
 
   const selectorImpl: Selector & { toString: () => string } = {
     execute,

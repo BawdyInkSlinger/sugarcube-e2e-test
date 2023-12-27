@@ -352,6 +352,7 @@ export const testController: TestController = {
       );
       logger.debug(`$(${selector.toString()}).trigger('click');`);
       selector.execute().trigger('click');
+      logger.debug(`finished $(${selector.toString()}).trigger('click'); Waiting for pageLoadPromise`);
       return pageLoadPromise;
     });
     return Object.assign(asyncClick, testController);

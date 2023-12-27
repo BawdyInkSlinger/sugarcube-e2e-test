@@ -1381,9 +1381,21 @@ Macro.add(['button', 'link'], {
           this.payload[0].contents !== ''
             ? () => Wikifier.wikifyEval(this.payload[0].contents.trim())
             : null,
+            /*
+            Change by BIS. Was:
+                passage != null // lazy equality for null
+                ? () => Engine.play(passage)
+                : null
+            */
           passage != null // lazy equality for null
-            ? () => Engine.play(passage)
-            : null
+            ? () => {
+                const result = Engine.play(passage); 
+                console.log(`Button Click End`); // todo: fire :clickend
+                return result;
+            } : () => {
+                console.log(`Button Click End`); // todo: fire :clickend
+                return null;
+            }
         )
       )
       .appendTo(this.output);
