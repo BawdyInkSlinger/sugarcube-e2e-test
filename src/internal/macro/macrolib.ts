@@ -1379,23 +1379,17 @@ Macro.add(['button', 'link'], {
         },
         this.createShadowWrapper(
           this.payload[0].contents !== ''
-            ? () => Wikifier.wikifyEval(this.payload[0].contents.trim())
-            : null,
-            /*
-            Change by BIS. Was:
-                passage != null // lazy equality for null
-                ? () => Engine.play(passage)
-                : null
-            */
+            ? () =>{ 
+                const result = Wikifier.wikifyEval(this.payload[0].contents.trim());
+                console.log(`Button Click End`); // todo: fire :clickend
+                return result;
+            } : null,
           passage != null // lazy equality for null
             ? () => {
                 const result = Engine.play(passage); 
-                jQuery.event.trigger(':clickend');
+                console.log(`Button Click End`); // todo: fire :clickend
                 return result;
-            } : () => {
-                jQuery.event.trigger(':clickend');
-                return null;
-            }
+            } : null
         )
       )
       .appendTo(this.output);
