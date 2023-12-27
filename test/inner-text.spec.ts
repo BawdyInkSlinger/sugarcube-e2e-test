@@ -1,4 +1,5 @@
 import { Selector, SugarcubeParser } from '../src';
+import { innerText } from '../src/test-api/internal/inner-text/inner-text';
 import * as inputs from './inner-text.inputs';
 
 describe(`innerText`, () => {
@@ -17,7 +18,7 @@ describe(`innerText`, () => {
       .contains(`passage text`);
   });
 
-  it(`squashes spaces between newlines`, async () => {
+  it(`completely squashes spaces between newlines`, async () => {
     const sugarcubeParser = await SugarcubeParser.create([
       {
         title: 'passage title',
@@ -76,6 +77,32 @@ she's determined.`,
       .goto('passage title')
       .expect(Selector(`.passage`).innerText)
       .eql(`foo bar`);
+  });
+
+  /*
+Last column is original node.textContent:
+│   68    │ 'handleHasChildNodes' │         'SPAN.you-say say'         │                                  '"\\"What·is·it?One·them·critter·girls?\\""'                                  │
+│   69    │     'handleText'      │              '#text'               │                                              '"\\"What·is·it?·"'                                               │
+│   70    │     'handleText'      │              '#text'               │                                    '"·······One·them·critter·girls?·····"'                                     │
+│   71    │     'handleText'      │              '#text'               │                                                    '"\\""'                                                     │
+*/
+  it('squashes spaces down to one between text nodes', async () => {
+    await SugarcubeParser.create([
+      {
+        title: 'passage title',
+        tags: ['passage tag'],
+        text: 'passage text',
+      },
+    ]); // done for side effect: Initializes `document`
+
+    const actual = innerText({
+      childNodes: [
+        document.createTextNode(` "What is it? `),
+        document.createTextNode(`       One them critter girls?     `),
+        document.createTextNode(`" `),
+      ],
+    } as any);
+    expect(actual).toEqual(`"What is it? One them critter girls? "`);
   });
 
   it(`returns expectations using real examples`, async () => {
