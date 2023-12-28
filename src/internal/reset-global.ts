@@ -11,9 +11,7 @@ export const resetGlobal = <T>(
     'reset' in globalThis[globalPropertyKey] &&
     typeof globalThis[globalPropertyKey].reset === 'function'
   ) {
-    logger.debug(
-      `Calling \`globalThis[${globalPropertyKey}].reset()\` because the global already exists.`
-    );
+    logMessage(globalPropertyKey, 'reset');
     globalThis[globalPropertyKey].reset();
   }
   if (
@@ -21,12 +19,28 @@ export const resetGlobal = <T>(
     'restart' in globalThis[globalPropertyKey] &&
     typeof globalThis[globalPropertyKey].restart === 'function'
   ) {
-    logger.debug(
-      `Calling \`globalThis[${globalPropertyKey}].restart()\` because the global already exists.`
-    );
+    logMessage(globalPropertyKey, 'restart');
     globalThis[globalPropertyKey].restart();
   }
   globalThis[globalPropertyKey] = globalPropertyValue;
   global[globalPropertyKey] = globalPropertyValue;
   window[globalPropertyKey] = globalPropertyValue;
+};
+
+const logMessage = (
+  globalPropertyKey: string,
+  functionName: 'reset' | 'restart'
+): void => {
+  const prefix = `Calling \`globalThis[${globalPropertyKey}].${functionName}()\` because the global already exists`;
+  let postfix = '.';
+  if (logger.isDebugEnabled()) {
+    postfix = `: ${JSON.stringify(globalThis[globalPropertyKey])}`;
+  }
+
+  const message = prefix + postfix;
+  if (logger.isInfoEnabled()) {
+    logger.info(message);
+  } else if (logger.isDebugEnabled()) {
+    logger.debug(message);
+  }
 };
