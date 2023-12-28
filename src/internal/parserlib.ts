@@ -27,6 +27,9 @@ import { Story } from './fakes/story';
 import { Passage } from './fakes/passage';
 import { stringFrom, throwError } from './helpers';
 
+// this and last line added by BIS to stop side-effects on import
+export const initialize = () => {
+
 /*******************************************************************************************************************
     Utility Functions.
   *******************************************************************************/
@@ -2057,3 +2060,5 @@ Wikifier.Parser.add({
     }
   },
 });
+
+}

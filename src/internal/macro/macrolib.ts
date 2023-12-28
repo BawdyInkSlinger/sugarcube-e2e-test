@@ -31,7 +31,7 @@ import { Macro } from './macro';
 
 declare const SimpleAudio: any;
 
-// this and last line added by BIS
+// this and last line added by BIS to stop side-effects on import
 export const initialize = () => {
 
 /*******************************************************************************************************************
