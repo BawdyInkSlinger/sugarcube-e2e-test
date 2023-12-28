@@ -51,7 +51,6 @@ export class SugarcubeParser {
     setPassageLoadedHandler(customPassageLoadedHandler);
 
     const { jsdom, document, window } = await SugarcubeParser.load();
-    delete globalThis.window; // if window is undefined and module.exports exists, jQuery will be a factory function instead of an instance
     const jQuery = jQueryFactory(window);
 
     resetGlobal('window', window);
