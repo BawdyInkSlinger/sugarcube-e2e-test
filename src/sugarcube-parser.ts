@@ -83,7 +83,8 @@ export class SugarcubeParser {
     const { Macro } = await import('./internal/macro/macro');
     resetGlobal('Macro', Macro);
 
-    await import('./internal/macro/macrolib');
+    const {initialize: initializeMacroLibs } = await import('./internal/macro/macrolib');
+    initializeMacroLibs();
 
     const { Wikifier }: any = await import('./internal/wikifier');
     resetGlobal('Wikifier', Wikifier);
