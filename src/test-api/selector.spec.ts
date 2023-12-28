@@ -7,7 +7,7 @@ describe(`selector`, () => {
       {
         title: 'passage title',
         tags: ['passage tag'],
-        text: '<button disabled>Button 1</button> <button>Button 2</button> <button disabled>Button 3</button>',
+        text: '<button disabled>Button 1</button> <<button "Button 2">><</button>> <button disabled>Button 3</button>',
       },
     ]);
 
@@ -22,7 +22,7 @@ describe(`selector`, () => {
       {
         title: 'passage title',
         tags: ['passage tag'],
-        text: '<button disabled>Button 1</button> <button>Button 2</button> <button disabled>Button 3</button>',
+        text: '<button disabled>Button 1</button> <<button "Button 2">><</button>> <button disabled>Button 3</button>',
       },
     ]);
 
