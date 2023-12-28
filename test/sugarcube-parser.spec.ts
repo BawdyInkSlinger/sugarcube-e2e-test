@@ -17,4 +17,24 @@ describe('SugarcubeParser', () => {
       .expect(Selector(`.passage`).innerText)
       .notContains(`SugarcubeParser t3xt`);
   });
+
+  fit('can use macros in later SugarcubeParser.create calls', async () => {
+    await SugarcubeParser.create([
+      {
+        title: 'passage title',
+        tags: ['passage tag'],
+        text: 'abc',
+      },
+    ]);
+console.log(`%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%`);
+    const sugarcubeParser = await SugarcubeParser.create([
+      {
+        title: 'passage title',
+        tags: ['passage tag'],
+        text: '<<button "Button">><</button>>',
+      },
+    ]);
+
+    await sugarcubeParser.testController.goto('passage title');
+  });
 });
