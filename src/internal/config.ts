@@ -226,16 +226,28 @@ export const Config = (() => {
       // legacy
       // Die if deprecated state history settings are accessed.
       get mode() {
-        throw new Error(_errHistoryModeDeprecated);
+        // Changed by BIS to prevent reset-global.ts logs from throwing an error. 
+        // Original: throw new Error(_errHistoryModeDeprecated);
+        console.error(_errHistoryModeDeprecated);
+        return;
       },
       set mode(_) {
-        throw new Error(_errHistoryModeDeprecated);
+        // Changed by BIS to prevent reset-global.ts logs from throwing an error. 
+        // Original: throw new Error(_errHistoryModeDeprecated);
+        console.error(_errHistoryModeDeprecated);
+        return;
       },
       get tracking() {
-        throw new Error(_errHistoryTrackingDeprecated);
+        // Changed by BIS to prevent reset-global.ts logs from throwing an error. 
+        // Original: throw new Error(_errHistoryTrackingDeprecated);
+        console.error(_errHistoryTrackingDeprecated);
+        return;
       },
       set tracking(_) {
-        throw new Error(_errHistoryTrackingDeprecated);
+        // Changed by BIS to prevent reset-global.ts logs from throwing an error. 
+        // Original: throw new Error(_errHistoryTrackingDeprecated);
+        console.error(_errHistoryTrackingDeprecated);
+        return;
       },
       // /legacy
     }),
@@ -525,7 +537,10 @@ export const Config = (() => {
       // legacy
       // Die if deprecated saves onLoad handler getter is accessed.
       get onLoad(): LoadHandler {
-        throw new Error(_errSavesOnLoadDeprecated);
+        // Changed by BIS to prevent reset-global.ts logs from throwing an error.
+        // Original: throw new Error(_errSavesOnLoadDeprecated);
+        console.error(_errSavesOnLoadDeprecated);
+        return;
       },
       // Warn if deprecated saves onLoad handler setter is assigned to, then
       // pass the handler to the `Save.onLoad` API for compatibilities sake.
@@ -536,7 +551,10 @@ export const Config = (() => {
 
       // Die if deprecated saves onSave handler getter is accessed.
       get onSave(): SaveHandler {
-        throw new Error(_errSavesOnSaveDeprecated);
+        // Changed by BIS to prevent reset-global.ts logs from throwing an error.
+        // Original: throw new Error(_errSavesOnSaveDeprecated);
+        console.error(_errSavesOnSaveDeprecated);
+        return;
       },
       // Warn if deprecated saves onSave handler setter is assigned to, then
       // pass the handler to the `Save.onSave` API for compatibilities sake.

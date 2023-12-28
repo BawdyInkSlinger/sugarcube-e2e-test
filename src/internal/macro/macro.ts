@@ -53,8 +53,8 @@ export const Macro = (() => {
     }
 
     try {
-      if (isObjectDefinition(def)) {
-        // changed by BIS. Original: if (typeof def === 'object') {
+      if (isObjectDefinition(def)) { // changed by BIS. Original: if (typeof def === 'object') {
+
         // Add the macro definition.
         //
         // NOTE: Since `macrosGet()` may return legacy macros, we add the `_MACRO_API`
