@@ -15,9 +15,9 @@
 */
 
 import { Patterns } from './patterns';
-import Serial from './serial';
 
-export {}; // imported for side effects only
+// this and last line added by BIS to stop side-effects on import
+export const initialize = () => {
 
 (() => {
   'use strict';
@@ -2101,3 +2101,5 @@ export {}; // imported for side effects only
     },
   });
 })();
+
+}
