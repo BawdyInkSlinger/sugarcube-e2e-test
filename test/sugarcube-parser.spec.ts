@@ -18,7 +18,7 @@ describe('SugarcubeParser', () => {
       .notContains(`SugarcubeParser t3xt`);
   });
 
-  fit('can use macros in later SugarcubeParser.create calls', async () => {
+  it('can use macros in subsequent SugarcubeParser.create calls', async () => {
     await SugarcubeParser.create([
       {
         title: 'passage title',
@@ -26,7 +26,7 @@ describe('SugarcubeParser', () => {
         text: 'abc',
       },
     ]);
-console.log(`%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%`);
+
     const sugarcubeParser = await SugarcubeParser.create([
       {
         title: 'passage title',
