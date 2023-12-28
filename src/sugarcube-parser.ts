@@ -79,7 +79,8 @@ export class SugarcubeParser {
     const {initialize: initializeJQueryPlugins } = await import('./internal/jquery-plugins');
     initializeJQueryPlugins();
 
-    await import('./internal/fakes/tempvariables');
+    const {initialize: initializeTempVariables } = await import('./internal/fakes/tempvariables');
+    initializeTempVariables();
 
     (Math as any).seedrandom = seedrandom;
 
