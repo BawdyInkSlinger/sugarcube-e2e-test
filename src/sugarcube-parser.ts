@@ -76,7 +76,8 @@ export class SugarcubeParser {
         resetGlobal('initializeJQueryExtensions', initializeJQueryExtensions);
     }
 
-    await import('./internal/jquery-plugins');
+    const {initialize: initializeJQueryPlugins } = await import('./internal/jquery-plugins');
+    initializeJQueryPlugins();
 
     await import('./internal/fakes/tempvariables');
 

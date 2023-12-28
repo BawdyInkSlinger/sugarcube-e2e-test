@@ -11,6 +11,9 @@ import { errorPrologRegExp } from './alert';
 import { Wikifier } from './wikifier';
 import { safeActiveElement } from './helpers';
 
+// this and last line added by BIS to stop side-effects on import
+export const initialize = () => {
+
 /*
 	WAI-ARIA methods plugin.
 
@@ -356,3 +359,5 @@ import { safeActiveElement } from './helpers';
     },
   });
 })();
+
+}
