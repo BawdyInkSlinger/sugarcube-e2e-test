@@ -9,12 +9,37 @@ export type ExecutionStep =
 
 export const execute = (executionSteps: ExecutionStep[]) => {
   const selectorToString = selectorToStringBuilder(executionSteps);
+
   if (executionLogger.isInfoEnabled()) {
     executionLogger.info(`execute selector: ${selectorToString()}`);
   }
-  let currentJQuery = $(); // noop
+  let jQuery = $(); // noop
 
-  const squashedExecutionSteps = executionSteps.reduce(
+  combineAdjacentSelectors(executionSteps).forEach((executionStep, index) => {
+    executionLogger.debug(`executionSteps index='${index}'`);
+    if (executionStep.action === 'jQuerySelector') {
+      executionLogger.debug(`executionSteps jQuerySelector='${executionStep}'`);
+      if (index === 0) {
+        executionLogger.debug(
+          `executionSteps execute='$(${executionStep.value})'`
+        );
+        jQuery = $(executionStep.value);
+      } else {
+        executionLogger.debug(
+          `executionSteps execute='currentJQuery.find(${executionStep.value})'`
+        );
+        jQuery = jQuery.find(executionStep.value);
+      }
+    } else if (executionStep.action === 'nth') {
+      executionLogger.debug(`executionSteps nth='${executionStep}'`);
+      jQuery = $(jQuery[executionStep.value]);
+    }
+  });
+  return jQuery;
+};
+
+const combineAdjacentSelectors = (executionSteps: ExecutionStep[]) => {
+  return executionSteps.reduce(
     (prev: ExecutionStep[], curr: ExecutionStep): ExecutionStep[] => {
       const previousStep = prev.length > 0 ? prev[prev.length - 1] : undefined;
       if (
@@ -28,26 +53,4 @@ export const execute = (executionSteps: ExecutionStep[]) => {
     },
     []
   );
-
-  squashedExecutionSteps.forEach((executionStep, index) => {
-    executionLogger.debug(`executionSteps index='${index}'`);
-    if (executionStep.action === 'jQuerySelector') {
-      executionLogger.debug(`executionSteps jQuerySelector='${executionStep}'`);
-      if (index === 0) {
-        executionLogger.debug(
-          `executionSteps execute='$(${executionStep.value})'`
-        );
-        currentJQuery = $(executionStep.value);
-      } else {
-        executionLogger.debug(
-          `executionSteps execute='currentJQuery.find(${executionStep.value})'`
-        );
-        currentJQuery = currentJQuery.find(executionStep.value);
-      }
-    } else if (executionStep.action === 'nth') {
-      executionLogger.debug(`executionSteps nth='${executionStep}'`);
-      currentJQuery = $(currentJQuery[executionStep.value]);
-    }
-  });
-  return currentJQuery;
 };
