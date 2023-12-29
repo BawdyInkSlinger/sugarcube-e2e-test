@@ -1,4 +1,5 @@
 import { getLogger } from '../../../logger';
+import { selectorToStringBuilder } from './selector-to-string-builder';
 
 const executionLogger = getLogger('DEBUG_SELECTOR_EXECUTION_LOG_MESSAGES');
 
@@ -7,10 +8,7 @@ export type ExecutionStep =
   | { action: 'nth'; value: number; toString: () => string };
 
 export const execute = (executionSteps: ExecutionStep[]) => {
-  function selectorToString(): string {
-    return `Selector(\`${executionSteps.join('')}\`)`;
-  }
-
+  const selectorToString = selectorToStringBuilder(executionSteps);
   if (executionLogger.isInfoEnabled()) {
     executionLogger.info(`execute selector: ${selectorToString()}`);
   }

@@ -3,6 +3,7 @@ import { innerText } from './internal/inner-text/inner-text';
 import { NodeSnapshot } from './internal/node-snapshot';
 import ReExecutablePromise from './internal/re-executable-promise';
 import { execute as selectorExecute } from './internal/selector/execute';
+import { selectorToStringBuilder } from './internal/selector/selector-to-string-builder';
 
 const enterLogger = getLogger('DEBUG_SELECTOR_ENTER_LOG_MESSAGES');
 const executionLogger = getLogger('DEBUG_SELECTOR_EXECUTION_LOG_MESSAGES');
@@ -152,10 +153,6 @@ export const Selector: SelectorFactory = (
     { action: 'jQuerySelector', value: init, toString: () => init },
   ];
 
-  function selectorToString(): string {
-    return `Selector(\`${executionSteps.join('')}\`)`;
-  }
-
   const selectorImpl: Selector & { toString: () => string } = {
     execute: () => selectorExecute(executionSteps),
     innerText: ReExecutablePromise.fromFn(() => {
@@ -188,7 +185,7 @@ export const Selector: SelectorFactory = (
         selectorExecute(executionSteps).attr(attributeName)
       );
     },
-    toString: selectorToString,
+    toString: selectorToStringBuilder(executionSteps),
   };
   return selectorImpl;
 };
