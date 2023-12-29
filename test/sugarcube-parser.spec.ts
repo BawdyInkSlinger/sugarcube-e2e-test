@@ -37,4 +37,37 @@ describe('SugarcubeParser', () => {
 
     await sugarcubeParser.testController.goto('passage title');
   });
+
+  it('can assign state and reload', async () => {
+    const sugarcubeParser = await SugarcubeParser.create([
+      {
+        title: 'passage title',
+        tags: ['passage tag'],
+        text: 'abc=$abc'
+      },
+      {
+        title: 'passage title2',
+        tags: ['passage tag2'],
+        text: 'abc2=$abc',
+      },
+    ]);
+
+    // $abc not set
+    await sugarcubeParser.testController
+    .goto('passage title')
+    .expect(Selector(`.passage`).innerText)
+    .eql('abc=$abc');
+    
+    // $abc set
+    await sugarcubeParser.assignStateAndReload({"abc": "123"}, "passage title2" )
+    await sugarcubeParser.testController
+    .expect(Selector(`.passage`).innerText)
+    .eql('abc2=123');
+    
+    // unset $abc
+    await sugarcubeParser.assignStateAndReload({"abc": undefined}, "passage title2" )
+    await sugarcubeParser.testController
+    .expect(Selector(`.passage`).innerText)
+    .eql('abc2=$abc');
+  });
 });

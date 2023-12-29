@@ -311,6 +311,7 @@ export interface TestController {
     this: Promise<void> | TestController,
     options: Parameters<Document['toPrettyString']>[0]
   ): TestControllerPromise;
+  log(this: Promise<void> | TestController, ...params: unknown[]): TestControllerPromise;
 }
 
 export const testController: TestController = {
@@ -352,7 +353,9 @@ export const testController: TestController = {
       );
       logger.debug(`$(${selector.toString()}).trigger('click');`);
       selector.execute().trigger('click');
-      logger.debug(`finished $(${selector.toString()}).trigger('click'); Waiting for pageLoadPromise`);
+      logger.debug(
+        `finished $(${selector.toString()}).trigger('click'); Waiting for pageLoadPromise`
+      );
       return pageLoadPromise;
     });
     return Object.assign(asyncClick, testController);
@@ -389,6 +392,25 @@ export const testController: TestController = {
       testController
     );
   },
+
+  log(
+    this: Promise<void> | TestController,
+    ...params: unknown[]
+  ): TestControllerPromise {
+    enterLogger.debug(
+      `${new Date().getTime()} testController: entering log params=${JSON.stringify(
+        params
+      )}`
+    );
+
+    return Object.assign(
+      thisAsPromise(this).then(() => {
+        console.log(params);
+      }),
+      testController
+    );
+  },
+
   wait(
     this: Promise<void> | TestController,
     millis: number,
