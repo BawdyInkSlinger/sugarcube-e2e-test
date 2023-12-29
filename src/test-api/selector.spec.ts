@@ -52,4 +52,29 @@ describe(`selector`, () => {
       .expect(Selector('.passage').innerText)
       .eql(`Destination`);
   });
+
+  it('can click a button that stays on the current passage', async () => {
+    const sugarcubeParser = await SugarcubeParser.create([
+      {
+        title: 'passage title',
+        tags: ['passage tag'],
+        text: `<<if $counter === undefined>><<set $counter to 0>><</if>>
+        <<button "Add P">>
+            <<set _counter to _counter + 1>>
+            <<append "#dynamic-container">>
+                <p @class="'paragraph-' + _counter">Paragraph 1</p>
+            <</append>>
+        <</button>>
+        <div id="dynamic-container"></div>`,
+      },
+    ]);
+
+    await sugarcubeParser.testController
+      .goto('passage title')
+      .expect(Selector('.passage p').exists)
+      .eql(false)
+      .click(Selector('.passage button'))
+      .expect(Selector('.passage p').exists)
+      .eql(true)
+  });
 });

@@ -1390,10 +1390,10 @@ Macro.add(['button', 'link'], {
           passage != null // lazy equality for null
             ? () => {
                 const result = Engine.play(passage); 
-                // console.log(`Button Click End`); // todo: fire :clickend
+                jQuery.event.trigger(':clickend');
                 return result;
             } : () => {
-                // console.log(`Button Click End`); // todo: fire :clickend
+                jQuery.event.trigger(':clickend');
                 return null;
             }
         )
