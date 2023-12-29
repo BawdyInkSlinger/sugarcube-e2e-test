@@ -103,7 +103,7 @@ interface SelectorAPI {
   // prevSibling(filterFn: (node: Element, idx: number, originNode: Element) => boolean,
   //             dependencies?: {[key: string]: any}): Selector;
   exists: Promise<boolean>;
-  // count: Promise<number>;
+  count: Promise<number>;
   // addCustomDOMProperties(props: {[prop: string]: (node: Element) => any}): Selector;
   // addCustomMethods(methods: {[method: string]: (node: Element, ...methodParams: any[]) => any }, opts?: {returnDOMNodes?: boolean}): Selector;
   // with(options?: SelectorOptions): Selector;
@@ -157,6 +157,9 @@ export const Selector: SelectorFactory = (
     }),
     exists: ReExecutablePromise.fromFn(
       () => selectorExecute(executionSteps).length > 0
+    ),
+    count: ReExecutablePromise.fromFn(
+      () => selectorExecute(executionSteps).length
     ),
     withText: function (text: string): Selector {
       enterLogger.debug(

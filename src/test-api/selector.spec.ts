@@ -77,4 +77,37 @@ describe(`selector`, () => {
       .expect(Selector('.passage p').exists)
       .eql(true)
   });
+
+  it('can return a count', async () => {
+    const sugarcubeParser = await SugarcubeParser.create([
+      {
+        title: 'passage title',
+        tags: ['passage tag'],
+        text: `<<if $counter === undefined>><<set $counter to 0>><</if>>
+        <<button "Add P">>
+            <<set _counter to _counter + 1>>
+            <<append "#dynamic-container">>
+                <p @class="'paragraph-' + _counter">Paragraph 1</p>
+            <</append>>
+        <</button>>
+        <div id="dynamic-container"></div>`,
+      },
+    ]);
+
+    await sugarcubeParser.testController
+      .goto('passage title')
+      .expect(Selector('.passage p').count)
+      .eql(0)
+      // first click
+      .click(Selector('.passage button'))
+      .expect(Selector('.passage p').count)
+      .eql(1)
+      // second click
+      .click(Selector('.passage button'))
+      .expect(Selector('.passage p').count)
+      .eql(2)
+      // search for a paragraph that doesn't exist
+      .expect(Selector('.passage p.paragraph-3').count)
+      .eql(0);
+  });
 });
