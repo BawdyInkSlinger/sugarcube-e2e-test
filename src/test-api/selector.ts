@@ -155,7 +155,6 @@ export const Selector: SelectorFactory = (
     return `Selector(\`${executionSteps.join('')}\`)`;
   }
 
-  /* NEW */
   const execute: () => JQuery<HTMLElement> = () => {
     if (executionLogger.isInfoEnabled()) {
       executionLogger.info(`execute selector: ${selectorToString()}`);
@@ -202,40 +201,6 @@ export const Selector: SelectorFactory = (
     });
     return currentJQuery;
   };
-
-  /* Old */
-  //   const execute: () => JQuery<HTMLElement> = () => {
-  //     if (executionLogger.isDebugEnabled()) {
-  //       executionLogger.debug(selectorToString());
-  //     }
-  //     let jQueryChain = $();
-  //     for (
-  //       let executionStepIndex = 0;
-  //       executionStepIndex < executionSteps.length;
-  //       executionStepIndex++
-  //     ) {
-  //       if (executionSteps[executionStepIndex]?.action === 'jQuerySelector') {
-  //         const loopCount = executionStepIndex;
-  //         let jQuerySelector = '';
-  //         while (
-  //           executionSteps[executionStepIndex]?.action === 'jQuerySelector'
-  //         ) {
-  //           jQuerySelector += executionSteps[executionStepIndex].value;
-  //           executionStepIndex++;
-  //         }
-  //         if (jQuerySelector.length > 0) {
-  //           if (loopCount === 0) {
-  //             jQueryChain = $(jQuerySelector);
-  //           } else {
-  //             jQueryChain = jQueryChain.find(jQuerySelector);
-  //           }
-  //         }
-  //       } else if (executionSteps[executionStepIndex]?.action === 'nth') {
-  //         jQueryChain = jQueryChain[executionSteps[executionStepIndex].value];
-  //       }
-  //     }
-  //     return jQueryChain;
-  //   };
 
   const selectorImpl: Selector & { toString: () => string } = {
     execute,
