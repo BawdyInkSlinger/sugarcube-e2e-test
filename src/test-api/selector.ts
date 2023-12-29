@@ -2,6 +2,7 @@ import { getLogger } from '../logger';
 import { innerText } from './internal/inner-text/inner-text';
 import { NodeSnapshot } from './internal/node-snapshot';
 import ReExecutablePromise from './internal/re-executable-promise';
+import { execute as selectorExecute } from './internal/selector/execute';
 
 const enterLogger = getLogger('DEBUG_SELECTOR_ENTER_LOG_MESSAGES');
 const executionLogger = getLogger('DEBUG_SELECTOR_EXECUTION_LOG_MESSAGES');
@@ -155,59 +156,14 @@ export const Selector: SelectorFactory = (
     return `Selector(\`${executionSteps.join('')}\`)`;
   }
 
-  const execute: () => JQuery<HTMLElement> = () => {
-    if (executionLogger.isInfoEnabled()) {
-      executionLogger.info(`execute selector: ${selectorToString()}`);
-    }
-    let currentJQuery = $(); // noop
-
-    const squashedExecutionSteps = executionSteps.reduce(
-      (prev: ExecutionStep[], curr: ExecutionStep): ExecutionStep[] => {
-        const previousStep =
-          prev.length > 0 ? prev[prev.length - 1] : undefined;
-        if (
-          previousStep?.action === 'jQuerySelector' &&
-          curr.action === 'jQuerySelector'
-        ) {
-          previousStep.value = previousStep.value + curr.value;
-          return prev;
-        }
-        return prev.concat([curr]);
-      },
-      []
-    );
-
-    squashedExecutionSteps.forEach((executionStep, index) => {
-      executionLogger.debug(`executionSteps index='${index}'`);
-      if (executionStep.action === 'jQuerySelector') {
-        executionLogger.debug(
-          `executionSteps jQuerySelector='${executionStep}'`
-        );
-        if (index === 0) {
-          executionLogger.debug(
-            `executionSteps execute='$(${executionStep.value})'`
-          );
-          currentJQuery = $(executionStep.value);
-        } else {
-          executionLogger.debug(
-            `executionSteps execute='currentJQuery.find(${executionStep.value})'`
-          );
-          currentJQuery = currentJQuery.find(executionStep.value);
-        }
-      } else if (executionStep.action === 'nth') {
-        executionLogger.debug(`executionSteps nth='${executionStep}'`);
-        currentJQuery = $(currentJQuery[executionStep.value]);
-      }
-    });
-    return currentJQuery;
-  };
-
   const selectorImpl: Selector & { toString: () => string } = {
-    execute,
+    execute: () => selectorExecute(executionSteps),
     innerText: ReExecutablePromise.fromFn(() => {
-      return innerText(execute()[0]);
+      return innerText(selectorExecute(executionSteps)[0]);
     }),
-    exists: ReExecutablePromise.fromFn(() => execute().length > 0),
+    exists: ReExecutablePromise.fromFn(
+      () => selectorExecute(executionSteps).length > 0
+    ),
     withText: function (text: string): Selector {
       enterLogger.debug(
         `${new Date().getTime()} selector: entering withText init='${init}' text='${text}'`
@@ -228,7 +184,9 @@ export const Selector: SelectorFactory = (
       return this;
     },
     getAttribute(attributeName: string): Promise<string | null> {
-      return ReExecutablePromise.fromFn(() => execute().attr(attributeName));
+      return ReExecutablePromise.fromFn(() =>
+        selectorExecute(executionSteps).attr(attributeName)
+      );
     },
     toString: selectorToString,
   };
