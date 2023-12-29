@@ -2,7 +2,7 @@ import { getLogger } from '../logger';
 import { innerText } from './internal/inner-text/inner-text';
 import { NodeSnapshot } from './internal/node-snapshot';
 import ReExecutablePromise from './internal/re-executable-promise';
-import { execute as selectorExecute } from './internal/selector/execute';
+import { ExecutionStep, execute as selectorExecute } from './internal/selector/execute';
 import { selectorToStringBuilder } from './internal/selector/selector-to-string-builder';
 
 const enterLogger = getLogger('DEBUG_SELECTOR_ENTER_LOG_MESSAGES');
@@ -146,9 +146,6 @@ export const Selector: SelectorFactory = (
     `${new Date().getTime()} selector: entering init='${init}'`
   );
 
-  type ExecutionStep =
-    | { action: 'jQuerySelector'; value: string; toString: () => string }
-    | { action: 'nth'; value: number; toString: () => string };
   const executionSteps: ExecutionStep[] = [
     { action: 'jQuerySelector', value: init, toString: () => init },
   ];
