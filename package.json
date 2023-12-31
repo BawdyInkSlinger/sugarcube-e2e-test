@@ -4,7 +4,7 @@
   "description": "Write end to end tests for your sugarcube project without firing up a browser.",
   "main": "dist/src/index.js",
   "scripts": {
-    "test": "jasmine --random=true --seed=78661 --config=\"spec/support/jasmine-spec.json\" && npm run compile-typescript",
+    "test": "jasmine --random=true --config=\"spec/support/jasmine-spec.json\" && npm run compile-typescript",
     "lint": "echo \"lint\" && eslint '**/*.ts' --fix",
     "compile-typescript": "echo \"compile ts\" && tsc --build && cp -r src/internal/declarations dist/src/internal/declarations && cp src/internal/html.tpl dist/src/internal/html.tpl",
     "only-build": "npm run compile-typescript",
