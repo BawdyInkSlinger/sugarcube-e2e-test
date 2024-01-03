@@ -20,9 +20,17 @@
   },
   "parserOptions": {
     "ecmaVersion": 2018,
-    "project": ["./tsconfig.json", "./tsconfig.src.json", "./tsconfig.test.json"]
+    "project": [
+      "./tsconfig.json",
+      "./tsconfig.src.json",
+      "./tsconfig.test.json"
+    ]
   },
-  "ignorePatterns": ["src/**/*.js", "dist/**", "**/sugarcube-testapi.reference.d.ts"],
+  "ignorePatterns": [
+    "src/**/*.js",
+    "dist/**",
+    "**/sugarcube-testapi.reference.d.ts"
+  ],
   "rules": {
     "prettier/prettier": "error",
     "quotes": ["off"],
@@ -39,6 +47,7 @@
     "prefer-const": ["warn"],
     "@typescript-eslint/ban-ts-comment": ["off"],
     "no-prototype-builtins": ["off"],
-    "prefer-rest-params": ["off"]
+    "prefer-rest-params": ["off"],
+    "@typescript-eslint/no-explicit-any": ["off"]
   }
 }
