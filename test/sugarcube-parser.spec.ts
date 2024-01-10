@@ -1,4 +1,10 @@
 import { Selector, SugarcubeParser } from '../src';
+import {
+  ResourceLoaderConstructorOptions,
+  ResourceLoader,
+  AbortablePromise,
+  FetchOptions,
+} from 'jsdom';
 
 describe('SugarcubeParser', () => {
   it('can be created and goto a passage', async () => {
@@ -83,5 +89,33 @@ describe('SugarcubeParser', () => {
     await sugarcubeParser.testController
       .expect(Selector(`.passage`).innerText)
       .eql('abc2=$abc');
+  });
+
+  it('uses the ResourceLoader', async () => {
+    let lastUrl: string | undefined;
+    class ResourceLoaderStub extends ResourceLoader {
+      fetch(
+        url: string,
+        options: FetchOptions
+      ): AbortablePromise<Buffer> | null {
+        lastUrl = url;
+        return null;
+      }
+    }
+
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag'],
+          text: '<iframe src="https://www.google.com">A link to Google</iframe>',
+        },
+      ],
+      resourceLoader: new ResourceLoaderStub(),
+    });
+
+    await sugarcubeParser.testController.goto('passage title');
+
+    expect(lastUrl).toEqual(`https://www.google.com/`);
   });
 });

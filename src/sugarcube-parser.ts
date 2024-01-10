@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import fs from 'fs/promises';
-import { DOMWindow, JSDOM } from 'jsdom';
+import { DOMWindow, JSDOM, ResourceLoader } from 'jsdom';
 import seedrandom from 'seedrandom';
 import { glob } from 'glob';
 import { SimplePassage } from './internal/declarations/unofficial/simple-passage';
@@ -22,6 +22,7 @@ const baseUrl = 'http://localhost';
 
 export type SugarcubeParserOptions = {
   passages: SimplePassage[];
+  resourceLoader?: ResourceLoader | "usable";
   customPassageLoadedHandler?: (debugNote: string) => Promise<void>;
 };
 
@@ -51,11 +52,12 @@ export class SugarcubeParser {
   static async create({
     passages,
     customPassageLoadedHandler = waitForPassageEnd,
+    resourceLoader = "usable"
   }: SugarcubeParserOptions): Promise<SugarcubeParser> {
     clearTimeouts(); // This could prevent parallel test runs?
     setPassageLoadedHandler(customPassageLoadedHandler);
 
-    const { jsdom, document, window } = await SugarcubeParser.load();
+    const { jsdom, document, window } = await SugarcubeParser.load(resourceLoader);
     const jQuery = jQueryFactory(window);
 
     resetGlobal('window', window);
@@ -177,7 +179,7 @@ export class SugarcubeParser {
     return new SugarcubeParser();
   }
 
-  private static async load(): Promise<{
+  private static async load(resources: ResourceLoader | "usable"): Promise<{
     window: DOMWindow;
     document: Document;
     jsdom: JSDOM;
@@ -188,7 +190,7 @@ export class SugarcubeParser {
     const jsdom = setupJsdom(sugarcubeHtml, {
       url: baseUrl,
       runScripts: 'dangerously',
-      resources: 'usable',
+      resources,
       pretendToBeVisual: true,
     });
 
