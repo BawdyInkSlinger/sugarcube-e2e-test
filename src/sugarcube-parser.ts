@@ -20,6 +20,11 @@ const logger = getLogger('DEFAULT');
 const passagesLogger = getLogger('DEBUG_PASSAGES');
 const baseUrl = 'http://localhost';
 
+export type SugarcubeParserOptions = {
+  passages: SimplePassage[];
+  customPassageLoadedHandler?: (debugNote: string) => Promise<void>;
+};
+
 export class SugarcubeParser {
   jQuery: JQueryStatic;
   Config: any;
@@ -43,10 +48,10 @@ export class SugarcubeParser {
     this.Story = globalThis.Story;
   }
 
-  static async create(
-    passages: SimplePassage[],
-    customPassageLoadedHandler = waitForPassageEnd
-  ): Promise<SugarcubeParser> {
+  static async create({
+    passages,
+    customPassageLoadedHandler = waitForPassageEnd,
+  }: SugarcubeParserOptions): Promise<SugarcubeParser> {
     clearTimeouts(); // This could prevent parallel test runs?
     setPassageLoadedHandler(customPassageLoadedHandler);
 
@@ -70,16 +75,22 @@ export class SugarcubeParser {
 
     resetGlobal('setup', {});
 
-    const {initialize: initializeJQueryExtensions } = await import('./internal/extensions');
-    if (globalThis["initializeJQueryExtensions"] === undefined) {
-        initializeJQueryExtensions();
-        resetGlobal('initializeJQueryExtensions', initializeJQueryExtensions);
+    const { initialize: initializeJQueryExtensions } = await import(
+      './internal/extensions'
+    );
+    if (globalThis['initializeJQueryExtensions'] === undefined) {
+      initializeJQueryExtensions();
+      resetGlobal('initializeJQueryExtensions', initializeJQueryExtensions);
     }
 
-    const {initialize: initializeJQueryPlugins } = await import('./internal/jquery-plugins');
+    const { initialize: initializeJQueryPlugins } = await import(
+      './internal/jquery-plugins'
+    );
     initializeJQueryPlugins();
 
-    const {initialize: initializeTempVariables } = await import('./internal/fakes/tempvariables');
+    const { initialize: initializeTempVariables } = await import(
+      './internal/fakes/tempvariables'
+    );
     initializeTempVariables();
 
     (Math as any).seedrandom = seedrandom;
@@ -90,15 +101,19 @@ export class SugarcubeParser {
     const { Macro } = await import('./internal/macro/macro');
     resetGlobal('Macro', Macro);
 
-    const {initialize: initializeMacroLibs } = await import('./internal/macro/macrolib');
+    const { initialize: initializeMacroLibs } = await import(
+      './internal/macro/macrolib'
+    );
     initializeMacroLibs();
 
     const { Wikifier }: any = await import('./internal/wikifier');
     resetGlobal('Wikifier', Wikifier);
-    const {initialize: initializeParserLibs } = await import('./internal/parserlib');
-    if (globalThis["initializeParserLibs"] === undefined) {
-        initializeParserLibs();
-        resetGlobal('initializeParserLibs', initializeParserLibs);
+    const { initialize: initializeParserLibs } = await import(
+      './internal/parserlib'
+    );
+    if (globalThis['initializeParserLibs'] === undefined) {
+      initializeParserLibs();
+      resetGlobal('initializeParserLibs', initializeParserLibs);
     }
 
     const { Setting } = await import('./internal/fakes/setting');

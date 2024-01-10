@@ -2,13 +2,15 @@ import { Selector, SugarcubeParser } from '../src';
 
 describe('Assertion.notMatch', () => {
   it('passes when there is no match', async () => {
-    const sugarcubeParser = await SugarcubeParser.create([
-      {
-        title: 'SugarcubeParser title',
-        tags: ['SugarcubeParser tag'],
-        text: 'SugarcubeParser text',
-      },
-    ]);
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'SugarcubeParser title',
+          tags: ['SugarcubeParser tag'],
+          text: 'SugarcubeParser text',
+        },
+      ],
+    });
 
     await sugarcubeParser.testController.goto('SugarcubeParser title');
 
@@ -18,13 +20,15 @@ describe('Assertion.notMatch', () => {
   });
 
   it('fails when there is a single match', async () => {
-    const sugarcubeParser = await SugarcubeParser.create([
-      {
-        title: 'SugarcubeParser title',
-        tags: ['SugarcubeParser tag'],
-        text: 'SugarcubeParser text',
-      },
-    ]);
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'SugarcubeParser title',
+          tags: ['SugarcubeParser tag'],
+          text: 'SugarcubeParser text',
+        },
+      ],
+    });
 
     await sugarcubeParser.testController.goto('SugarcubeParser title');
 
@@ -41,13 +45,15 @@ describe('Assertion.notMatch', () => {
   });
 
   it('fails when there are multiple matches', async () => {
-    const sugarcubeParser = await SugarcubeParser.create([
-      {
-        title: 'SugarcubeParser title',
-        tags: ['SugarcubeParser tag'],
-        text: 'SugarcubeParser text',
-      },
-    ]);
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'SugarcubeParser title',
+          tags: ['SugarcubeParser tag'],
+          text: 'SugarcubeParser text',
+        },
+      ],
+    });
 
     await sugarcubeParser.testController.goto('SugarcubeParser title');
 

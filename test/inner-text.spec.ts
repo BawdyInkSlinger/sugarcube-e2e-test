@@ -4,13 +4,15 @@ import * as inputs from './inner-text.inputs';
 
 describe(`innerText`, () => {
   it(`returns text string`, async () => {
-    const sugarcubeParser = await SugarcubeParser.create([
-      {
-        title: 'passage title',
-        tags: ['passage tag'],
-        text: 'passage text',
-      },
-    ]);
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag'],
+          text: 'passage text',
+        },
+      ],
+    });
 
     await sugarcubeParser.testController
       .goto('passage title')
@@ -19,13 +21,15 @@ describe(`innerText`, () => {
   });
 
   it(`completely squashes spaces between newlines`, async () => {
-    const sugarcubeParser = await SugarcubeParser.create([
-      {
-        title: 'passage title',
-        tags: ['passage tag'],
-        text: 'a<br><br>    <br><br>b',
-      },
-    ]);
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag'],
+          text: 'a<br><br>    <br><br>b',
+        },
+      ],
+    });
 
     await sugarcubeParser.testController
       .goto('passage title')
@@ -34,14 +38,16 @@ describe(`innerText`, () => {
   });
 
   it(`replaces newline characters with blank`, async () => {
-    const sugarcubeParser = await SugarcubeParser.create([
-      {
-        title: 'passage title',
-        tags: ['passage tag'],
-        text: `You'll give her one thing: 
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag'],
+          text: `You'll give her one thing: 
 she's determined.`,
-      },
-    ]);
+        },
+      ],
+    });
 
     await sugarcubeParser.testController
       .goto('passage title')
@@ -50,13 +56,15 @@ she's determined.`,
   });
 
   it(`squashes space between text and inline elements`, async () => {
-    const sugarcubeParser = await SugarcubeParser.create([
-      {
-        title: 'passage title',
-        tags: ['passage tag'],
-        text: `foo  <span> bar </span> `,
-      },
-    ]);
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag'],
+          text: `foo  <span> bar </span> `,
+        },
+      ],
+    });
 
     await sugarcubeParser.testController
       .goto('passage title')
@@ -65,13 +73,15 @@ she's determined.`,
   });
 
   it('squashes space between inline elements and text', async () => {
-    const sugarcubeParser = await SugarcubeParser.create([
-      {
-        title: 'passage title',
-        tags: ['passage tag'],
-        text: `<span> foo </span> bar  `,
-      },
-    ]);
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag'],
+          text: `<span> foo </span> bar  `,
+        },
+      ],
+    });
 
     await sugarcubeParser.testController
       .goto('passage title')
@@ -87,13 +97,15 @@ Last column is original node.textContent:
 │   71    │     'handleText'      │              '#text'               │                                                    '"\\""'                                                     │
 */
   it('squashes spaces down to one between text nodes', async () => {
-    await SugarcubeParser.create([
-      {
-        title: 'passage title',
-        tags: ['passage tag'],
-        text: 'passage text',
-      },
-    ]); // done for side effect: Initializes `document`
+    await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag'],
+          text: 'passage text',
+        },
+      ],
+    }); // done for side effect}: Initializes `document`
 
     const actual = innerText({
       childNodes: [
@@ -112,13 +124,15 @@ Last column is original node.textContent:
       const html = inputs[`html${index}`];
       const expected = inputs[`expected${index}`];
 
-      const sugarcubeParser = await SugarcubeParser.create([
-        {
-          title: 'passage title',
-          tags: ['passage tag'],
-          text: html,
-        },
-      ]);
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'passage title',
+            tags: ['passage tag'],
+            text: html,
+          },
+        ],
+      });
 
       await sugarcubeParser.testController
         .goto('passage title')

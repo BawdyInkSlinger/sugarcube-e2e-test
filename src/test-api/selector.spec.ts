@@ -3,13 +3,15 @@ import { Selector } from './selector';
 
 describe(`selector`, () => {
   it('returns the text of the first matched element', async () => {
-    const sugarcubeParser = await SugarcubeParser.create([
-      {
-        title: 'passage title',
-        tags: ['passage tag'],
-        text: '<button disabled>Button 1</button> <<button "Button 2">><</button>> <button disabled>Button 3</button>',
-      },
-    ]);
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag'],
+          text: '<button disabled>Button 1</button> <<button "Button 2">><</button>> <button disabled>Button 3</button>',
+        },
+      ],
+    });
 
     await sugarcubeParser.testController
       .goto('passage title')
@@ -18,13 +20,15 @@ describe(`selector`, () => {
   });
 
   it('returns the text of the second matched element', async () => {
-    const sugarcubeParser = await SugarcubeParser.create([
-      {
-        title: 'passage title',
-        tags: ['passage tag'],
-        text: '<button disabled>Button 1</button> <<button "Button 2">><</button>> <button disabled>Button 3</button>',
-      },
-    ]);
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag'],
+          text: '<button disabled>Button 1</button> <<button "Button 2">><</button>> <button disabled>Button 3</button>',
+        },
+      ],
+    });
 
     await sugarcubeParser.testController
       .goto('passage title')
@@ -33,18 +37,20 @@ describe(`selector`, () => {
   });
 
   it('can click a button withText', async () => {
-    const sugarcubeParser = await SugarcubeParser.create([
-      {
-        title: 'passage title',
-        tags: ['passage tag'],
-        text: '<button disabled>Button 1</button> <<button "Button 2" "passage 2">><</button>> <button disabled>Button 3</button>',
-      },
-      {
-        title: 'passage 2',
-        tags: ['passage tag'],
-        text: 'Destination',
-      },
-    ]);
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag'],
+          text: '<button disabled>Button 1</button> <<button "Button 2" "passage 2">><</button>> <button disabled>Button 3</button>',
+        },
+        {
+          title: 'passage 2',
+          tags: ['passage tag'],
+          text: 'Destination',
+        },
+      ],
+    });
 
     await sugarcubeParser.testController
       .goto('passage title')
@@ -54,11 +60,12 @@ describe(`selector`, () => {
   });
 
   it('can click a button that stays on the current passage', async () => {
-    const sugarcubeParser = await SugarcubeParser.create([
-      {
-        title: 'passage title',
-        tags: ['passage tag'],
-        text: `<<if $counter === undefined>><<set $counter to 0>><</if>>
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag'],
+          text: `<<if $counter === undefined>><<set $counter to 0>><</if>>
         <<button "Add P">>
             <<set _counter to _counter + 1>>
             <<append "#dynamic-container">>
@@ -66,8 +73,9 @@ describe(`selector`, () => {
             <</append>>
         <</button>>
         <div id="dynamic-container"></div>`,
-      },
-    ]);
+        },
+      ],
+    });
 
     await sugarcubeParser.testController
       .goto('passage title')
@@ -75,15 +83,16 @@ describe(`selector`, () => {
       .eql(false)
       .click(Selector('.passage button'))
       .expect(Selector('.passage p').exists)
-      .eql(true)
+      .eql(true);
   });
 
   it('can return a count', async () => {
-    const sugarcubeParser = await SugarcubeParser.create([
-      {
-        title: 'passage title',
-        tags: ['passage tag'],
-        text: `<<if $counter === undefined>><<set $counter to 0>><</if>>
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag'],
+          text: `<<if $counter === undefined>><<set $counter to 0>><</if>>
         <<button "Add P">>
             <<set _counter to _counter + 1>>
             <<append "#dynamic-container">>
@@ -91,8 +100,9 @@ describe(`selector`, () => {
             <</append>>
         <</button>>
         <div id="dynamic-container"></div>`,
-      },
-    ]);
+        },
+      ],
+    });
 
     await sugarcubeParser.testController
       .goto('passage title')
