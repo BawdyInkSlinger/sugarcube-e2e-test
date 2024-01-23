@@ -22,6 +22,10 @@ const nodeTypes = {
 type NodeType = (typeof nodeTypes)[keyof typeof nodeTypes];
 
 export const innerText = (el: Node): string => {
+  if (innerTextLogger.isDebugEnabled()) {
+    innerTextLogger.debug((el as HTMLElement).outerHTML);
+  }
+
   const { result, debugDataTable } = innerTextHelper(el);
 
   if (innerTextLogger.isDebugEnabled()) {

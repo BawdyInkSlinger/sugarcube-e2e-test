@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jasmine --random=true --config=\"spec/support/jasmine-spec.json\" && npm run compile-typescript",
     "lint": "echo \"lint\" && eslint '**/*.ts' --fix",
-    "compile-typescript": "echo \"compile ts\" && tsc --build && cp -r src/internal/declarations dist/src/internal/declarations && cp src/internal/html.tpl dist/src/internal/html.tpl",
+    "compile-typescript": "echo \"compile ts\" && tsc --build --verbose && cp -r src/internal/declarations dist/src/internal/declarations && cp src/internal/html.tpl dist/src/internal/html.tpl",
+    "postcompile-typescript": "echo \"precompile ts\" && npx yalc push",
     "only-build": "npm run compile-typescript",
     "build": "npm run compile-typescript",
     "clean": "rm -rf dist"
