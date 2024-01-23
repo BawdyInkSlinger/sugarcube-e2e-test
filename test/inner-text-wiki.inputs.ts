@@ -1,5 +1,4 @@
 export const expected1 = `Author: Test2`;
-
 export const wiki1 = `    <div class="author">
       Author: 
       <<if _author_href is undefined>>
@@ -8,11 +7,10 @@ export const wiki1 = `    <div class="author">
         <a @href="_author_href">_author</a>
       <</if>>
     </div>`;
-
-export const variables1 = {
+export const passageTags1 = [`nobr`];
+export const state1 = {
   variables: {},
   temporary: {
-    '_author': 'Test2',
-    '_author_href': undefined,
+    'author': 'Test2',
   },
 };
