@@ -236,33 +236,13 @@ export class SugarcubeParser {
   async assignStateAndReload<V = any, T = any>(
     variables: Partial<V>,
     passageName?: string,
-    temporaries?: Partial<T>
+    temporaryVariables?: Partial<T>
   ): Promise<void> {
     Object.assign(globalThis.State.variables, variables);
     const currentTitle = passageName ?? globalThis.State.current?.title;
     logger.debug(`assignStateAndReload: currentTitle=${currentTitle}`);
-    if (temporaries !== undefined) {
-      logger.debug(
-        `assignStateAndReload: temporaries=${JSON.stringify(temporaries)}`
-      );
-      this.jQuery(document).one(':passagestart', () => {
-        logger.debug(
-          `assignStateAndReload: :passagestart temporaries=${JSON.stringify(
-            temporaries
-          )}`
-        );
-        for (const key of Object.keys(temporaries)) {
-          globalThis.State.temporary[key] = temporaries[key];
-        }
-        logger.debug(
-          `assignStateAndReload: globalThis.State.temporary=${JSON.stringify(
-            globalThis.State.temporary
-          )}`
-        );
-      });
-    }
     if (currentTitle) {
-      await testController.goto(currentTitle);
+      await testController.goto(currentTitle, temporaryVariables);
     }
   }
 }

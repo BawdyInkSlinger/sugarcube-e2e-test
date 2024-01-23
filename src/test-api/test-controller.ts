@@ -306,18 +306,25 @@ export interface TestController {
   // ): TestControllerPromise;
 
   // report(...args: any[]): TestControllerPromise;
-  goto(passageTitle: string): TestControllerPromise;
-  logDocument<T>(
+  goto(
+    passageTitle: string,
+    temporaryVariables?: unknown
+  ): TestControllerPromise;
+  logDocument(
     this: Promise<void> | TestController,
     options: Parameters<Document['toPrettyString']>[0]
   ): TestControllerPromise;
-  log(this: Promise<void> | TestController, ...params: unknown[]): TestControllerPromise;
+  log(
+    this: Promise<void> | TestController,
+    ...params: unknown[]
+  ): TestControllerPromise;
 }
 
 export const testController: TestController = {
   goto(
     this: Promise<void> | TestController,
-    passageTitle: string
+    passageTitle: string,
+    temporaryVariables?: unknown
   ): TestControllerPromise {
     enterLogger.debug(
       `${new Date().getTime()} testController: entering goto '${passageTitle}'`
@@ -328,6 +335,27 @@ export const testController: TestController = {
         const pageLoadPromise = getPassageLoadedHandler()(
           `goto '${passageTitle}'`
         );
+        if (temporaryVariables !== undefined) {
+          logger.debug(
+            `temporaryVariables=${JSON.stringify(temporaryVariables)}`
+          );
+          $(document).one(':passagestart', () => {
+            logger.debug(
+              `:passagestart temporaryVariables=${JSON.stringify(
+                temporaryVariables
+              )}`
+            );
+            for (const key of Object.keys(temporaryVariables)) {
+              globalThis.State.temporary[key] = temporaryVariables[key];
+            }
+            logger.debug(
+              `globalThis.State.temporary=${JSON.stringify(
+                globalThis.State.temporary
+              )}`
+            );
+          });
+        }
+
         globalThis.Engine.play(passageTitle);
 
         return pageLoadPromise;
