@@ -1,6 +1,6 @@
-import { Selector, SugarcubeParser } from '../src';
-import { innerText } from '../src/test-api/internal/inner-text/inner-text';
-import * as inputs from './inner-text.inputs';
+import { Selector, SugarcubeParser } from '../../..';
+import { innerText } from './inner-text';
+import * as inputs from '../../../../test/inner-text.inputs';
 
 describe(`innerText`, () => {
   it(`returns text string`, async () => {

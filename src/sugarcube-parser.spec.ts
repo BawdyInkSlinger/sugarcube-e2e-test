@@ -1,4 +1,4 @@
-import { Selector, SugarcubeParser } from '../src';
+import { Selector, SugarcubeParser } from '.';
 import {
   ResourceLoaderConstructorOptions,
   ResourceLoader,
