@@ -22,7 +22,7 @@ const baseUrl = 'http://localhost';
 
 export type SugarcubeParserOptions = {
   passages: SimplePassage[];
-  resourceLoader?: ResourceLoader | "usable";
+  resourceLoader?: ResourceLoader | 'usable';
   customPassageLoadedHandler?: (debugNote: string) => Promise<void>;
 };
 
@@ -52,12 +52,13 @@ export class SugarcubeParser {
   static async create({
     passages,
     customPassageLoadedHandler = waitForPassageEnd,
-    resourceLoader = "usable"
+    resourceLoader = 'usable',
   }: SugarcubeParserOptions): Promise<SugarcubeParser> {
     clearTimeouts(); // This could prevent parallel test runs?
     setPassageLoadedHandler(customPassageLoadedHandler);
 
-    const { jsdom, document, window } = await SugarcubeParser.load(resourceLoader);
+    const { jsdom, document, window } =
+      await SugarcubeParser.load(resourceLoader);
     const jQuery = jQueryFactory(window);
 
     resetGlobal('window', window);
@@ -179,7 +180,7 @@ export class SugarcubeParser {
     return new SugarcubeParser();
   }
 
-  private static async load(resources: ResourceLoader | "usable"): Promise<{
+  private static async load(resources: ResourceLoader | 'usable'): Promise<{
     window: DOMWindow;
     document: Document;
     jsdom: JSDOM;
@@ -232,13 +233,34 @@ export class SugarcubeParser {
     globalThis.runStoryInit();
   }
 
-  async assignStateAndReload<V = any>(
+  async assignStateAndReload<V = any, T = any>(
     variables: Partial<V>,
-    passageName?: string
+    passageName?: string,
+    temporaries?: Partial<T>
   ): Promise<void> {
     Object.assign(globalThis.State.variables, variables);
     const currentTitle = passageName ?? globalThis.State.current?.title;
-    logger.debug(`assignStateAndReload: currentTitle=`, currentTitle);
+    logger.debug(`assignStateAndReload: currentTitle=${currentTitle}`);
+    if (temporaries !== undefined) {
+      logger.debug(
+        `assignStateAndReload: temporaries=${JSON.stringify(temporaries)}`
+      );
+      this.jQuery(document).one(':passagestart', () => {
+        logger.debug(
+          `assignStateAndReload: :passagestart temporaries=${JSON.stringify(
+            temporaries
+          )}`
+        );
+        for (const key of Object.keys(temporaries)) {
+          globalThis.State.temporary[key] = temporaries[key];
+        }
+        logger.debug(
+          `assignStateAndReload: globalThis.State.temporary=${JSON.stringify(
+            globalThis.State.temporary
+          )}`
+        );
+      });
+    }
     if (currentTitle) {
       await testController.goto(currentTitle);
     }

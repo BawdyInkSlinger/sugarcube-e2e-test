@@ -56,39 +56,40 @@ describe('SugarcubeParser', () => {
         {
           title: 'passage title',
           tags: ['passage tag'],
-          text: 'abc=$abc',
+          text: 'variable=$variable temporary=_temporary',
         },
         {
           title: 'passage title2',
           tags: ['passage tag2'],
-          text: 'abc2=$abc',
+          text: 'variable2=$variable temporary=_temporary',
         },
       ],
     });
 
-    // $abc not set
+    // $variable not set, _temporary not set
     await sugarcubeParser.testController
       .goto('passage title')
       .expect(Selector(`.passage`).innerText)
-      .eql('abc=$abc');
+      .eql('variable=$variable temporary=_temporary');
 
-    // $abc set
+    // $variable set, _temporary set
     await sugarcubeParser.assignStateAndReload(
-      { 'abc': '123' },
+      { 'variable': '123' },
+      'passage title2',
+      { 'temporary': '456' }
+    );
+    await sugarcubeParser.testController
+      .expect(Selector(`.passage`).innerText)
+      .eql('variable2=123 temporary=456');
+
+    // unset $variable, unset _temporary
+    await sugarcubeParser.assignStateAndReload(
+      { 'variable': undefined },
       'passage title2'
     );
     await sugarcubeParser.testController
       .expect(Selector(`.passage`).innerText)
-      .eql('abc2=123');
-
-    // unset $abc
-    await sugarcubeParser.assignStateAndReload(
-      { 'abc': undefined },
-      'passage title2'
-    );
-    await sugarcubeParser.testController
-      .expect(Selector(`.passage`).innerText)
-      .eql('abc2=$abc');
+      .eql('variable2=$variable temporary=_temporary');
   });
 
   it('uses the ResourceLoader', async () => {
