@@ -1,6 +1,6 @@
 import { Selector, SugarcubeParser } from '../../..';
 import { innerText } from './inner-text';
-import * as inputs from '../../../../test/inner-text.inputs';
+import * as inputs from '../../../../test/inner-text-html.inputs';
 
 describe(`innerText`, () => {
   it(`returns text string`, async () => {
