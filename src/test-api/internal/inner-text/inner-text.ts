@@ -37,7 +37,7 @@ export const innerText = (el: Node): string => {
 
 export const innerTextHelper = (
   el: Node,
-  recursionDepth: number
+  parentDepth: number
 ): { result: string; debugDataTable: DataTable } => {
   const debugDataTable = new DataTable();
 
@@ -45,9 +45,9 @@ export const innerTextHelper = (
     .map((node: Node, index: number, originalArray: Node[]): TextAndLog => {
       switch (getType(node)) {
         case 'TEXT_NODE':
-          return handleText(node, index, originalArray, recursionDepth);
+          return handleText(node, index, originalArray, parentDepth);
         case 'ELEMENT_NODE':
-          return handleElement(node, index, originalArray, recursionDepth);
+          return handleElement(node, index, originalArray, parentDepth);
       }
     })
     .map((textAndLog: TextAndLog) => {

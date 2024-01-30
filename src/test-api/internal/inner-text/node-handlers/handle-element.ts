@@ -6,18 +6,18 @@ export const handleElement: NodeHandler = (
   node: Node,
   index: number,
   originalArray: Node[],
-  recursionDepth: number
+  parentDepth: number
 ): TextAndLog => {
   if (node.hasChildNodes() && node.nodeName.toLowerCase().trim() === `div`) {
-    return handleParentDiv(node, index, originalArray, recursionDepth);
+    return handleParentDiv(node, index, originalArray, parentDepth);
   } else if (node.hasChildNodes()) {
-    return handleHasChildNodes(node, index, originalArray, recursionDepth);
+    return handleHasChildNodes(node, index, originalArray, parentDepth);
   } else if (
     node.nodeName.toLowerCase().trim() === `br` &&
     index - 1 >= 0 &&
     originalArray[index - 1].nodeName.toLowerCase().trim() === `br`
   ) {
-    return handleDoubleBr(node, index, originalArray, recursionDepth);
+    return handleDoubleBr(node, index, originalArray, parentDepth);
   } else if (
     node.nodeName.toLowerCase().trim() === `br` &&
     index - 1 >= 0 &&
@@ -25,9 +25,9 @@ export const handleElement: NodeHandler = (
     index + 1 < originalArray.length &&
     originalArray[index + 1].nodeName.toLowerCase().trim() !== `br`
   ) {
-    return handleSingleBr(node, index, originalArray, recursionDepth);
+    return handleSingleBr(node, index, originalArray, parentDepth);
   } else {
-    return handleDefault(node, index, originalArray, recursionDepth);
+    return handleDefault(node, index, originalArray, parentDepth);
   }
 };
 
@@ -35,9 +35,9 @@ const handleParentDiv: NodeHandler = (
   node: Node,
   index: number,
   originalArray: Node[],
-  recursionDepth: number
+  parentDepth: number
 ): TextAndLog => {
-  const recursed = recurse(node, recursionDepth, (result) => {
+  const recursed = recurse(node, parentDepth, (result) => {
     return '\n' + result.replaceAll(/^\s+/g, '').replaceAll(/\s+$/g, '') + '\n';
   });
 
@@ -46,7 +46,7 @@ const handleParentDiv: NodeHandler = (
     handleParentDiv.name,
     `${node.nodeName}.${(node as HTMLElement).classList}`,
     recursed.result,
-    recursionDepth,
+    parentDepth,
     recursed.debugDataTable
   );
 };
@@ -55,9 +55,9 @@ const handleHasChildNodes: NodeHandler = (
   node: Node,
   index: number,
   originalArray: Node[],
-  recursionDepth: number
+  parentDepth: number
 ): TextAndLog => {
-  const recursed = recurse(node, recursionDepth, (result) => {
+  const recursed = recurse(node, parentDepth, (result) => {
     return result;
   });
 
@@ -66,7 +66,7 @@ const handleHasChildNodes: NodeHandler = (
     handleHasChildNodes.name,
     `${node.nodeName}.${(node as HTMLElement).classList}`,
     recursed.result,
-    recursionDepth,
+    parentDepth,
     recursed.debugDataTable
   );
 };
@@ -75,7 +75,7 @@ const handleDoubleBr: NodeHandler = (
   node: Node,
   index: number,
   originalArray: Node[],
-  recursionDepth: number
+  parentDepth: number
 ): TextAndLog => {
   const text = `\n\n`;
 
@@ -84,7 +84,7 @@ const handleDoubleBr: NodeHandler = (
     handleDoubleBr.name,
     `${node.nodeName}.${(node as HTMLElement).classList}`,
     text,
-    recursionDepth
+    parentDepth
   );
 };
 
@@ -92,7 +92,7 @@ const handleSingleBr: NodeHandler = (
   node: Node,
   index: number,
   originalArray: Node[],
-  recursionDepth: number
+  parentDepth: number
 ): TextAndLog => {
   const text = ' ';
 
@@ -101,7 +101,7 @@ const handleSingleBr: NodeHandler = (
     handleDoubleBr.name,
     `${node.nodeName}.${(node as HTMLElement).classList}`,
     text,
-    recursionDepth
+    parentDepth
   );
 };
 
@@ -109,7 +109,7 @@ const handleDefault: NodeHandler = (
   node: Node,
   index: number,
   originalArray: Node[],
-  recursionDepth: number
+  parentDepth: number
 ): TextAndLog => {
   const text = '';
 
@@ -118,16 +118,16 @@ const handleDefault: NodeHandler = (
     handleDefault.name,
     `${node.nodeName}.${(node as HTMLElement).classList}`,
     text,
-    recursionDepth
+    parentDepth
   );
 };
 
 const recurse = (
   node: Node,
-   recursionDepth: number,
+   parentDepth: number,
   cb: (value: string) => string
 ): { result: string; debugDataTable: DataTable } => {
-  const { result, debugDataTable } = innerTextHelper(node, recursionDepth + 1);
+  const { result, debugDataTable } = innerTextHelper(node, parentDepth + 1);
 
   return {
     result: cb(result),

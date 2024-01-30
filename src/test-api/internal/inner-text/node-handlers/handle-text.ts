@@ -4,16 +4,16 @@ export const handleText: NodeHandler = (
   node: Node,
   index: number,
   originalArray: Node[],
-  recursionDepth: number
+  parentDepth: number
 ): TextAndLog => {
   if (
     node.nodeName.toLowerCase().trim() === `#text` &&
     index - 1 >= 0 &&
     originalArray[index - 1].nodeName.toLowerCase().trim() === `#text`
   ) {
-    return handleDoubleText(node, index, originalArray, recursionDepth);
+    return handleDoubleText(node, index, originalArray, parentDepth);
   } else {
-    return handleSingleText(node, index, originalArray, recursionDepth);
+    return handleSingleText(node, index, originalArray, parentDepth);
   }
 };
 
@@ -21,7 +21,7 @@ const handleSingleText: AddParameters<NodeHandler, [functionName?: string]> = (
   node: Node,
   index: number,
   originalArray: Node[],
-  recursionDepth: number,
+  parentDepth: number,
   functionName = handleSingleText.name
 ): TextAndLog => {
   const leaveSpaceAtStart: boolean =
@@ -42,7 +42,7 @@ const handleSingleText: AddParameters<NodeHandler, [functionName?: string]> = (
     functionName,
     node.nodeName,
     node.textContent,
-    recursionDepth
+    parentDepth
   );
 };
 
@@ -50,7 +50,7 @@ const handleDoubleText: NodeHandler = (
   node: Node,
   index: number,
   originalArray: Node[],
-  recursionDepth: number
+  parentDepth: number
 ): TextAndLog => {
   const previousNode = originalArray[index - 1];
   const previousNodeTextContent = previousNode.textContent;
@@ -60,7 +60,7 @@ const handleDoubleText: NodeHandler = (
     node,
     index,
     originalArray,
-    recursionDepth,
+    parentDepth,
     handleDoubleText.name
   );
 
@@ -73,7 +73,7 @@ const handleDoubleText: NodeHandler = (
       handleDoubleText.name,
       node.nodeName,
       text,
-      recursionDepth
+      parentDepth
     );
   }
 
