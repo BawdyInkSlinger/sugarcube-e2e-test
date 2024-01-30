@@ -55,13 +55,30 @@ she's determined.`,
       .eql(`You'll give her one thing: she's determined.`);
   });
 
-  it(`squashes space between text and inline elements`, async () => {
+  it(`squashes spaces between text and inline elements`, async () => {
     const sugarcubeParser = await SugarcubeParser.create({
       passages: [
         {
           title: 'passage title',
           tags: ['passage tag'],
           text: `foo  <span> bar </span> `,
+        },
+      ],
+    });
+
+    await sugarcubeParser.testController
+      .goto('passage title')
+      .expect(Selector(`.passage`).innerText)
+      .eql(`foo bar`);
+  });
+
+  it(`squashes spaces between multiple inline elements`, async () => {
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag'],
+          text: ` <span> <span> foo </span>   <span> bar </span> </span> `,
         },
       ],
     });

@@ -1,7 +1,7 @@
 import { Selector, SugarcubeParser } from '../../..';
 import * as inputs from '../../../../test/inner-text-wiki.inputs';
 
-xdescribe(`innerText wiki`, () => {
+describe(`innerText wiki`, () => {
   it(`returns expectations using real examples`, async () => {
     const exampleCount = Object.getOwnPropertyNames(inputs).length / 4;
     expect(exampleCount).toBeGreaterThan(0);

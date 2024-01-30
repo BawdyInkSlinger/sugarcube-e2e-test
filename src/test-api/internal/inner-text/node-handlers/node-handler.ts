@@ -27,6 +27,7 @@ export const returnWrapper = (
       functionName,
       nodeInfo: indent(recursionDepth) + nodeInfo,
       nodeText,
+      postProcess: text,
     },
     children: childTable.rows,
   };

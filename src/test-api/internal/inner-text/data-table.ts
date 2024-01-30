@@ -2,6 +2,7 @@ export type DataRow = {
   functionName: string;
   nodeInfo: string;
   nodeText: string;
+  postProcess: string;
 };
 
 export class DataTable {

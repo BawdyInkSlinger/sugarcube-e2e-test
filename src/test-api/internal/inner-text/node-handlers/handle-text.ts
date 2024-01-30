@@ -17,11 +17,12 @@ export const handleText: NodeHandler = (
   }
 };
 
-const handleSingleText: NodeHandler = (
+const handleSingleText: AddParameters<NodeHandler, [functionName?: string]> = (
   node: Node,
   index: number,
   originalArray: Node[],
-  recursionDepth: number
+  recursionDepth: number,
+  functionName = handleSingleText.name
 ): TextAndLog => {
   const leaveSpaceAtStart: boolean =
     index - 1 >= 0 && isInlineElementName(originalArray[index - 1].nodeName);
@@ -38,7 +39,7 @@ const handleSingleText: NodeHandler = (
 
   return returnWrapper(
     text,
-    handleText.name,
+    functionName,
     node.nodeName,
     node.textContent,
     recursionDepth
@@ -55,11 +56,17 @@ const handleDoubleText: NodeHandler = (
   const previousNodeTextContent = previousNode.textContent;
   const currentNodeTextContent = node.textContent;
 
-  const result = handleSingleText(node, index, originalArray, recursionDepth);
-  if (
-    previousNodeTextContent.trimEnd().length < previousNodeTextContent.length ||
-    currentNodeTextContent.trimStart().length < currentNodeTextContent.length
-  ) {
+  const result = handleSingleText(
+    node,
+    index,
+    originalArray,
+    recursionDepth,
+    handleDoubleText.name
+  );
+
+  const previousEndsWithSpace = isSpaceAfter(previousNodeTextContent);
+  const currentBeginsWithSpace = isSpaceBefore(currentNodeTextContent);
+  if (result.text !== '' && (previousEndsWithSpace || currentBeginsWithSpace)) {
     const text = ' ' + result.text.trimStart();
     return returnWrapper(
       text,
@@ -107,3 +114,18 @@ const isInlineElementName = (elementName: string): boolean => {
     return inlineElementName === elementName.toLowerCase().trim();
   });
 };
+
+function isSpaceBefore(text: string): boolean {
+  return text.trimStart().length < text.length;
+}
+
+function isSpaceAfter(text: string): boolean {
+  return text.trimEnd().length < text.length;
+}
+
+type AddParameters<
+  TFunction extends (...args: any) => any,
+  TParameters extends [...args: any],
+> = (
+  ...args: [...Parameters<TFunction>, ...TParameters]
+) => ReturnType<TFunction>;
