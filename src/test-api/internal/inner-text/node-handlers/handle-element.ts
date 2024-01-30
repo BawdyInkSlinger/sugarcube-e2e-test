@@ -128,7 +128,7 @@ const recurse = (
   cb: (value: string) => string
 ): { result: string; debugDataTable: DataTable } => {
   const { result, debugDataTable } = innerTextHelper(node, {
-    parentName,
+    parentName: node.nodeName,
     depth: depth + 1,
   });
 
