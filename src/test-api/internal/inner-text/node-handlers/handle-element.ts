@@ -1,12 +1,12 @@
 import { DataTable } from '../data-table';
-import { innerTextHelper } from '../inner-text';
+import { ParentDepth, innerTextHelper } from '../inner-text';
 import { NodeHandler, TextAndLog, returnWrapper } from './node-handler';
 
 export const handleElement: NodeHandler = (
   node: Node,
   index: number,
   originalArray: Node[],
-  parentDepth: number
+  parentDepth: ParentDepth
 ): TextAndLog => {
   if (node.hasChildNodes() && node.nodeName.toLowerCase().trim() === `div`) {
     return handleParentDiv(node, index, originalArray, parentDepth);
@@ -35,7 +35,7 @@ const handleParentDiv: NodeHandler = (
   node: Node,
   index: number,
   originalArray: Node[],
-  parentDepth: number
+  parentDepth: ParentDepth
 ): TextAndLog => {
   const recursed = recurse(node, parentDepth, (result) => {
     return '\n' + result.replaceAll(/^\s+/g, '').replaceAll(/\s+$/g, '') + '\n';
@@ -55,7 +55,7 @@ const handleHasChildNodes: NodeHandler = (
   node: Node,
   index: number,
   originalArray: Node[],
-  parentDepth: number
+  parentDepth: ParentDepth
 ): TextAndLog => {
   const recursed = recurse(node, parentDepth, (result) => {
     return result;
@@ -75,7 +75,7 @@ const handleDoubleBr: NodeHandler = (
   node: Node,
   index: number,
   originalArray: Node[],
-  parentDepth: number
+  parentDepth: ParentDepth
 ): TextAndLog => {
   const text = `\n\n`;
 
@@ -92,7 +92,7 @@ const handleSingleBr: NodeHandler = (
   node: Node,
   index: number,
   originalArray: Node[],
-  parentDepth: number
+  parentDepth: ParentDepth
 ): TextAndLog => {
   const text = ' ';
 
@@ -109,7 +109,7 @@ const handleDefault: NodeHandler = (
   node: Node,
   index: number,
   originalArray: Node[],
-  parentDepth: number
+  parentDepth: ParentDepth
 ): TextAndLog => {
   const text = '';
 
@@ -124,10 +124,13 @@ const handleDefault: NodeHandler = (
 
 const recurse = (
   node: Node,
-   parentDepth: number,
+  { parentName, depth }: ParentDepth,
   cb: (value: string) => string
 ): { result: string; debugDataTable: DataTable } => {
-  const { result, debugDataTable } = innerTextHelper(node, parentDepth + 1);
+  const { result, debugDataTable } = innerTextHelper(node, {
+    parentName,
+    depth: depth + 1,
+  });
 
   return {
     result: cb(result),

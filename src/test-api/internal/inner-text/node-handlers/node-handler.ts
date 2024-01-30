@@ -1,4 +1,5 @@
 import { DataRow, DataTable } from '../data-table';
+import { ParentDepth } from '../inner-text';
 
 export type TextAndLog = {
   text: string;
@@ -10,7 +11,7 @@ export type NodeHandler = (
   node: Node,
   index: number,
   originalArray: Node[],
-  parentDepth: number
+  parentDepth: ParentDepth
 ) => TextAndLog;
 
 export const returnWrapper = (
@@ -18,7 +19,7 @@ export const returnWrapper = (
   functionName: string,
   nodeInfo: string,
   nodeText: string,
-  parentDepth: number,
+  parentDepth: ParentDepth,
   childTable: DataTable = new DataTable()
 ): TextAndLog => {
   return {
@@ -33,6 +34,6 @@ export const returnWrapper = (
   };
 };
 
-const indent = (parentDepth: number): string => {
-  return `·`.repeat(parentDepth * 2);
+const indent = ({ depth }: ParentDepth): string => {
+  return `·`.repeat(depth * 2);
 };

@@ -1,10 +1,11 @@
+import { ParentDepth } from '../inner-text';
 import { NodeHandler, TextAndLog, returnWrapper } from './node-handler';
 
 export const handleText: NodeHandler = (
   node: Node,
   index: number,
   originalArray: Node[],
-  parentDepth: number
+  parentDepth: ParentDepth
 ): TextAndLog => {
   if (
     node.nodeName.toLowerCase().trim() === `#text` &&
@@ -21,7 +22,7 @@ const handleSingleText: AddParameters<NodeHandler, [functionName?: string]> = (
   node: Node,
   index: number,
   originalArray: Node[],
-  parentDepth: number,
+  parentDepth: ParentDepth,
   functionName = handleSingleText.name
 ): TextAndLog => {
   const leaveSpaceAtStart: boolean =
@@ -50,7 +51,7 @@ const handleDoubleText: NodeHandler = (
   node: Node,
   index: number,
   originalArray: Node[],
-  parentDepth: number
+  parentDepth: ParentDepth
 ): TextAndLog => {
   const previousNode = originalArray[index - 1];
   const previousNodeTextContent = previousNode.textContent;

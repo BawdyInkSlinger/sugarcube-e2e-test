@@ -21,12 +21,14 @@ const nodeTypes = {
 
 type NodeType = (typeof nodeTypes)[keyof typeof nodeTypes];
 
+export type ParentDepth = { parentName?: string; depth: number };
+
 export const innerText = (el: Node): string => {
   if (innerTextLogger.isDebugEnabled()) {
     innerTextLogger.debug((el as HTMLElement).outerHTML);
   }
 
-  const { result, debugDataTable } = innerTextHelper(el, 0);
+  const { result, debugDataTable } = innerTextHelper(el, { depth: 0 });
 
   if (innerTextLogger.isDebugEnabled()) {
     debugDataTable.print();
@@ -37,7 +39,7 @@ export const innerText = (el: Node): string => {
 
 export const innerTextHelper = (
   el: Node,
-  parentDepth: number
+  parentDepth: ParentDepth
 ): { result: string; debugDataTable: DataTable } => {
   const debugDataTable = new DataTable();
 
