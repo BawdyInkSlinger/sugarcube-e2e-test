@@ -26,7 +26,7 @@ export const returnWrapper = (
     text,
     log: {
       functionName,
-      nodeInfo: indent(parentDepth) + nodeInfo,
+      nodeInfo: calculateParentNodeInfo(parentDepth, nodeInfo),
       nodeText,
       postProcess: text,
     },
@@ -34,6 +34,30 @@ export const returnWrapper = (
   };
 };
 
-const indent = ({ depth }: ParentDepth): string => {
-  return `·`.repeat(depth * 2);
+const calculateParentNodeInfo = (
+  { parent }: ParentDepth,
+  nodeInfo: string
+): string => {
+  return [
+    parent === undefined ? undefined : calculateNodeInfo(parent),
+    nodeInfo,
+  ]
+    .filter((val) => {
+      return val !== undefined;
+    })
+    .join('>');
+};
+
+export const calculateNodeInfo = (node: Node): string => {
+  const id = (node as HTMLElement).id;
+  if (id !== '') {
+    return '#' + id;
+  }
+
+  const classes = (node as HTMLElement).className;
+  if (classes !== '') {
+    return '.' + classes.replaceAll(' ', '.');
+  }
+
+  return `${node.nodeName}`;
 };

@@ -1,6 +1,11 @@
 import { DataTable } from '../data-table';
 import { ParentDepth, innerTextHelper } from '../inner-text';
-import { NodeHandler, TextAndLog, returnWrapper } from './node-handler';
+import {
+  NodeHandler,
+  TextAndLog,
+  calculateNodeInfo,
+  returnWrapper,
+} from './node-handler';
 
 export const handleElement: NodeHandler = (
   node: Node,
@@ -44,7 +49,7 @@ const handleParentDiv: NodeHandler = (
   return returnWrapper(
     recursed.result,
     handleParentDiv.name,
-    `${node.nodeName}.${(node as HTMLElement).classList}`,
+    calculateNodeInfo(node),
     recursed.result,
     parentDepth,
     recursed.debugDataTable
@@ -64,7 +69,7 @@ const handleHasChildNodes: NodeHandler = (
   return returnWrapper(
     recursed.result,
     handleHasChildNodes.name,
-    `${node.nodeName}.${(node as HTMLElement).classList}`,
+    calculateNodeInfo(node),
     recursed.result,
     parentDepth,
     recursed.debugDataTable
@@ -82,7 +87,7 @@ const handleDoubleBr: NodeHandler = (
   return returnWrapper(
     text,
     handleDoubleBr.name,
-    `${node.nodeName}.${(node as HTMLElement).classList}`,
+    calculateNodeInfo(node),
     text,
     parentDepth
   );
@@ -99,7 +104,7 @@ const handleSingleBr: NodeHandler = (
   return returnWrapper(
     text,
     handleDoubleBr.name,
-    `${node.nodeName}.${(node as HTMLElement).classList}`,
+    calculateNodeInfo(node),
     text,
     parentDepth
   );
@@ -116,7 +121,7 @@ const handleDefault: NodeHandler = (
   return returnWrapper(
     text,
     handleDefault.name,
-    `${node.nodeName}.${(node as HTMLElement).classList}`,
+    calculateNodeInfo(node),
     text,
     parentDepth
   );
@@ -124,11 +129,11 @@ const handleDefault: NodeHandler = (
 
 const recurse = (
   node: Node,
-  { parentName, depth }: ParentDepth,
+  { parent, depth }: ParentDepth,
   cb: (value: string) => string
 ): { result: string; debugDataTable: DataTable } => {
   const { result, debugDataTable } = innerTextHelper(node, {
-    parentName: node.nodeName,
+    parent: node,
     depth: depth + 1,
   });
 

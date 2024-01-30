@@ -21,7 +21,7 @@ const nodeTypes = {
 
 type NodeType = (typeof nodeTypes)[keyof typeof nodeTypes];
 
-export type ParentDepth = { parentName?: string; depth: number };
+export type ParentDepth = { parent?: Node; depth: number };
 
 export const innerText = (el: Node): string => {
   if (innerTextLogger.isDebugEnabled()) {
