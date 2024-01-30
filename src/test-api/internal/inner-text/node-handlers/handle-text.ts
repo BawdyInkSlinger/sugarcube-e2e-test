@@ -3,23 +3,25 @@ import { NodeHandler, TextAndLog, returnWrapper } from './node-handler';
 export const handleText: NodeHandler = (
   node: Node,
   index: number,
-  originalArray: Node[]
+  originalArray: Node[],
+  recursionDepth: number
 ): TextAndLog => {
   if (
     node.nodeName.toLowerCase().trim() === `#text` &&
     index - 1 >= 0 &&
     originalArray[index - 1].nodeName.toLowerCase().trim() === `#text`
   ) {
-    return handleDoubleText(node, index, originalArray);
+    return handleDoubleText(node, index, originalArray, recursionDepth);
   } else {
-    return handleSingleText(node, index, originalArray);
+    return handleSingleText(node, index, originalArray, recursionDepth);
   }
 };
 
 const handleSingleText: NodeHandler = (
   node: Node,
   index: number,
-  originalArray: Node[]
+  originalArray: Node[],
+  recursionDepth: number
 ): TextAndLog => {
   const leaveSpaceAtStart: boolean =
     index - 1 >= 0 && isInlineElementName(originalArray[index - 1].nodeName);
@@ -34,25 +36,38 @@ const handleSingleText: NodeHandler = (
   text = leaveSpaceAtStart ? text : text.trimStart();
   text = leaveSpaceAtEnd ? text : text.trimEnd();
 
-  return returnWrapper(text, handleText.name, node.nodeName, node.textContent);
+  return returnWrapper(
+    text,
+    handleText.name,
+    node.nodeName,
+    node.textContent,
+    recursionDepth
+  );
 };
 
 const handleDoubleText: NodeHandler = (
   node: Node,
   index: number,
-  originalArray: Node[]
+  originalArray: Node[],
+  recursionDepth: number
 ): TextAndLog => {
   const previousNode = originalArray[index - 1];
   const previousNodeTextContent = previousNode.textContent;
   const currentNodeTextContent = node.textContent;
 
-  const result = handleSingleText(node, index, originalArray);
+  const result = handleSingleText(node, index, originalArray, recursionDepth);
   if (
     previousNodeTextContent.trimEnd().length < previousNodeTextContent.length ||
     currentNodeTextContent.trimStart().length < currentNodeTextContent.length
   ) {
     const text = ' ' + result.text.trimStart();
-    return returnWrapper(text, handleDoubleText.name, node.nodeName, text);
+    return returnWrapper(
+      text,
+      handleDoubleText.name,
+      node.nodeName,
+      text,
+      recursionDepth
+    );
   }
 
   return result;

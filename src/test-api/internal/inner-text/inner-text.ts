@@ -26,7 +26,7 @@ export const innerText = (el: Node): string => {
     innerTextLogger.debug((el as HTMLElement).outerHTML);
   }
 
-  const { result, debugDataTable } = innerTextHelper(el);
+  const { result, debugDataTable } = innerTextHelper(el, 0);
 
   if (innerTextLogger.isDebugEnabled()) {
     debugDataTable.print();
@@ -36,7 +36,8 @@ export const innerText = (el: Node): string => {
 };
 
 export const innerTextHelper = (
-  el: Node
+  el: Node,
+  recursionDepth: number
 ): { result: string; debugDataTable: DataTable } => {
   const debugDataTable = new DataTable();
 
@@ -44,9 +45,9 @@ export const innerTextHelper = (
     .map((node: Node, index: number, originalArray: Node[]): TextAndLog => {
       switch (getType(node)) {
         case 'TEXT_NODE':
-          return handleText(node, index, originalArray);
+          return handleText(node, index, originalArray, recursionDepth);
         case 'ELEMENT_NODE':
-          return handleElement(node, index, originalArray);
+          return handleElement(node, index, originalArray, recursionDepth);
       }
     })
     .map((textAndLog: TextAndLog) => {

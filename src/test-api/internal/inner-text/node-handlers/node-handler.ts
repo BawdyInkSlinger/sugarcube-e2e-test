@@ -9,7 +9,8 @@ export type TextAndLog = {
 export type NodeHandler = (
   node: Node,
   index: number,
-  originalArray: Node[]
+  originalArray: Node[],
+  recursionDepth: number
 ) => TextAndLog;
 
 export const returnWrapper = (
@@ -17,15 +18,20 @@ export const returnWrapper = (
   functionName: string,
   nodeInfo: string,
   nodeText: string,
-  childTable: DataTable = new DataTable(),
+  recursionDepth: number,
+  childTable: DataTable = new DataTable()
 ): TextAndLog => {
   return {
     text,
     log: {
       functionName,
-      nodeInfo,
+      nodeInfo: indent(recursionDepth) + nodeInfo,
       nodeText,
     },
     children: childTable.rows,
   };
+};
+
+const indent = (recursionDepth: number): string => {
+  return `·`.repeat(recursionDepth * 2);
 };
