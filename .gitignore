@@ -5,3 +5,5 @@ tscbuild
 screenshots/
 random_content.zip
 watch.sh.pids
+.yalc
+yalc.lock
