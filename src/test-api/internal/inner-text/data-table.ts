@@ -1,3 +1,5 @@
+import { Table } from 'console-table-printer';
+
 export type DataRow = {
   functionName: string;
   nodeInfo: string;
@@ -7,8 +9,8 @@ export type DataRow = {
 
 export class DataTable {
   debugDataTable: DataRow[] = [];
-  
-  get rows () {
+
+  get rows() {
     return this.debugDataTable;
   }
 
@@ -26,13 +28,33 @@ export class DataTable {
   }
 
   print(): void {
-    console.table(
+    const minLen = 10;
+    const maxLen = 100;
+    const alignment = 'left';
+    const table = new Table({
+      columns: [
+        { name: 'functionName', alignment },
+        { name: 'nodeInfo', alignment },
+        { name: 'nodeText', alignment, minLen, maxLen },
+        { name: 'postProcess', alignment, minLen, maxLen },
+      ],
+    });
+    table.addRows(
       this.debugDataTable.map((datum) => {
         return {
           ...datum,
-          nodeText: JSON.stringify(datum.nodeText).replaceAll(/ /g, '·'),
+          nodeText: JSON.stringify(datum.nodeText)
+            .replaceAll(/ /g, '·')
+            .replaceAll(/\n/g, '\\n'),
+          postProcess: JSON.stringify(datum.postProcess).replaceAll(
+            /\n/g,
+            '\\n'
+          ),
         };
-      })
+      }),
+      { color: 'green' }
     );
+
+    table.printTable();
   }
 }

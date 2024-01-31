@@ -35,11 +35,11 @@ export const returnWrapper = (
 };
 
 const calculateParentNodeInfo = (
-  { parent }: ParentDepth,
+  { parent, depth }: ParentDepth,
   nodeInfo: string
 ): string => {
   return [
-    parent === undefined ? undefined : calculateNodeInfo(parent),
+    parent === undefined ? undefined : ` `.repeat(2 * (depth - 1)) + `└`,
     nodeInfo,
   ]
     .filter((val) => {
