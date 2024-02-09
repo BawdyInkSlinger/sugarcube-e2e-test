@@ -20,7 +20,7 @@ describe(`innerText html`, () => {
       .contains(`passage text`);
   });
 
-  it(`completely squashes spaces between newlines`, async () => {
+  it('keeps newlines while completely squashing spaces between them', async () => {
     const sugarcubeParser = await SugarcubeParser.create({
       passages: [
         {
@@ -28,13 +28,29 @@ describe(`innerText html`, () => {
           tags: ['passage tag'],
           text: 'a<br><br>    <br><br>b',
         },
+        {
+          title: 'passage title nested div',
+          tags: ['passage tag nested'],
+          text: '<div>a<br><br>    <br><br>b</div>',
+        },
+        {
+          title: 'passage title nested span',
+          tags: ['passage tag nested'],
+          text: '<span>a<br><br>    <br><br>b</span>',
+        },
       ],
     });
 
     await sugarcubeParser.testController
       .goto('passage title')
-      .expect(Selector(`.passage`).innerText)
-      .eql(`a\n\n\n\nb`);
+      .expect(Selector('.passage').innerText)
+      .eql(`a\n\n\n\nb`)
+      .goto('passage title nested div')
+      .expect(Selector('.passage').innerText)
+      .eql(`a\n\n\n\nb`)
+      .goto('passage title nested span')
+      .expect(Selector('.passage').innerText)
+      .eql(`a\n\n\n\nb`)
   });
 
   it(`replaces newline characters with blank`, async () => {
