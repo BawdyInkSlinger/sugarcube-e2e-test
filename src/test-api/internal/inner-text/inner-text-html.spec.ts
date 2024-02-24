@@ -50,7 +50,7 @@ describe(`innerText html`, () => {
       .eql(`a\n\n\n\nb`)
       .goto('passage title nested span')
       .expect(Selector('.passage').innerText)
-      .eql(`a\n\n\n\nb`)
+      .eql(`a\n\n\n\nb`);
   });
 
   it(`replaces newline characters with blank`, async () => {
@@ -71,55 +71,115 @@ she's determined.`,
       .eql(`You'll give her one thing: she's determined.`);
   });
 
-  it(`squashes spaces between text and inline elements`, async () => {
-    const sugarcubeParser = await SugarcubeParser.create({
-      passages: [
+  describe('whitespace between text and elements', () => {
+    type BetweenTextAndElement = string;
+    type MultipleNestedElement = string;
+    type BetweenElementAndText = string;
+
+    interface TestDatum {
+      whitespace: ' ' | '\n';
+      text: ['foo' | 'bar', 'foo' | 'bar'];
+      element: 'div' | 'span';
+      expected: [
+        BetweenTextAndElement,
+        MultipleNestedElement,
+        BetweenElementAndText,
+      ];
+    }
+
+    (
+      [
         {
-          title: 'passage title',
-          tags: ['passage tag'],
-          text: `foo  <span> bar </span> `,
+          whitespace: ' ',
+          text: ['foo', 'bar'],
+          element: `div`,
+          expected: [`foo\nbar`, `foo\nbar`, `foo\nbar`],
         },
-      ],
-    });
-
-    await sugarcubeParser.testController
-      .goto('passage title')
-      .expect(Selector(`.passage`).innerText)
-      .eql(`foo bar`);
-  });
-
-  it(`squashes spaces between multiple inline elements`, async () => {
-    const sugarcubeParser = await SugarcubeParser.create({
-      passages: [
         {
-          title: 'passage title',
-          tags: ['passage tag'],
-          text: ` <span> <span> foo </span>   <span> bar </span> </span> `,
+          whitespace: '\n',
+          text: ['foo', 'bar'],
+          element: `div`,
+          expected: [
+            `\nfoo\n\n\n\nbar\n\n\n`,
+            `\n\n\n\n\nfoo\n\n\n\n\n\n\nbar\n\n\n\n\n`,
+            `\n\n\nfoo\n\n\nbar\n\n`,
+          ],
         },
-      ],
-    });
-
-    await sugarcubeParser.testController
-      .goto('passage title')
-      .expect(Selector(`.passage`).innerText)
-      .eql(`foo bar`);
-  });
-
-  it('squashes space between inline elements and text', async () => {
-    const sugarcubeParser = await SugarcubeParser.create({
-      passages: [
         {
-          title: 'passage title',
-          tags: ['passage tag'],
-          text: `<span> foo </span> bar  `,
+          whitespace: ' ',
+          text: ['foo', 'bar'],
+          element: `span`,
+          expected: [`foo bar`, `foo bar`, `foo bar`],
         },
-      ],
-    });
+        {
+          whitespace: '\n',
+          text: ['foo', 'bar'],
+          element: `span`,
+          expected: [
+            `\nfoo\n\n\nbar\n\n`,
+            `\n\n\nfoo\n\n\n\n\nbar\n\n\n`,
+            `\n\nfoo\n\nbar\n\n`,
+          ],
+        },
+      ] satisfies TestDatum[]
+    ).forEach(({ whitespace, text, element, expected }) => {
+      it(`squashes ${
+        whitespace === ' ' ? 'spaces' : 'newlines'
+      } between text and ${element} elements`, async () => {
+        const sugarcubeParser = await SugarcubeParser.create({
+          passages: [
+            {
+              title: 'passage title',
+              tags: ['passage tag'],
+              text: `${whitespace}${text[0]}${whitespace}${whitespace}<${element}>${whitespace}${text[1]}${whitespace}</${element}>${whitespace}`,
+            },
+          ],
+        });
 
-    await sugarcubeParser.testController
-      .goto('passage title')
-      .expect(Selector(`.passage`).innerText)
-      .eql(`foo bar`);
+        await sugarcubeParser.testController
+          .goto('passage title')
+          .expect(Selector(`.passage`).innerText)
+          .eql(expected[0]);
+      });
+
+      it(`squashes ${
+        whitespace === ' ' ? 'spaces' : 'newlines'
+      } between multiple nested ${element} elements`, async () => {
+        const sugarcubeParser = await SugarcubeParser.create({
+          passages: [
+            {
+              title: 'passage title',
+              tags: ['passage tag'],
+              text: `${whitespace}<${element}>${whitespace}<${element}>${whitespace}${text[0]}${whitespace}</${element}>${whitespace}${whitespace}${whitespace}<${element}>${whitespace}${text[1]}${whitespace}</${element}>${whitespace}</${element}>${whitespace}`,
+            },
+          ],
+        });
+
+        await sugarcubeParser.testController
+          .goto('passage title')
+          .expect(Selector(`.passage`).innerText)
+          .eql(expected[1]);
+      });
+
+      it(`squashes ${
+        whitespace === ' ' ? 'spaces' : 'newlines'
+      } between ${element} elements and text`, async () => {
+        const sugarcubeParser = await SugarcubeParser.create({
+          passages: [
+            {
+              title: 'passage title',
+              tags: ['passage tag'],
+              text: `${whitespace}<${element}>${whitespace}${text[0]}${whitespace}</${element}>${whitespace}${text[1]}${whitespace}${whitespace}`,
+            },
+          ],
+        });
+
+        await sugarcubeParser.testController
+          .goto('passage title')
+          .expect(Selector(`.passage`).innerText)
+          .eql(expected[2]);
+      });
+    });
   });
 
   /*

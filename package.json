@@ -54,11 +54,11 @@
     "glob": "10.3.10",
     "lodash": "4.17.21",
     "seedrandom": "2.3.3"
-  },
-  "peerDependencies": {
+},
+"peerDependencies": {
+    "console-table-printer": "file:.yalc/console-table-printer",
     "jquery": "^3.7.1",
     "jsdom": "^23.2.0",
-    "console-table-printer": "latest",
     "winston": "^3.11.0"
   }
 }
