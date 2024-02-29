@@ -17,9 +17,9 @@ export function waitForPassageEnd(debugNote = '') {
         });
       }),
       new Promise<void>((resolve) => {
-        $(document).one(':clickend', function () {
+        $(document).one(':clickdone', function () {
           logger.debug(
-            `${new Date().getTime()} waitForPassageEnd: resolving waitForPassageEnd :clickend debugNote=${debugNote}`
+            `${new Date().getTime()} waitForPassageEnd: resolving waitForPassageEnd :clickdone debugNote=${debugNote}`
           );
           resolve();
         });
