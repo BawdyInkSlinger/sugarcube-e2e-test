@@ -3,8 +3,19 @@ import { getLogger } from '../logger';
 
 const logger = getLogger();
 
+// Object.getOwnPropertyNames(window) returns invalid results when created with
+// { runScripts: 'dangerously' }
+// This property will be initialized without that option so its `window` can be used
+// in Object.getOwnPropertyNames(window) as a workaround to that bug.
+let workaroundForJsdomGetOwnPropertyNamesBug: JSDOM;
+
 export function setupJsdom(html?: string, options: ConstructorOptions = {}) {
   logger.debug(`setupJsdom(${html}, ${JSON.stringify(options)})`);
+
+  if (workaroundForJsdomGetOwnPropertyNamesBug === undefined) {
+    workaroundForJsdomGetOwnPropertyNamesBug = new JSDOM('');
+  }
+
   // set a default url if we don't get one - otherwise things explode when we copy localstorage keys
   if (!('url' in options)) {
     Object.assign(options, { url: 'http://localhost:3000' });
@@ -26,9 +37,9 @@ export function setupJsdom(html?: string, options: ConstructorOptions = {}) {
 
   const KEYS = [];
   KEYS.push(
-    ...Object.getOwnPropertyNames(window).filter(
-      (k) => !k.startsWith('_') && !(k in global)
-    )
+    ...Object.getOwnPropertyNames(
+      workaroundForJsdomGetOwnPropertyNamesBug.window
+    ).filter((k) => !k.startsWith('_') && !(k in global))
   );
   // eslint-disable-next-line no-return-assign
   KEYS.forEach((key) => (global[key] = window[key]));
