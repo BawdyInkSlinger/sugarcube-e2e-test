@@ -1,5 +1,4 @@
 import { setupJsdom } from './setup-jsdom';
-import { createContext as createGlobalContext, isContext, runInNewContext } from 'node:vm';
 
 const domPropertyNames = [
   'HTMLElement',
@@ -10,41 +9,32 @@ const domPropertyNames = [
 
 describe(`setupJsdom`, () => {
   describe(`window`, () => {
-    let globalContext;
     beforeEach(() => {
-      globalContext = createGlobalContext({ setupJsdom, console });
-      globalContext.global = globalContext;
-      console.log(`beforeEach.isContext`, isContext(globalContext));
+      domPropertyNames.forEach((propertyName) => {
+        delete global[propertyName];
+      });
     });
 
     it(`includes DOM objects in globalThis when called with default options`, async () => {
-      runInNewContext(`setupJsdom('');`, globalContext);
+      setupJsdom('');
 
       domPropertyNames.forEach((propertyName) => {
-        expect(globalContext[propertyName])
-          .withContext(propertyName)
-          .toBeDefined();
-        expect(globalContext[propertyName])
-          .withContext(propertyName)
-          .not.toBeNull();
+        expect(global[propertyName]).withContext(propertyName).toBeDefined();
+        expect(global[propertyName]).withContext(propertyName).not.toBeNull();
       });
     });
 
     it('includes DOM objects in globalThis when called with "runScripts": "dangerously" options', async () => {
-      runInNewContext(
-        `setupJsdom('', { url: 'http://localhost', runScripts: 'dangerously', resources: 'usable', pretendToBeVisual: true, });`,
-        globalContext
-      );
-
-      console.log(`globalContext`, globalContext);
+      setupJsdom('', {
+        url: 'http://localhost',
+        runScripts: 'dangerously',
+        resources: 'usable',
+        pretendToBeVisual: true,
+      });
 
       domPropertyNames.forEach((propertyName) => {
-        expect(globalContext[propertyName])
-          .withContext(propertyName)
-          .toBeDefined();
-        expect(globalContext[propertyName])
-          .withContext(propertyName)
-          .not.toBeNull();
+        expect(global[propertyName]).withContext(propertyName).toBeDefined();
+        expect(global[propertyName]).withContext(propertyName).not.toBeNull();
       });
     });
   });
