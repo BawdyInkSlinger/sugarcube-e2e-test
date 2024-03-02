@@ -1,4 +1,4 @@
-import { JSDOM } from 'jsdom';
+import { JSDOMInstance } from '../../setup-jsdom';
 
 declare global {
   interface Document {
@@ -8,5 +8,5 @@ declare global {
   // eslint-disable-next-line no-var
   var isJSDOM: boolean | undefined;
   // eslint-disable-next-line no-var
-  var jsdom: JSDOM;
+  var jsdom: JSDOMInstance;
 }

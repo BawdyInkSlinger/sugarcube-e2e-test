@@ -1,7 +1,9 @@
 import { JSDOM, ConstructorOptions } from 'jsdom';
 import { getLogger } from '../logger';
 
+export type JSDOMInstance = JSDOM & { jsdomInstanceNumber: number}
 const logger = getLogger();
+let jsdomInstanceNumber = 0;
 
 // Object.getOwnPropertyNames(window) returns invalid results when created with
 // { runScripts: 'dangerously' }
@@ -9,7 +11,7 @@ const logger = getLogger();
 // in Object.getOwnPropertyNames(window) as a workaround to that bug.
 let workaroundForJsdomGetOwnPropertyNamesBug: JSDOM;
 
-export function setupJsdom(html?: string, options: ConstructorOptions = {}) {
+export function setupJsdom(html?: string, options: ConstructorOptions = {}): JSDOMInstance {
   logger.debug(`setupJsdom(${html}, ${JSON.stringify(options)})`);
 
   if (workaroundForJsdomGetOwnPropertyNamesBug === undefined) {
@@ -27,7 +29,7 @@ export function setupJsdom(html?: string, options: ConstructorOptions = {}) {
     Object.assign(options, { pretendToBeVisual: true });
   }
 
-  const jsdom = new JSDOM(html, options);
+  const jsdom = new JSDOM(html, options) as JSDOMInstance;
   const { window } = jsdom;
   const { document } = window;
 
@@ -47,9 +49,14 @@ export function setupJsdom(html?: string, options: ConstructorOptions = {}) {
   // add properties to help with troubleshooting
   window.isJSDOM = true;
   document.isJSDOM = true;
+  jsdomInstanceNumber++;
+  jsdom.jsdomInstanceNumber = jsdomInstanceNumber;
+
 
   // setup document / window / window.console
   global.document = document;
+
+  console.log(`Object.getOwnPropertyNames(window).filter((k) => k === "HTMLElement").length`, Object.getOwnPropertyNames(window).filter((k) => k === "HTMLElement").length);
 
   return jsdom;
 }

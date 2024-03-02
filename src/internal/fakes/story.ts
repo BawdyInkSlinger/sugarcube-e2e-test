@@ -259,7 +259,8 @@ function storyLoad(moduleScripts: Script[], storyScripts: Script[]) {
 function start(moduleScripts: Script[], storyScripts: Script[]) {
   moduleScripts.forEach((script) => {
     evalLogger.info(`evaluating moduleScripts element named ${script.path}`);
-    Scripting.evalJavaScript(script.content);
+    const indirectEval = eval;
+    indirectEval(script.content);
   });
 
   // primarily deals with StoryInterface Dom modifications
