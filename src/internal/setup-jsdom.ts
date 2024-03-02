@@ -3,12 +3,8 @@ import { getLogger } from '../logger';
 
 const logger = getLogger();
 
-// define this here so that we only ever dynamically populate KEYS once.
-const KEYS = [];
-
-export function setupJsdom(html?: string, options?: ConstructorOptions) {
+export function setupJsdom(html?: string, options: ConstructorOptions = {}) {
   logger.debug(`setupJsdom(${html}, ${JSON.stringify(options)})`);
-  KEYS.length = 0;
   // set a default url if we don't get one - otherwise things explode when we copy localstorage keys
   if (!('url' in options)) {
     Object.assign(options, { url: 'http://localhost:3000' });
@@ -28,13 +24,12 @@ export function setupJsdom(html?: string, options?: ConstructorOptions) {
   // based on the jsdom version. filter out internal methods as well as anything
   // that node already defines
 
-  if (KEYS.length === 0) {
-    KEYS.push(
-      ...Object.getOwnPropertyNames(window).filter(
-        (k) => !k.startsWith('_') && !(k in global)
-      )
-    );
-  }
+  const KEYS = [];
+  KEYS.push(
+    ...Object.getOwnPropertyNames(window).filter(
+      (k) => !k.startsWith('_') && !(k in global)
+    )
+  );
   // eslint-disable-next-line no-return-assign
   KEYS.forEach((key) => (global[key] = window[key]));
 
