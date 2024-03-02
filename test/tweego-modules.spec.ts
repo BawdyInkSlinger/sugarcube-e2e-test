@@ -2,7 +2,6 @@ import { SugarcubeParser, Selector } from '../src';
 
 const passageText = `
 <<script>>
-    console.log(window.NodeList);
     const easing = 'easeOutQuart';
     anime({
         targets: "p",
@@ -16,7 +15,7 @@ const passageText = `
 `
 
 describe('Tweego Modules', () => {
-  fit('can load and use anime.js when targets match multiple elements', async () => {
+  it('can load and use anime.js when targets match multiple elements', async () => {
     const sugarcubeParser = await SugarcubeParser.create({
       passages: [
         {

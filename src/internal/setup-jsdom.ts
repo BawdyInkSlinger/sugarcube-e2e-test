@@ -9,13 +9,15 @@ let jsdomInstanceNumber = 0;
 // { runScripts: 'dangerously' }
 // This property will be initialized without that option so its `window` can be used
 // in Object.getOwnPropertyNames(window) as a workaround to that bug.
+// Note: pretendToBeVisual: true is needed or anime.js would error on load with:
+// requestAnimationFrame is not defined
 let workaroundForJsdomGetOwnPropertyNamesBug: JSDOM;
 
 export function setupJsdom(html?: string, options: ConstructorOptions = {}): JSDOMInstance {
   logger.debug(`setupJsdom(${html}, ${JSON.stringify(options)})`);
 
   if (workaroundForJsdomGetOwnPropertyNamesBug === undefined) {
-    workaroundForJsdomGetOwnPropertyNamesBug = new JSDOM('');
+    workaroundForJsdomGetOwnPropertyNamesBug = new JSDOM('', { pretendToBeVisual: true });
   }
 
   // set a default url if we don't get one - otherwise things explode when we copy localstorage keys
@@ -55,8 +57,6 @@ export function setupJsdom(html?: string, options: ConstructorOptions = {}): JSD
 
   // setup document / window / window.console
   global.document = document;
-
-  console.log(`Object.getOwnPropertyNames(window).filter((k) => k === "HTMLElement").length`, Object.getOwnPropertyNames(window).filter((k) => k === "HTMLElement").length);
 
   return jsdom;
 }
