@@ -15,6 +15,7 @@ import { getLogger } from './logger';
 import { addToPrettyString } from './add-to-pretty-string';
 import { clearTimeouts } from './trigger-timeout';
 import jQueryFactory from 'jquery';
+import {} from 'node:path';
 
 const logger = getLogger('DEFAULT');
 const passagesLogger = getLogger('DEBUG_PASSAGES');
@@ -24,6 +25,8 @@ export type SugarcubeParserOptions = {
   passages: SimplePassage[];
   resourceLoader?: ResourceLoader | 'usable';
   customPassageLoadedHandler?: (debugNote: string) => Promise<void>;
+  moduleScripts?: string[];
+  sugarcubeScripts?: string[];
 };
 
 export class SugarcubeParser {
@@ -53,6 +56,8 @@ export class SugarcubeParser {
     passages,
     customPassageLoadedHandler = waitForPassageEnd,
     resourceLoader = 'usable',
+    moduleScripts = [],
+    sugarcubeScripts = [],
   }: SugarcubeParserOptions): Promise<SugarcubeParser> {
     clearTimeouts(); // This could prevent parallel test runs?
     setPassageLoadedHandler(customPassageLoadedHandler);
@@ -146,23 +151,16 @@ export class SugarcubeParser {
     resetGlobal('initializeStory', initializeStory);
     resetGlobal('runStoryInit', runStoryInit);
 
-    const moduleFiles = await glob(['modules/*.js'], {
-      ignore: 'node_modules/**',
-    });
     const modules = await Promise.all(
-      moduleFiles.map(async (path) => {
+      moduleScripts.map(async (path) => {
         passagesLogger.debug(`Found moduleFile: ${path}`);
 
         return { path, content: (await fs.readFile(path)).toString() };
       })
     );
 
-    const jsFiles = await glob(
-      ['exposed_sugarcube_variables/*.js', 'story/*.js'],
-      { ignore: 'node_modules/**' }
-    );
     const javascripts = await Promise.all(
-      jsFiles.map(async (path) => {
+      sugarcubeScripts.map(async (path) => {
         passagesLogger.debug(`Found jsFile: ${path}`);
 
         return { path, content: (await fs.readFile(path)).toString() };

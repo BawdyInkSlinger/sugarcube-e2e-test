@@ -12,7 +12,7 @@ const passageText = `
 <</script>>
 <p>p1</p>
 <p>p2</p>
-`
+`;
 
 describe('Tweego Modules', () => {
   it('can load and use anime.js when targets match multiple elements', async () => {
@@ -24,6 +24,7 @@ describe('Tweego Modules', () => {
           text: passageText,
         },
       ],
+      moduleScripts: ['./test/anime.js'],
     });
 
     await sugarcubeParser.testController
