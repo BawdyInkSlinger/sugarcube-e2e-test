@@ -119,4 +119,109 @@ describe('SugarcubeParser', () => {
 
     expect(lastUrl).toEqual(`https://www.google.com/`);
   });
+
+  it('has access to tags() in the passage', async () => {
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'SugarcubeParser title',
+          tags: ['SugarcubeParser tag'],
+          text: `<<print tags()>>`,
+        },
+      ],
+    });
+
+    await sugarcubeParser.testController
+      .goto('SugarcubeParser title')
+      .expect(Selector(`.passage`).innerText)
+      .contains(`SugarcubeParser tag`);
+  });
+  
+  it('has access to tags() in :passageend', async () => {
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'SugarcubeParser title',
+          tags: ['SugarcubeParser tag'],
+          text: `<span id="tag-placeholder"></span>`,
+        },
+        {
+          title: 'SugarcubeParser script',
+          tags: ['script'],
+          text: `
+          $(document).on(':passageend', function (ev) {
+            $("#tag-placeholder").append(tags());
+          });`,
+        },
+      ],
+    });
+
+    await sugarcubeParser.testController
+      .goto('SugarcubeParser title')
+      .expect(Selector(`#tag-placeholder`).innerText)
+      .eql(`SugarcubeParser tag`);
+  });
+
+  describe(`resetState`, () => {
+    it(`retains access to the tags() function`, async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'SugarcubeParser title',
+            tags: ['SugarcubeParser tag'],
+            text: `<<print tags()>>`,
+          },
+        ],
+      });
+
+      sugarcubeParser.resetState('foo=bar');
+
+      await sugarcubeParser.testController
+        .goto('SugarcubeParser title')
+        .expect(Selector(`.passage`).innerText)
+        .contains(`SugarcubeParser tag`);
+    });
+  });
+
+  describe(`assignStateAndReload`, () => {
+    it(`retains access to the tags() function`, async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'SugarcubeParser title',
+            tags: ['SugarcubeParser tag'],
+            text: `<<print tags()>>`,
+          },
+        ],
+      });
+
+      await sugarcubeParser.assignStateAndReload({}, `SugarcubeParser title`);
+      await sugarcubeParser.testController
+        .goto('SugarcubeParser title')
+        .expect(Selector(`.passage`).innerText)
+        .contains(`SugarcubeParser tag`);
+    });
+  });
+
+  describe(`resetState then assignStateAndReload`, () => {
+    it(`retains access to the tags() function`, async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'SugarcubeParser title',
+            tags: ['SugarcubeParser tag'],
+            text: `<<print tags()>>`,
+          },
+        ],
+      });
+
+      sugarcubeParser.resetState('foo=bar');
+      await sugarcubeParser.assignStateAndReload({}, `SugarcubeParser title`);
+
+      await sugarcubeParser.testController
+        .goto('SugarcubeParser title')
+        .expect(Selector(`.passage`).innerText)
+        .contains(`SugarcubeParser tag`);
+    });
+  });
 });
