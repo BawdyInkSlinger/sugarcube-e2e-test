@@ -1,7 +1,7 @@
 import { JSDOM, ConstructorOptions } from 'jsdom';
 import { getLogger } from '../logger';
 
-export type JSDOMInstance = JSDOM & { jsdomInstanceNumber: number}
+export type JSDOMInstance = JSDOM & { jsdomInstanceNumber: number };
 const logger = getLogger();
 let jsdomInstanceNumber = 0;
 
@@ -13,11 +13,16 @@ let jsdomInstanceNumber = 0;
 // requestAnimationFrame is not defined
 let workaroundForJsdomGetOwnPropertyNamesBug: JSDOM;
 
-export function setupJsdom(html?: string, options: ConstructorOptions = {}): JSDOMInstance {
+export function setupJsdom(
+  html?: string,
+  options: ConstructorOptions = {}
+): JSDOMInstance {
   logger.debug(`setupJsdom(${html}, ${JSON.stringify(options)})`);
 
   if (workaroundForJsdomGetOwnPropertyNamesBug === undefined) {
-    workaroundForJsdomGetOwnPropertyNamesBug = new JSDOM('', { pretendToBeVisual: true });
+    workaroundForJsdomGetOwnPropertyNamesBug = new JSDOM('', {
+      pretendToBeVisual: true,
+    });
   }
 
   // set a default url if we don't get one - otherwise things explode when we copy localstorage keys
@@ -53,7 +58,6 @@ export function setupJsdom(html?: string, options: ConstructorOptions = {}): JSD
   document.isJSDOM = true;
   jsdomInstanceNumber++;
   jsdom.jsdomInstanceNumber = jsdomInstanceNumber;
-
 
   // setup document / window / window.console
   global.document = document;

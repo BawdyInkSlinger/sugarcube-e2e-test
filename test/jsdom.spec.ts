@@ -14,7 +14,6 @@ describe(`jsdom`, () => {
       pretendToBeVisual: false,
     });
 
-    window.eval(`requestAnimationFrame`);
     expect(window.requestAnimationFrame).toBeUndefined();
   });
 });

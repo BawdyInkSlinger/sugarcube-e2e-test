@@ -53,7 +53,8 @@ export const Macro = (() => {
     }
 
     try {
-      if (isObjectDefinition(def)) { // changed by BIS. Original: if (typeof def === 'object') {
+      if (isObjectDefinition(def)) {
+        // changed by BIS. Original: if (typeof def === 'object') {
 
         // Add the macro definition.
         //

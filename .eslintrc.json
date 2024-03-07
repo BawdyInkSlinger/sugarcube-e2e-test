@@ -36,6 +36,7 @@
     "quotes": ["off"],
     "no-plusplus": ["off"],
     "curly": ["error", "all"],
+    "prefer-promise-reject-errors": ["error"],
     "@typescript-eslint/no-misused-promises": [2],
     "@typescript-eslint/no-floating-promises": [2],
     "@typescript-eslint/no-empty-function": ["off"],

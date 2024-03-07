@@ -1,9 +1,7 @@
-import { LogLevel } from "../src";
-
 const logLevels = new Map<string, 'debug' | 'info' | 'warn' | 'error'>([
   ['DEFAULT', 'warn'],
   ['DEBUG_TRIGGER_TIMEOUT', 'warn'],
-  ['DEBUG_EVAL', 'info'],
+  ['DEBUG_EVAL', 'warn'],
   ['DEBUG_PASSAGES', 'warn'],
   ['DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES', 'warn'],
   ['DEBUG_SELECTOR_ENTER_LOG_MESSAGES', 'warn'],

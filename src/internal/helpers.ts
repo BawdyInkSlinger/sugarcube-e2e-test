@@ -324,7 +324,7 @@ export const {
     const $toggle = jQuery(document.createElement('button'));
     const $source = jQuery(document.createElement('pre'));
     const mesg = `${L10n.get('errorTitle')}: ${message || 'unknown error'}`;
-    
+
     console.warn(`${mesg}\n\t${source?.replace(/\n/g, '\n\t')}`);
 
     $toggle

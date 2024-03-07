@@ -226,25 +226,25 @@ export const Config = (() => {
       // legacy
       // Die if deprecated state history settings are accessed.
       get mode() {
-        // Changed by BIS to prevent reset-global.ts logs from throwing an error. 
+        // Changed by BIS to prevent reset-global.ts logs from throwing an error.
         // Original: throw new Error(_errHistoryModeDeprecated);
         console.error(_errHistoryModeDeprecated);
         return;
       },
       set mode(_) {
-        // Changed by BIS to prevent reset-global.ts logs from throwing an error. 
+        // Changed by BIS to prevent reset-global.ts logs from throwing an error.
         // Original: throw new Error(_errHistoryModeDeprecated);
         console.error(_errHistoryModeDeprecated);
         return;
       },
       get tracking() {
-        // Changed by BIS to prevent reset-global.ts logs from throwing an error. 
+        // Changed by BIS to prevent reset-global.ts logs from throwing an error.
         // Original: throw new Error(_errHistoryTrackingDeprecated);
         console.error(_errHistoryTrackingDeprecated);
         return;
       },
       set tracking(_) {
-        // Changed by BIS to prevent reset-global.ts logs from throwing an error. 
+        // Changed by BIS to prevent reset-global.ts logs from throwing an error.
         // Original: throw new Error(_errHistoryTrackingDeprecated);
         console.error(_errHistoryTrackingDeprecated);
         return;

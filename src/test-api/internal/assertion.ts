@@ -196,7 +196,10 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
           );
           const matches = splitMatches(actualValue + '', re);
           if (matches.length > 1) {
-            cause.message = `\n  Expected:\n${highlightMatches(matches, chalk.bgRed)}\n  To NOT match:\n${re}`;
+            cause.message = `\n  Expected:\n${highlightMatches(
+              matches,
+              chalk.bgRed
+            )}\n  To NOT match:\n${re}`;
             // console.log($(`.passage main`).html());
             // console.log(`actualValue`, JSON.stringify(actualValue));
             // console.log(document.toPrettyString({includeHeadElement: false,
@@ -383,8 +386,8 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
                 const color = change.added
                   ? chalk.bgGreen
                   : change.removed
-                  ? chalk.bgRed
-                  : (x: string): string => x;
+                    ? chalk.bgRed
+                    : (x: string): string => x;
 
                 const coloredText = color(change.value);
                 return coloredText;
