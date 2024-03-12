@@ -1,5 +1,5 @@
 const logLevels = new Map<string, 'debug' | 'info' | 'warn' | 'error'>([
-  ['DEFAULT', 'warn'],
+  ['DEFAULT', 'info'],
   ['DEBUG_TRIGGER_TIMEOUT', 'warn'],
   ['DEBUG_EVAL', 'warn'],
   ['DEBUG_PASSAGES', 'warn'],

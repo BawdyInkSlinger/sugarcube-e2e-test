@@ -1,4 +1,5 @@
 import { createLogger, Logger, format, transports } from 'winston';
+import { logPrefix } from './log-prefix';
 
 export type Category =
   | 'DEFAULT'
@@ -38,10 +39,10 @@ export const getLogger = (categoryName: Category = 'DEFAULT'): Logger => {
   return loggerPool.get(configuredLevel ?? 'debug');
 };
 
-const buildLoggerOptions = (configuredLevel?: LogLevel) => {
+const buildLoggerOptions = (configuredLevel: LogLevel) => {
   return {
-    level: configuredLevel ?? 'debug',
-    format: format.simple(),
+    level: configuredLevel,
+    format: format.combine(logPrefix(), format.simple()),
     transports: new transports.Console(),
     exceptionHandlers: new transports.Console(),
     rejectionHandlers: new transports.Console(),
