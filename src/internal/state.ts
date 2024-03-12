@@ -20,7 +20,7 @@ import { StorageContainer } from './fakes/storage';
 import { TempVariablesContainer } from './fakes/tempvariables';
 import { PRNGWrapper } from './prngwrapper';
 import { objectDefineProperties } from './utils/object-define-properties';
-import { getLogger } from '../logger';
+import { getLogger } from '../logging/logger';
 import { clone } from './helpers';
 
 const logger = getLogger('DEFAULT');

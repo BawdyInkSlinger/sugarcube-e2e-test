@@ -4,7 +4,7 @@ import { AssertionOptions } from './assertion-options';
 import ReExecutablePromise from './re-executable-promise';
 import { testController, TestControllerPromise } from '../test-controller';
 import _ from 'lodash';
-import { getLogger } from '../../logger';
+import { getLogger } from '../../logging/logger';
 import { splitMatches } from './split-matches';
 import { highlightMatches } from './highlight-matches';
 

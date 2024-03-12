@@ -1,7 +1,7 @@
 import { AssertionApi, PromiseAssertions } from './internal/assertion';
 import { Selector } from './selector';
 import { getPassageLoadedHandler } from './passage-loaded-handler';
-import { getLogger } from '../logger';
+import { getLogger } from '../logging/logger';
 
 // added by BIS:
 const logger = getLogger('DEFAULT');

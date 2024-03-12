@@ -1,4 +1,4 @@
-import { getLogger } from '../logger';
+import { getLogger } from '../logging/logger';
 
 const logger = getLogger('DEFAULT');
 const enterLogger = getLogger('DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES');

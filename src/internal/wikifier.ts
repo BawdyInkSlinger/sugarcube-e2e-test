@@ -21,7 +21,7 @@ import { errorPrologRegExp } from './alert';
 import { Story } from './fakes/story';
 import { TempStateContainer } from './fakes/tempstate';
 import { Node } from './fakes/node';
-import { getLogger } from '../logger';
+import { getLogger } from '../logging/logger';
 import { convertBreaks } from './helpers';
 import { objectDefineProperties } from './utils/object-define-properties';
 import { Util } from './util';

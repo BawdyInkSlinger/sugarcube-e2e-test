@@ -5,7 +5,7 @@
  */
 
 import { Branded } from './internal/utils/branded';
-import { getLogger } from './logger';
+import { getLogger } from './logging/logger';
 
 const logger = getLogger('DEBUG_TRIGGER_TIMEOUT');
 

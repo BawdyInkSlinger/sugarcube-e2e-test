@@ -1,4 +1,4 @@
-import { getLogger } from '../logger';
+import { getLogger } from '../logging/logger';
 import { innerText } from './internal/inner-text/inner-text';
 import { NodeSnapshot } from './internal/node-snapshot';
 import ReExecutablePromise from './internal/re-executable-promise';

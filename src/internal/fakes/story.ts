@@ -8,7 +8,7 @@ import { Passage, PassageClass } from './passage';
 import { SessionContainer } from './session';
 import { StorageContainer } from './storage';
 import { SimplePassage } from '../declarations/unofficial/simple-passage';
-import { getLogger } from '../../logger';
+import { getLogger } from '../../logging/logger';
 import { L10n } from '../l10n';
 import { Util } from '../util';
 

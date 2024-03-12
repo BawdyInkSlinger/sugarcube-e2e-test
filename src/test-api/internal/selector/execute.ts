@@ -1,4 +1,4 @@
-import { getLogger } from '../../../logger';
+import { getLogger } from '../../../logging/logger';
 import { selectorToStringBuilder } from './selector-to-string-builder';
 
 const executionLogger = getLogger('DEBUG_SELECTOR_EXECUTION_LOG_MESSAGES');

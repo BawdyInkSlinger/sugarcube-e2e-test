@@ -10,7 +10,7 @@ import { objectCreateNull } from '../utils/object-create-null';
 import { TempStateContainer } from './tempstate';
 import { triggerTimeout } from '../../trigger-timeout';
 import { Util } from '../util';
-import { getLogger } from '../../logger';
+import { getLogger } from '../../logging/logger';
 import { setDisplayTitle } from '../helpers';
 
 /* eslint-disable no-var */

@@ -1,5 +1,5 @@
 import { JSDOM, ConstructorOptions } from 'jsdom';
-import { getLogger } from '../logger';
+import { getLogger } from '../logging/logger';
 
 export type JSDOMInstance = JSDOM & { jsdomInstanceNumber: number };
 const logger = getLogger();

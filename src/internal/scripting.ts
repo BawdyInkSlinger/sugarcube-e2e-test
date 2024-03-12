@@ -15,7 +15,7 @@ import { Story } from './fakes/story';
 import { Patterns } from './patterns';
 import { Util } from './util';
 import { objectDefineProperties } from './utils/object-define-properties';
-import { getLogger } from '../logger';
+import { getLogger } from '../logging/logger';
 import { stringFrom } from './helpers';
 
 const evalLogger = getLogger('DEBUG_EVAL');

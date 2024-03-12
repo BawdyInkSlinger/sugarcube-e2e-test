@@ -1,4 +1,4 @@
-import { Category, getLogger } from '../../../logger';
+import { Category, getLogger } from '../../../logging/logger';
 import { DataTable } from './data-table';
 import { handleElement } from './node-handlers/handle-element';
 import { handleText } from './node-handlers/handle-text';

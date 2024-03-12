@@ -52,7 +52,8 @@
     "chalk": "4.1.2",
     "console-table-printer": "file:.yalc/console-table-printer",
     "lodash": "4.17.21",
-    "seedrandom": "2.3.3"
+    "seedrandom": "2.3.3",
+    "stacktrace-parser": "^0.1.10"
   },
   "peerDependencies": {
     "console-table-printer": "file:.yalc/console-table-printer",
