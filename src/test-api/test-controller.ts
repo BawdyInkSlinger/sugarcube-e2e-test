@@ -379,10 +379,10 @@ export const testController: TestController = {
       const pageLoadPromise = getPassageLoadedHandler()(
         `click ${selector.toString()}`
       );
-      logger.debug(`$(${selector.toString()}).trigger('click');`);
+      logger.debug(`Pre $(${selector.toString()}).trigger('click');`);
       selector.execute().trigger('click');
       logger.debug(
-        `finished $(${selector.toString()}).trigger('click'); Waiting for pageLoadPromise`
+        `Post $(${selector.toString()}).trigger('click'); Waiting for pageLoadPromise`
       );
       return pageLoadPromise;
     });
