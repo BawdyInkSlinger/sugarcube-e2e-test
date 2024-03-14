@@ -5,7 +5,7 @@ const enterLogger = getLogger('DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES');
 
 export function waitForPassageEnd(debugNote = '') {
   enterLogger.debug(
-    `waitForPassageEnd: entering waitForPageLoad debugNote=${debugNote}`
+    `waitForPassageEnd: entering waitForPassageEnd debugNote=${debugNote}`
   );
   return Promise.race([
     new Promise<void>((resolve) => {
