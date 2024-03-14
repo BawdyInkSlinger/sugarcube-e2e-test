@@ -42,7 +42,7 @@ export function triggerTimeout<Params extends unknown[]>(
     cancelTimeout: () => {
       clearTimeout(timeoutId);
       logger.debug(
-        `${new Date().getTime()} triggerTimeout: trigger :cleartimeout for '${context.replaceAll(
+        `triggerTimeout: trigger :cleartimeout for '${context.replaceAll(
           /\r/g,
           ''
         )}' delay='${delay}'`
@@ -68,7 +68,7 @@ export function triggerTimeout<Params extends unknown[]>(
       }
     } finally {
       logger.debug(
-        `${new Date().getTime()} triggerTimeout: trigger :completetimeout for '${context.replaceAll(
+        `triggerTimeout: trigger :completetimeout for '${context.replaceAll(
           /\r/g,
           ''
         )}' delay='${delay}'`
@@ -79,7 +79,7 @@ export function triggerTimeout<Params extends unknown[]>(
   }
 
   logger.debug(
-    `${new Date().getTime()} triggerTimeout: trigger :createtimeout for '${context.replaceAll(
+    `triggerTimeout: trigger :createtimeout for '${context.replaceAll(
       /\r/g,
       ''
     )}' delay='${delay}'`

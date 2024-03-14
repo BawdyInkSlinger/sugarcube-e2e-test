@@ -146,7 +146,7 @@ export const Selector: SelectorFactory = (
   // options?: SelectorOptions
 ): Selector => {
   enterLogger.debug(
-    `${new Date().getTime()} selector: entering init='${init}'`
+    `selector: entering init='${init}'`
   );
 
   const executionSteps: ExecutionStep[] = [
@@ -157,7 +157,7 @@ export const Selector: SelectorFactory = (
     execute: () => selectorExecute(executionSteps),
     innerText: ReExecutablePromise.fromFn(() => {
         executionLogger.debug(
-          `${new Date().getTime()} selector: innerText on '${selectorToStringBuilder(executionSteps)}'`
+          `selector: innerText on '${selectorToStringBuilder(executionSteps)}'`
         );
       return innerText(selectorExecute(executionSteps)[0]);
     }),
@@ -169,7 +169,7 @@ export const Selector: SelectorFactory = (
     ),
     withText: function (text: string): Selector {
       enterLogger.debug(
-        `${new Date().getTime()} selector: entering withText init='${init}' text='${text}'`
+        `selector: entering withText init='${init}' text='${text}'`
       );
       executionSteps.push({
         action: 'jQuerySelector',

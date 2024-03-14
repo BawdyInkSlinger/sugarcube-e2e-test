@@ -327,7 +327,7 @@ export const testController: TestController = {
     temporaryVariables?: unknown
   ): TestControllerPromise {
     enterLogger.debug(
-      `${new Date().getTime()} testController: entering goto '${passageTitle}'`
+      `testController: entering goto '${passageTitle}'`
     );
 
     return Object.assign(
@@ -369,11 +369,11 @@ export const testController: TestController = {
     selector: Selector
   ): TestControllerPromise {
     enterLogger.debug(
-      `${new Date().getTime()} testController: entering click selector='${selector}'`
+      `testController: entering click selector='${selector}'`
     );
     const asyncClick = thisAsPromise(this).then<void>(() => {
       enterLogger.debug(
-        `${new Date().getTime()} testController: entering asyncClick selector='${selector}'`
+        `testController: entering asyncClick selector='${selector}'`
       );
 
       const pageLoadPromise = getPassageLoadedHandler()(
@@ -394,7 +394,7 @@ export const testController: TestController = {
     actual: A | Promise<A>
   ): AssertionApi<A> {
     enterLogger.debug(
-      `${new Date().getTime()} testController: entering expect actual=`,
+      `testController: entering expect actual=`,
       actual
     );
     if (!(actual instanceof Promise)) {
@@ -409,7 +409,7 @@ export const testController: TestController = {
     options: Parameters<Document['toPrettyString']>[0]
   ): TestControllerPromise {
     enterLogger.debug(
-      `${new Date().getTime()} testController: entering logDocument options=`,
+      `testController: entering logDocument options=`,
       options
     );
 
@@ -426,7 +426,7 @@ export const testController: TestController = {
     ...params: unknown[]
   ): TestControllerPromise {
     enterLogger.debug(
-      `${new Date().getTime()} testController: entering log params=${JSON.stringify(
+      `testController: entering log params=${JSON.stringify(
         params
       )}`
     );
@@ -449,7 +449,7 @@ export const testController: TestController = {
     );
 
     enterLogger.debug(
-      `${new Date().getTime()} testController: entering wait(${millis}, '${resolveOrReject}')`
+      `testController: entering wait(${millis}, '${resolveOrReject}')`
     );
 
     return Object.assign(
@@ -471,10 +471,10 @@ export const testController: TestController = {
 
 const thisAsPromise = (self: Promise<void> | TestController) => {
   if (self instanceof Promise) {
-    thisAsPromiseLogger.debug(`${new Date().getTime()} thisPromise: Promise`);
+    thisAsPromiseLogger.debug(`thisPromise: Promise`);
     return self;
   } else {
-    thisAsPromiseLogger.debug(`${new Date().getTime()} thisPromise: this`);
+    thisAsPromiseLogger.debug(`thisPromise: this`);
     return Promise.resolve();
   }
 };
@@ -486,7 +486,7 @@ const wait = (
   const cause = new Error('Timeout');
   return new Promise<void>((resolve, reject) => {
     enterLogger.debug(
-      `${new Date().getTime()} testController: entering waiting ${millis} seconds`
+      `testController: entering waiting ${millis} seconds`
     );
     let impl = resolve;
     if (resolveOrReject === 'reject') {

@@ -176,7 +176,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
   ): TestControllerPromise<void> {
     const cause = new Error();
     enterLogger.debug(
-      `${new Date().getTime()} PromiseAssertions: entering notMatch this.actual=${
+      `PromiseAssertions: entering notMatch this.actual=${
         this.actual
       }`
     );
@@ -184,7 +184,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
       this.currentPromise
         .then(() => {
           logger.debug(
-            `${new Date().getTime()} PromiseAssertions: resolving notMatch then regexp='${re}' this.actual=${
+            `PromiseAssertions: resolving notMatch then regexp='${re}' this.actual=${
               this.actual
             }`
           );
@@ -192,7 +192,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
         })
         .then((actualValue: A) => {
           logger.debug(
-            `${new Date().getTime()} PromiseAssertions: resolving notMatch then regexp='${re}' actualValue=${actualValue}`
+            `PromiseAssertions: resolving notMatch then regexp='${re}' actualValue=${actualValue}`
           );
           const matches = splitMatches(actualValue + '', re);
           if (matches.length > 1) {
@@ -220,7 +220,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
   ): TestControllerPromise<void> {
     const cause = new Error();
     enterLogger.debug(
-      `${new Date().getTime()} PromiseAssertions: entering contains needle='${needle}' this.actual='${
+      `PromiseAssertions: entering contains needle='${needle}' this.actual='${
         this.actual
       }'`
     );
@@ -228,13 +228,13 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
       this.currentPromise
         .then(() => {
           logger.debug(
-            `${new Date().getTime()} PromiseAssertions: resolving contains then needle='${needle}' this.actual='${
+            `PromiseAssertions: resolving contains then needle='${needle}' this.actual='${
               this.actual
             }'`
           );
           if (this.actual instanceof ReExecutablePromise) {
             logger.debug(
-              `${new Date().getTime()} PromiseAssertions: re-executing!='${needle}' this.actual='${
+              `PromiseAssertions: re-executing!='${needle}' this.actual='${
                 this.actual
               }'`
             );
@@ -245,7 +245,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
         })
         .then((actualValue: A) => {
           logger.debug(
-            `${new Date().getTime()} PromiseAssertions: resolving contains then needle='${needle}' actualValue='${actualValue}'`
+            `PromiseAssertions: resolving contains then needle='${needle}' actualValue='${actualValue}'`
           );
           if (
             typeof actualValue === 'string' &&
@@ -277,7 +277,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
   ): TestControllerPromise<void> {
     const cause = new Error();
     enterLogger.debug(
-      `${new Date().getTime()} PromiseAssertions: entering notContains needle='${needle}' this.actual='${
+      `PromiseAssertions: entering notContains needle='${needle}' this.actual='${
         this.actual
       }'`
     );
@@ -285,13 +285,13 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
       this.currentPromise
         .then(() => {
           logger.debug(
-            `${new Date().getTime()} PromiseAssertions: resolving notContains then needle='${needle}' this.actual='${
+            `PromiseAssertions: resolving notContains then needle='${needle}' this.actual='${
               this.actual
             }'`
           );
           if (this.actual instanceof ReExecutablePromise) {
             logger.debug(
-              `${new Date().getTime()} PromiseAssertions: re-executing!='${needle}' this.actual='${
+              `PromiseAssertions: re-executing!='${needle}' this.actual='${
                 this.actual
               }'`
             );
@@ -302,7 +302,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
         })
         .then((actualValue: A) => {
           logger.debug(
-            `${new Date().getTime()} PromiseAssertions: resolving notContains then needle='${needle}' actualValue='${actualValue}'`
+            `PromiseAssertions: resolving notContains then needle='${needle}' actualValue='${actualValue}'`
           );
           if (
             typeof actualValue === 'string' &&
@@ -342,7 +342,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
   ): TestControllerPromise<void> {
     const cause = new Error();
     enterLogger.debug(
-      `${new Date().getTime()} PromiseAssertions: entering eql expected='${expected}' this.actual='${
+      `PromiseAssertions: entering eql expected='${expected}' this.actual='${
         this.actual
       }'`
     );
@@ -350,13 +350,13 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
       this.currentPromise
         .then(() => {
           logger.debug(
-            `${new Date().getTime()} PromiseAssertions: resolving eql then expected='${expected}' this.actual='${
+            `PromiseAssertions: resolving eql then expected='${expected}' this.actual='${
               this.actual
             }'`
           );
           if (this.actual instanceof ReExecutablePromise) {
             logger.debug(
-              `${new Date().getTime()} PromiseAssertions: re-executing!='${expected}' this.actual='${
+              `PromiseAssertions: re-executing!='${expected}' this.actual='${
                 this.actual
               }'`
             );
@@ -367,7 +367,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
         })
         .then((actualValue: A) => {
           logger.debug(
-            `${new Date().getTime()} PromiseAssertions: resolving eql then expected='${expected}' actualValue='${actualValue}'`
+            `PromiseAssertions: resolving eql then expected='${expected}' actualValue='${actualValue}'`
           );
           if (actualValue !== expected) {
             // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#escape_sequences
@@ -407,7 +407,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
   ok(options?: AssertionOptions): TestControllerPromise<void> {
     const cause = new Error();
     enterLogger.debug(
-      `${new Date().getTime()} PromiseAssertions: entering ok this.actual=${
+      `PromiseAssertions: entering ok this.actual=${
         this.actual
       }`
     );
@@ -415,7 +415,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
       this.currentPromise
         .then(() => {
           logger.debug(
-            `${new Date().getTime()} PromiseAssertions: resolving ok then this.actual=${
+            `PromiseAssertions: resolving ok then this.actual=${
               this.actual
             }`
           );
@@ -427,7 +427,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
         })
         .then((actualValue: A) => {
           logger.debug(
-            `${new Date().getTime()} PromiseAssertions: resolving ok then actualValue=${actualValue}`
+            `PromiseAssertions: resolving ok then actualValue=${actualValue}`
           );
           if (!actualValue) {
             cause.message = `\n  Expected:\nTruthy\n  Actual:\n${actualValue}`;
@@ -442,7 +442,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
   notOk(options?: AssertionOptions): TestControllerPromise<void> {
     const cause = new Error();
     enterLogger.debug(
-      `${new Date().getTime()} PromiseAssertions: entering notOk this.actual=${
+      `PromiseAssertions: entering notOk this.actual=${
         this.actual
       }`
     );
@@ -450,7 +450,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
       this.currentPromise
         .then(() => {
           logger.debug(
-            `${new Date().getTime()} PromiseAssertions: resolving notOk then this.actual=${
+            `PromiseAssertions: resolving notOk then this.actual=${
               this.actual
             }`
           );
@@ -458,7 +458,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
         })
         .then((actualValue: A) => {
           logger.debug(
-            `${new Date().getTime()} PromiseAssertions: resolving notOk then actualValue=${actualValue}`
+            `PromiseAssertions: resolving notOk then actualValue=${actualValue}`
           );
           if (actualValue) {
             cause.message = `\n  Expected:\nFalsy\n  Actual:\n${actualValue}`;
