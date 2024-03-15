@@ -326,9 +326,7 @@ export const testController: TestController = {
     passageTitle: string,
     temporaryVariables?: unknown
   ): TestControllerPromise {
-    enterLogger.debug(
-      `testController: entering goto '${passageTitle}'`
-    );
+    enterLogger.debug(`testController: entering goto '${passageTitle}'`);
 
     return Object.assign(
       thisAsPromise(this).then(() => {
@@ -368,9 +366,7 @@ export const testController: TestController = {
     this: Promise<void> | TestController,
     selector: Selector
   ): TestControllerPromise {
-    enterLogger.debug(
-      `testController: entering click selector='${selector}'`
-    );
+    enterLogger.debug(`testController: entering click selector='${selector}'`);
     const asyncClick = thisAsPromise(this).then<void>(() => {
       enterLogger.debug(
         `testController: entering asyncClick selector='${selector}'`
@@ -393,10 +389,7 @@ export const testController: TestController = {
     this: Promise<void> | TestController,
     actual: A | Promise<A>
   ): AssertionApi<A> {
-    enterLogger.debug(
-      `testController: entering expect actual=`,
-      actual
-    );
+    enterLogger.debug(`testController: entering expect actual=`, actual);
     if (!(actual instanceof Promise)) {
       actual = Promise.resolve(actual);
     }
@@ -408,10 +401,7 @@ export const testController: TestController = {
     this: Promise<void> | TestController,
     options: Parameters<Document['toPrettyString']>[0]
   ): TestControllerPromise {
-    enterLogger.debug(
-      `testController: entering logDocument options=`,
-      options
-    );
+    enterLogger.debug(`testController: entering logDocument options=`, options);
 
     return Object.assign(
       thisAsPromise(this).then(() => {
@@ -426,9 +416,7 @@ export const testController: TestController = {
     ...params: unknown[]
   ): TestControllerPromise {
     enterLogger.debug(
-      `testController: entering log params=${JSON.stringify(
-        params
-      )}`
+      `testController: entering log params=${JSON.stringify(params)}`
     );
 
     return Object.assign(
@@ -455,12 +443,9 @@ export const testController: TestController = {
     return Object.assign(
       thisAsPromise(this).then(() => {
         return new Promise<void>((resolve, reject) => {
-          let impl = resolve;
-          if (resolveOrReject === 'reject') {
-            impl = () => {
-              reject(cause);
-            };
-          }
+          const impl = () => {
+            return resolveOrReject === 'resolve' ? resolve() : reject(cause);
+          };
           setTimeout(impl, millis);
         });
       }),
@@ -485,9 +470,7 @@ const wait = (
 ): Promise<void> => {
   const cause = new Error('Timeout');
   return new Promise<void>((resolve, reject) => {
-    enterLogger.debug(
-      `testController: entering waiting ${millis} seconds`
-    );
+    enterLogger.debug(`testController: entering waiting ${millis} seconds`);
     let impl = resolve;
     if (resolveOrReject === 'reject') {
       impl = () => {
