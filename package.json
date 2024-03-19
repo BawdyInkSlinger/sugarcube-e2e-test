@@ -59,6 +59,12 @@
     "console-table-printer": "file:.yalc/console-table-printer",
     "jquery": "^3.7.1",
     "jsdom": "^24.0.0",
-    "winston": "^3.12.0"
+    "winston": "^3.12.0",
+    "jasmine": "^5"
+  },
+  "peerDependenciesMeta": {
+    "jasmine": {
+        "optional": true
+    }
   }
 }

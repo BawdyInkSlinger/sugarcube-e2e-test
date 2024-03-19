@@ -9,5 +9,6 @@
       "path": "./tsconfig.src.json"
     }
   ],
-  "include": ["./**/*.spec.ts", "./test/**/*.ts"]
+  "include": ["./**/*.spec.ts", "./test/**/*.ts"],
+  "exclude": ["./**/sugarcube-testapi.reference.d.ts"]
 }

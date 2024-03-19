@@ -1381,13 +1381,11 @@ Macro.add(['button', 'link'], {
           this.payload[0].contents !== ''
             ? () =>{ 
                 const result = Wikifier.wikifyEval(this.payload[0].contents.trim());
-                jQuery.event.trigger( ':clickdone');
                 return result;
             } : null,
           passage != null // lazy equality for null
             ? () => {
                 const result = Engine.play(passage);
-                jQuery.event.trigger( ':clickdone');
                 return result;
             } : null
         )

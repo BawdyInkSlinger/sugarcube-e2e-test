@@ -4,28 +4,32 @@ import { promiseWithTimeout } from './promise-with-timeout';
 const logger = getLogger('DEFAULT');
 const enterLogger = getLogger('DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES');
 
-export function waitForPassageEnd(debugNote = '', timeoutMillis = 2000) {
+export function waitForClickEnd(debugNote = '', timeoutMillis = 2000) {
   const cause = new Error(
     `Timeout after ${timeoutMillis}ms. debugNote=${debugNote}`
   );
   enterLogger.debug(
-    `waitForPassageEnd: entering waitForPassageEnd debugNote=${debugNote}`
+    `waitForClickEnd: entering waitForClickEnd debugNote=${debugNote}`
   );
   return promiseWithTimeout(
     timeoutMillis,
     new Promise<void>((resolve) => {
-      $(document).one(':passageend', function () {
+      setTimeout(() => {
         logger.debug(
-          `waitForPassageEnd: resolving waitForPassageEnd :passageend debugNote=${debugNote}`
+          `waitForClickEnd: resolving waitForClickEnd :passageend debugNote=${debugNote}`
         );
         resolve();
-      });
+      }, 1); // wait until the effects of the click render
     })
   ).then(
     () => {
       logger.debug(
-        `waitForPassageEnd: resolving waitForPassageEnd then debugNote=${debugNote}`
+        `waitForClickEnd: resolving waitForClickEnd then debugNote=${debugNote}`
       );
+    },
+    (reason) => {
+      reason.cause = cause;
+      throw reason;
     }
   );
 }

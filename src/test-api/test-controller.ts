@@ -1,7 +1,9 @@
 import { AssertionApi, PromiseAssertions } from './internal/assertion';
 import { Selector } from './selector';
-import { getPassageLoadedHandler } from './passage-loaded-handler';
 import { getLogger } from '../logging/logger';
+import { ClickActionOptions } from './internal/click-action-options';
+import { buildWaitStrategy } from './wait-strategy';
+import { GotoActionOptions } from './internal/goto-action-options';
 
 // added by BIS:
 const logger = getLogger('DEFAULT');
@@ -25,11 +27,11 @@ export interface TestController {
   // ): TestControllerPromise;
   click(
     selector: // | string
-    Selector
+    Selector,
     // | NodeSnapshot
     // | SelectorPromise,
     // | ((...args: any[]) => Node | Node[] | NodeList | HTMLCollection),
-    // options?: ClickActionOptions
+    options?: ClickActionOptions
   ): TestControllerPromise;
   // rightClick(
   //   selector:
@@ -308,7 +310,8 @@ export interface TestController {
   // report(...args: any[]): TestControllerPromise;
   goto(
     passageTitle: string,
-    temporaryVariables?: unknown
+    temporaryVariables?: unknown,
+    options?: GotoActionOptions
   ): TestControllerPromise;
   logDocument(
     this: Promise<void> | TestController,
@@ -324,15 +327,20 @@ export const testController: TestController = {
   goto(
     this: Promise<void> | TestController,
     passageTitle: string,
-    temporaryVariables?: unknown
+    temporaryVariables?: unknown,
+    { waitFor: waitStrategy = ':passageend' }: GotoActionOptions = {}
   ): TestControllerPromise {
+    const cause = new Error(`goto error`);
     enterLogger.debug(`testController: entering goto '${passageTitle}'`);
 
     return Object.assign(
       thisAsPromise(this).then(() => {
-        const pageLoadPromise = getPassageLoadedHandler()(
+        const pageLoadPromise = buildWaitStrategy(waitStrategy)(
           `goto '${passageTitle}'`
-        );
+        ).catch((reason) => {
+          reason.cause = cause;
+          throw reason;
+        });
         if (temporaryVariables !== undefined) {
           logger.debug(
             `temporaryVariables=${JSON.stringify(temporaryVariables)}`
@@ -364,23 +372,29 @@ export const testController: TestController = {
 
   click(
     this: Promise<void> | TestController,
-    selector: Selector
+    selector: Selector,
+    { waitFor: waitStrategy = ':passageend' }: ClickActionOptions = {}
   ): TestControllerPromise {
+    const cause = new Error(`click error`);
     enterLogger.debug(`testController: entering click selector='${selector}'`);
     const asyncClick = thisAsPromise(this).then<void>(() => {
       enterLogger.debug(
-        `testController: entering asyncClick selector='${selector}'`
+        `testController: entering asyncClick selector='${selector}' to wait for ${waitStrategy}`
       );
 
-      const pageLoadPromise = getPassageLoadedHandler()(
-        `click ${selector.toString()}`
-      );
+      const waitUntil = buildWaitStrategy(waitStrategy)(
+        `click ${selector.toString()} and wait for ${waitStrategy}`
+      ).catch((reason) => {
+        reason.cause = cause;
+        throw reason;
+      });
+
       logger.debug(`Pre $(${selector.toString()}).trigger('click');`);
       selector.execute().trigger('click');
       logger.debug(
-        `Post $(${selector.toString()}).trigger('click'); Waiting for pageLoadPromise`
+        `Post $(${selector.toString()}).trigger('click'); Waiting for ${waitStrategy}`
       );
-      return pageLoadPromise;
+      return waitUntil;
     });
     return Object.assign(asyncClick, testController);
   },

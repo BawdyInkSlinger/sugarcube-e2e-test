@@ -2,15 +2,12 @@ import _ from 'lodash';
 import fs from 'fs/promises';
 import { DOMWindow, JSDOM, ResourceLoader } from 'jsdom';
 import seedrandom from 'seedrandom';
-import { glob } from 'glob';
 import { SimplePassage } from './internal/declarations/unofficial/simple-passage';
 import { setupJsdom } from './internal/setup-jsdom';
 import { resetGlobal } from './internal/reset-global';
 import { SugarCubeStoryVariables } from './internal/declarations/unofficial/userdata';
 import { SugarCubeTemporaryVariables } from './internal/declarations/twine-sugarcube-copy/userdata';
 import { TestController, testController } from './test-api/test-controller';
-import { waitForPassageEnd } from './test-api/wait-for-passage-end';
-import { setPassageLoadedHandler } from './test-api/passage-loaded-handler';
 import { getLogger } from './logging/logger';
 import { addToPrettyString } from './add-to-pretty-string';
 import { clearTimeouts } from './trigger-timeout';
@@ -24,7 +21,7 @@ const baseUrl = 'http://localhost';
 export type SugarcubeParserOptions = {
   passages: SimplePassage[];
   resourceLoader?: ResourceLoader | 'usable';
-  customPassageLoadedHandler?: (debugNote: string) => Promise<void>;
+//   customPassageLoadedHandler?: (debugNote: string) => Promise<void>;  TODO: turn TestController into a class so this (and timeoutMillis, for eg) can be passed into it?
   moduleScripts?: string[];
   sugarcubeScripts?: string[];
 };
@@ -54,13 +51,13 @@ export class SugarcubeParser {
 
   static async create({
     passages,
-    customPassageLoadedHandler = waitForPassageEnd,
+    // customPassageLoadedHandler = waitForPassageEnd,  TODO: turn TestController into a class so this (and timeoutMillis, for eg) can be passed into it?
     resourceLoader = 'usable',
     moduleScripts = [],
     sugarcubeScripts = [],
   }: SugarcubeParserOptions): Promise<SugarcubeParser> {
     clearTimeouts(); // This could prevent parallel test runs?
-    setPassageLoadedHandler(customPassageLoadedHandler);
+    // setPassageLoadedHandler(customPassageLoadedHandler); TODO: turn TestController into a class so this (and timeoutMillis, for eg) can be passed into it?
 
     const { jsdom, document, window } =
       await SugarcubeParser.load(resourceLoader);

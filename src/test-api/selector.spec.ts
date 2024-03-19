@@ -54,7 +54,9 @@ describe(`selector`, () => {
 
     await sugarcubeParser.testController
       .goto('passage title')
-      .click(Selector('.passage button').withText(`Button 2`))
+      .click(Selector('.passage button').withText(`Button 2`), {
+        waitFor: 'click end',
+      })
       .expect(Selector('.passage').innerText)
       .eql(`Destination`);
   });
@@ -81,7 +83,7 @@ describe(`selector`, () => {
       .goto('passage title')
       .expect(Selector('.passage p').exists)
       .eql(false)
-      .click(Selector('.passage button'))
+      .click(Selector('.passage button'), { waitFor: 'click end' })
       .expect(Selector('.passage p').exists)
       .eql(true);
   });
@@ -109,11 +111,11 @@ describe(`selector`, () => {
       .expect(Selector('.passage p').count)
       .eql(0)
       // first click
-      .click(Selector('.passage button'))
+      .click(Selector('.passage button'), { waitFor: 'click end' })
       .expect(Selector('.passage p').count)
       .eql(1)
       // second click
-      .click(Selector('.passage button'))
+      .click(Selector('.passage button'), { waitFor: 'click end' })
       .expect(Selector('.passage p').count)
       .eql(2)
       // search for a paragraph that doesn't exist
