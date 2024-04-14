@@ -119,4 +119,39 @@ describe('SugarcubeParser', () => {
 
     expect(lastUrl).toEqual(`https://www.google.com/`);
   });
+
+  describe(`resetState`, () => {
+    it(`resets variables`, async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'passage title',
+            tags: ['passage tag'],
+            text: 'variable=$variable temporary=_temporary',
+          },
+        ],
+      });
+
+      await sugarcubeParser.testController
+        .goto('passage title')
+        .expect(Selector(`.passage`).innerText)
+        .eql('variable=$variable temporary=_temporary');
+
+      // $variable set, _temporary set
+      await sugarcubeParser.assignStateAndReload(
+        { 'variable': '123' },
+        'passage title',
+        { 'temporary': '456' }
+      );
+
+      // resetState
+      sugarcubeParser.resetState();
+
+      // $variable not set, _temporary not set
+      await sugarcubeParser.testController
+        .goto('passage title')
+        .expect(Selector(`.passage`).innerText)
+        .eql('variable=$variable temporary=_temporary');
+    });
+  });
 });
