@@ -11,6 +11,7 @@ import { TestController, testController } from './test-api/test-controller';
 import { getLogger } from './logging/logger';
 import { addToPrettyString } from './add-to-pretty-string';
 import { clearTimeouts } from './trigger-timeout';
+import type { State } from './internal/state';
 import jQueryFactory from 'jquery';
 import {} from 'node:path';
 
@@ -31,7 +32,7 @@ export class SugarcubeParser {
   Config: any;
   Macro: any;
   Setting: any;
-  State: any;
+  State: typeof State;
   Engine: any;
   Save: any;
   Template: any;

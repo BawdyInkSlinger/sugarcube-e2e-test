@@ -414,6 +414,7 @@ export const Engine = (() => {
 			Delete the active session.
 		*/
     State.reset();
+    State.clearTemporary();
 
     /*
 			Trigger an ':enginerestart' event.

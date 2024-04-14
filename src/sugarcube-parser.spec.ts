@@ -148,10 +148,8 @@ describe('SugarcubeParser', () => {
       sugarcubeParser.resetState();
 
       // $variable not set, _temporary not set
-      await sugarcubeParser.testController
-        .goto('passage title')
-        .expect(Selector(`.passage`).innerText)
-        .eql('variable=$variable temporary=_temporary');
+      expect(sugarcubeParser.State.variables[`variable`]).not.toBeDefined();
+      expect(sugarcubeParser.State.temporary[`temporary`]).not.toBeDefined();
     });
   });
 });
