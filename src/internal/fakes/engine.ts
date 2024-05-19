@@ -35,7 +35,7 @@ export const Engine = (() => {
   });
 
   // Minimum delay for DOM actions (in milliseconds).
-  const DOM_DELAY = 40; // I want all delays to be as short as possible so tests run faster, but setting this to 0 errors: bad evaluation: anime is not defined
+  const DOM_DELAY = 0; // I want all delays to be as short as possible so tests run faster, but setting this to 0 errors: bad evaluation: anime is not defined
 
   // Cache of the debug view(s) for initialization special passage(s).
   const _initDebugViews = [];
