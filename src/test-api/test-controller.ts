@@ -423,11 +423,12 @@ export const testController: TestController = {
     this: Promise<void> | TestController,
     actual: A | Promise<A>
   ): AssertionApi<A> {
+    const startMillis = Date.now();
     enterLogger.debug(`testController: entering expect actual=`, actual);
     if (!(actual instanceof Promise)) {
       actual = Promise.resolve(actual);
     }
-    const assertionApi = new PromiseAssertions(thisAsPromise(this), actual);
+    const assertionApi = new PromiseAssertions(thisAsPromise(this), actual, startMillis);
     return assertionApi as AssertionApi<A>;
   },
 

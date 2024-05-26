@@ -7,6 +7,7 @@ import _ from 'lodash';
 import { getLogger } from '../../logging/logger';
 import { splitMatches } from './split-matches';
 import { highlightMatches } from './highlight-matches';
+import { durationFormat } from './duration-format';
 
 export type ElementOf<T> = T extends (infer E)[] ? E : never;
 export type Extend<T, E> = T extends E ? E : never;
@@ -161,14 +162,21 @@ export interface AssertionApi<E = any> {
 
 const logger = getLogger('DEFAULT');
 const enterLogger = getLogger('DEBUG_ASSERTIONS_ENTER_LOG_MESSAGES');
+const performanceLogger = getLogger('DEBUG_PERFORMANCE');
 
 export class PromiseAssertions<A> implements AssertionApi<A> {
   currentPromise: Promise<void>;
   actual: Promise<A>;
+  startMillis: number;
 
-  constructor(currentPromise: Promise<void>, actual: Promise<A>) {
+  constructor(
+    currentPromise: Promise<void>,
+    actual: Promise<A>,
+    startMillis: number
+  ) {
     this.currentPromise = currentPromise;
     this.actual = actual;
+    this.startMillis = startMillis;
   }
   notMatch(
     re: RegExp,
@@ -176,17 +184,13 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
   ): TestControllerPromise<void> {
     const cause = new Error();
     enterLogger.debug(
-      `PromiseAssertions: entering notMatch this.actual=${
-        this.actual
-      }`
+      `PromiseAssertions: entering notMatch this.actual=${this.actual}`
     );
     return Object.assign(
       this.currentPromise
         .then(() => {
           logger.debug(
-            `PromiseAssertions: resolving notMatch then regexp='${re}' this.actual=${
-              this.actual
-            }`
+            `PromiseAssertions: resolving notMatch then regexp='${re}' this.actual=${this.actual}`
           );
           return this.actual;
         })
@@ -209,6 +213,16 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
           } else {
             return Promise.resolve();
           }
+        })
+        .finally(() => {
+          const endMillis = Date.now();
+          performanceLogger.isDebugEnabled() &&
+            performanceLogger.debug(
+              `notMatch performance: ${durationFormat(
+                this.startMillis,
+                endMillis
+              )}`
+            );
         }),
       testController
     );
@@ -220,23 +234,17 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
   ): TestControllerPromise<void> {
     const cause = new Error();
     enterLogger.debug(
-      `PromiseAssertions: entering contains needle='${needle}' this.actual='${
-        this.actual
-      }'`
+      `PromiseAssertions: entering contains needle='${needle}' this.actual='${this.actual}'`
     );
     return Object.assign(
       this.currentPromise
         .then(() => {
           logger.debug(
-            `PromiseAssertions: resolving contains then needle='${needle}' this.actual='${
-              this.actual
-            }'`
+            `PromiseAssertions: resolving contains then needle='${needle}' this.actual='${this.actual}'`
           );
           if (this.actual instanceof ReExecutablePromise) {
             logger.debug(
-              `PromiseAssertions: re-executing!='${needle}' this.actual='${
-                this.actual
-              }'`
+              `PromiseAssertions: re-executing!='${needle}' this.actual='${this.actual}'`
             );
             return this.actual._reExecute();
           } else {
@@ -267,6 +275,16 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
 
           cause.message = `\n  Expected:\n${actualValue}\n  To Contain:\n${needle}`;
           return Promise.reject(cause);
+        })
+        .finally(() => {
+          const endMillis = Date.now();
+          performanceLogger.isDebugEnabled() &&
+            performanceLogger.debug(
+              `contains performance: ${durationFormat(
+                this.startMillis,
+                endMillis
+              )}`
+            );
         }),
       testController
     );
@@ -277,23 +295,17 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
   ): TestControllerPromise<void> {
     const cause = new Error();
     enterLogger.debug(
-      `PromiseAssertions: entering notContains needle='${needle}' this.actual='${
-        this.actual
-      }'`
+      `PromiseAssertions: entering notContains needle='${needle}' this.actual='${this.actual}'`
     );
     return Object.assign(
       this.currentPromise
         .then(() => {
           logger.debug(
-            `PromiseAssertions: resolving notContains then needle='${needle}' this.actual='${
-              this.actual
-            }'`
+            `PromiseAssertions: resolving notContains then needle='${needle}' this.actual='${this.actual}'`
           );
           if (this.actual instanceof ReExecutablePromise) {
             logger.debug(
-              `PromiseAssertions: re-executing!='${needle}' this.actual='${
-                this.actual
-              }'`
+              `PromiseAssertions: re-executing!='${needle}' this.actual='${this.actual}'`
             );
             return this.actual._reExecute();
           } else {
@@ -324,6 +336,16 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
 
           cause.message = `\n  Expected:\n${actualValue}\n  To NOT Contain:\n${needle}`;
           return Promise.reject(cause);
+        })
+        .finally(() => {
+          const endMillis = Date.now();
+          performanceLogger.isDebugEnabled() &&
+            performanceLogger.debug(
+              `notContains performance: ${durationFormat(
+                this.startMillis,
+                endMillis
+              )}`
+            );
         }),
       testController
     );
@@ -342,23 +364,17 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
   ): TestControllerPromise<void> {
     const cause = new Error();
     enterLogger.debug(
-      `PromiseAssertions: entering eql expected='${expected}' this.actual='${
-        this.actual
-      }'`
+      `PromiseAssertions: entering eql expected='${expected}' this.actual='${this.actual}'`
     );
     return Object.assign(
       this.currentPromise
         .then(() => {
           logger.debug(
-            `PromiseAssertions: resolving eql then expected='${expected}' this.actual='${
-              this.actual
-            }'`
+            `PromiseAssertions: resolving eql then expected='${expected}' this.actual='${this.actual}'`
           );
           if (this.actual instanceof ReExecutablePromise) {
             logger.debug(
-              `PromiseAssertions: re-executing!='${expected}' this.actual='${
-                this.actual
-              }'`
+              `PromiseAssertions: re-executing!='${expected}' this.actual='${this.actual}'`
             );
             return this.actual._reExecute();
           } else {
@@ -400,6 +416,13 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
           } else {
             return Promise.resolve();
           }
+        })
+        .finally(() => {
+          const endMillis = Date.now();
+          performanceLogger.isDebugEnabled() &&
+            performanceLogger.debug(
+              `eql performance: ${durationFormat(this.startMillis, endMillis)}`
+            );
         }),
       testController
     );
@@ -407,17 +430,13 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
   ok(options?: AssertionOptions): TestControllerPromise<void> {
     const cause = new Error();
     enterLogger.debug(
-      `PromiseAssertions: entering ok this.actual=${
-        this.actual
-      }`
+      `PromiseAssertions: entering ok this.actual=${this.actual}`
     );
     return Object.assign(
       this.currentPromise
         .then(() => {
           logger.debug(
-            `PromiseAssertions: resolving ok then this.actual=${
-              this.actual
-            }`
+            `PromiseAssertions: resolving ok then this.actual=${this.actual}`
           );
           if (this.actual instanceof ReExecutablePromise) {
             return this.actual._reExecute();
@@ -435,6 +454,13 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
           } else {
             return Promise.resolve();
           }
+        })
+        .finally(() => {
+          const endMillis = Date.now();
+          performanceLogger.isDebugEnabled() &&
+            performanceLogger.debug(
+              `ok performance: ${durationFormat(this.startMillis, endMillis)}`
+            );
         }),
       testController
     );
@@ -442,17 +468,13 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
   notOk(options?: AssertionOptions): TestControllerPromise<void> {
     const cause = new Error();
     enterLogger.debug(
-      `PromiseAssertions: entering notOk this.actual=${
-        this.actual
-      }`
+      `PromiseAssertions: entering notOk this.actual=${this.actual}`
     );
     return Object.assign(
       this.currentPromise
         .then(() => {
           logger.debug(
-            `PromiseAssertions: resolving notOk then this.actual=${
-              this.actual
-            }`
+            `PromiseAssertions: resolving notOk then this.actual=${this.actual}`
           );
           return this.actual;
         })
@@ -466,6 +488,16 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
           } else {
             return Promise.resolve();
           }
+        })
+        .finally(() => {
+          const endMillis = Date.now();
+          performanceLogger.isDebugEnabled() &&
+            performanceLogger.debug(
+              `notOk performance: ${durationFormat(
+                this.startMillis,
+                endMillis
+              )}`
+            );
         }),
       testController
     );
