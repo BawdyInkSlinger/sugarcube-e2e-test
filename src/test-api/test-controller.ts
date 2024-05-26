@@ -4,9 +4,11 @@ import { getLogger } from '../logging/logger';
 import { ClickActionOptions } from './internal/click-action-options';
 import { buildWaitStrategy } from './wait-strategy';
 import { GotoActionOptions } from './internal/goto-action-options';
+import { durationFormat } from './internal/duration-format';
 
 // added by BIS:
 const logger = getLogger('DEFAULT');
+const performanceLogger = getLogger('DEBUG_PERFORMANCE');
 const enterLogger = getLogger('DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES');
 const thisAsPromiseLogger = getLogger('DEBUG_THIS_AS_PROMISE');
 
@@ -375,6 +377,7 @@ export const testController: TestController = {
     selector: Selector,
     { waitFor: waitStrategy = ':passageend' }: ClickActionOptions = {}
   ): TestControllerPromise {
+    const startMillis = Date.now();
     const cause = new Error(`click error`);
     enterLogger.debug(`testController: entering click selector='${selector}'`);
     const asyncClick = thisAsPromise(this).then<void>(() => {
@@ -384,10 +387,18 @@ export const testController: TestController = {
 
       const waitUntil = buildWaitStrategy(waitStrategy)(
         `click ${selector.toString()} and wait for ${waitStrategy}`
-      ).catch((reason) => {
-        reason.cause = cause;
-        throw reason;
-      });
+      )
+        .catch((reason) => {
+          reason.cause = cause;
+          throw reason;
+        })
+        .finally(() => {
+          const endMillis = Date.now();
+          performanceLogger.isDebugEnabled() &&
+            performanceLogger.debug(
+              `click performance: ${durationFormat(startMillis, endMillis)}`
+            );
+        });
 
       logger.debug(`Pre $(${selector.toString()}).trigger('click');`);
       selector.execute().trigger('click');

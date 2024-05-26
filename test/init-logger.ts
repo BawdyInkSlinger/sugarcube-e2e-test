@@ -1,9 +1,12 @@
-const logLevels = new Map<string, 'debug' | 'info' | 'warn' | 'error'>([
+import { Category } from '../src/logging/logger'
+
+const logLevels = new Map<Category, 'debug' | 'info' | 'warn' | 'error'>([
   ['DEFAULT', 'warn'],
   ['DEBUG_TRIGGER_TIMEOUT', 'warn'],
   ['DEBUG_EVAL', 'warn'],
   ['DEBUG_PASSAGES', 'warn'],
   ['DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES', 'warn'],
+  ['DEBUG_PERFORMANCE', 'warn'],
   ['DEBUG_SELECTOR_ENTER_LOG_MESSAGES', 'warn'],
   ['DEBUG_SELECTOR_EXECUTION_LOG_MESSAGES', 'warn'],
   ['DEBUG_ASSERTIONS_ENTER_LOG_MESSAGES', 'warn'],
