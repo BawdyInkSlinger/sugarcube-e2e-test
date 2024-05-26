@@ -332,6 +332,7 @@ export const testController: TestController = {
     temporaryVariables?: unknown,
     { waitFor: waitStrategy = ':passageend' }: GotoActionOptions = {}
   ): TestControllerPromise {
+    const startMillis = Date.now();
     const cause = new Error(`goto error`);
     enterLogger.debug(`testController: entering goto '${passageTitle}'`);
 
@@ -339,10 +340,18 @@ export const testController: TestController = {
       thisAsPromise(this).then(() => {
         const pageLoadPromise = buildWaitStrategy(waitStrategy)(
           `goto '${passageTitle}'`
-        ).catch((reason) => {
-          reason.cause = cause;
-          throw reason;
-        });
+        )
+          .catch((reason) => {
+            reason.cause = cause;
+            throw reason;
+          })
+          .finally(() => {
+            const endMillis = Date.now();
+            performanceLogger.isDebugEnabled() &&
+              performanceLogger.debug(
+                `goto performance: ${durationFormat(startMillis, endMillis)}`
+              );
+          });
         if (temporaryVariables !== undefined) {
           logger.debug(
             `temporaryVariables=${JSON.stringify(temporaryVariables)}`
