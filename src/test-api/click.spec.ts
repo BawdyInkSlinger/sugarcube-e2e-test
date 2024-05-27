@@ -50,8 +50,31 @@ describe(`click`, () => {
       .eql(`clicked`);
   });
 
+  it('gives a useful error if you wait for passage end (default click strategy) but the click does not render a new passage', async () => {
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag'],
+          text: `<<button "Button">>
+              <<replace '#status'>>clicked<</replace>>
+            <</button>>
+            <div id="status">pending</div>`,
+        },
+      ],
+    });
+
+    await sugarcubeParser.testController
+      .goto('passage title')
+      .expect(Selector(`#status`).innerText)
+      .eql(`pending`);
+
+    await expectAsync(
+      sugarcubeParser.testController.click(Selector('.passage button'))
+    ).toBeRejectedWithError(/:passageend/);
+  });
+
   /*
-error if wrong click strategy
 error if selector not on page
 
   */
