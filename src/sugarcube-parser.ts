@@ -221,8 +221,9 @@ export class SugarcubeParser {
 
   resetState(urlParams = ''): void {
     logger.debug(`resetState(urlParams=\`${urlParams}\`)`);
-
+    
     const url = baseUrl + (urlParams.length > 0 ? `?${urlParams}` : '');
+    logger.debug(`resetState(url=\`${url}\`)`);
     globalThis.jsdom.reconfigure({ url });
 
     globalThis.Engine.restart();
