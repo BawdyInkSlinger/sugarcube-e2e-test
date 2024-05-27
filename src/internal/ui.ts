@@ -11,7 +11,7 @@
 	       errorPrologRegExp, settings
 */
 
-var UI = (() => { // eslint-disable-line no-unused-vars, no-var
+export const UI = (() => { // eslint-disable-line no-unused-vars, no-var
 	'use strict';
 
 	/*******************************************************************************************************************
