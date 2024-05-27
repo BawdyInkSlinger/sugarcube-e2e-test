@@ -103,7 +103,7 @@ const handleSingleBr: NodeHandler = (
 
   return returnWrapper(
     text,
-    handleDoubleBr.name,
+    handleSingleBr.name,
     calculateNodeInfo(node),
     text,
     parentDepth
