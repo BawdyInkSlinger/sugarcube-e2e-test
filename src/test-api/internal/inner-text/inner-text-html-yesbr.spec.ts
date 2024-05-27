@@ -1,8 +1,8 @@
 import { Selector, SugarcubeParser } from '../../..';
 import { innerText } from './inner-text';
-import * as inputs from '../../../../test/inner-text-html.inputs';
+import * as inputs from '../../../../test/inner-text-html-yesbr.inputs';
 
-describe(`innerText html`, () => {
+describe(`innerText html yesbr`, () => {
   it(`returns text string`, async () => {
     const sugarcubeParser = await SugarcubeParser.create({
       passages: [

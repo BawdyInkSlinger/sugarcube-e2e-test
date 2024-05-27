@@ -30,6 +30,12 @@ export const handleElement: NodeHandler = (
     index + 1 < originalArray.length &&
     originalArray[index + 1].nodeName.toLowerCase().trim() !== `br`
   ) {
+    // console.log(`handleSingleBr`, {
+    //     node,
+    //     index,
+    //     originalArray,
+    //     parentDepth
+    // });
     return handleSingleBr(node, index, originalArray, parentDepth);
   } else {
     return handleDefault(node, index, originalArray, parentDepth);
