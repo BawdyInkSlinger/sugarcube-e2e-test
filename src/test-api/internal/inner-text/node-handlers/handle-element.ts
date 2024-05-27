@@ -105,7 +105,7 @@ const handleSingleBr: NodeHandler = (
   originalArray: Node[],
   parentDepth: ParentDepth
 ): TextAndLog => {
-  const text = ' ';
+  const text = '\n';
 
   return returnWrapper(
     text,

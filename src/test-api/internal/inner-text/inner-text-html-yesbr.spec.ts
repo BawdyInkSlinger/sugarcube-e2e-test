@@ -68,7 +68,8 @@ she's determined.`,
     await sugarcubeParser.testController
       .goto('passage title')
       .expect(Selector(`.passage`).innerText)
-      .eql(`You'll give her one thing: she's determined.`);
+      .eql(`You'll give her one thing:
+she's determined.`);
   });
 
   /*
