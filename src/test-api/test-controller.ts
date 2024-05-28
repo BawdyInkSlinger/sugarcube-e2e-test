@@ -5,6 +5,7 @@ import { ClickActionOptions } from './internal/click-action-options';
 import { buildWaitStrategy } from './wait-strategy';
 import { GotoActionOptions } from './internal/goto-action-options';
 import { durationFormat } from './internal/duration-format';
+import { PromiseTimeoutError } from './promise-with-timeout';
 
 // added by BIS:
 const logger = getLogger('DEFAULT');
@@ -389,33 +390,54 @@ export const testController: TestController = {
     const startMillis = Date.now();
     const cause = new Error(`click error`);
     enterLogger.debug(`testController: entering click selector='${selector}'`);
-    const asyncClick = thisAsPromise(this).then<void>(() => {
-      enterLogger.debug(
-        `testController: entering asyncClick selector='${selector}' to wait for ${waitStrategy}`
-      );
 
-      const waitUntil = buildWaitStrategy(waitStrategy)(
-        `click ${selector.toString()} and wait for ${waitStrategy}`
-      )
-        .catch((reason) => {
-          reason.cause = cause;
-          throw reason;
-        })
-        .finally(() => {
-          const endMillis = Date.now();
-          performanceLogger.isDebugEnabled() &&
-            performanceLogger.debug(
-              `click performance: ${durationFormat(startMillis, endMillis)}`
-            );
-        });
+    const asyncClick = thisAsPromise(this)
+      .then<void>(() => {
+        enterLogger.debug(
+          `testController: entering asyncClick selector='${selector}' to wait for ${waitStrategy}`
+        );
 
-      logger.debug(`Pre $(${selector.toString()}).trigger('click');`);
-      selector.execute().trigger('click');
-      logger.debug(
-        `Post $(${selector.toString()}).trigger('click'); Waiting for ${waitStrategy}`
-      );
-      return waitUntil;
-    });
+        const waitUntil = buildWaitStrategy(waitStrategy)(
+          `click ${selector.toString()} and wait for ${waitStrategy}`
+        );
+
+        logger.debug(`Pre $(${selector.toString()}).trigger('click');`);
+        const clickable = selector.execute();
+        if (clickable.length === 0) {
+          throw new Error(
+            `Attempted to click on selector that could not be found: ${selector.toString()}`
+          );
+        }
+        clickable.trigger('click');
+        logger.debug(
+          `Post $(${selector.toString()}).trigger('click'); Waiting for ${waitStrategy}`
+        );
+
+        return waitUntil;
+      })
+      .catch((err: Error) => {
+        err.cause = cause;
+        if (err instanceof PromiseTimeoutError) {
+          throw new Error(
+            `The selector was clicked, but a timeout occurred 
+while waiting for a :passageend event. Does this click 
+go to a new passage? If not, click with a different wait strategy.`.replace(
+              /\n/,
+              ''
+            ) +
+              `\n\ne.g., await t.click(${selector.toString()}, { waitFor: 'click end' })`,
+            { cause: err }
+          );
+        }
+        throw err;
+      })
+      .finally(() => {
+        const endMillis = Date.now();
+        performanceLogger.isDebugEnabled() &&
+          performanceLogger.debug(
+            `click performance: ${durationFormat(startMillis, endMillis)}`
+          );
+      });
     return Object.assign(asyncClick, testController);
   },
 
@@ -428,7 +450,11 @@ export const testController: TestController = {
     if (!(actual instanceof Promise)) {
       actual = Promise.resolve(actual);
     }
-    const assertionApi = new PromiseAssertions(thisAsPromise(this), actual, startMillis);
+    const assertionApi = new PromiseAssertions(
+      thisAsPromise(this),
+      actual,
+      startMillis
+    );
     return assertionApi as AssertionApi<A>;
   },
 

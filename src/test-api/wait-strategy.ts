@@ -9,7 +9,7 @@ export type WaitStrategyType = ':passageend' | 'click end' | WaitStrategy;
 
 export const buildWaitStrategy = (
   waitStrategyType: WaitStrategyType
-) => {
+): WaitStrategy => {
   switch (waitStrategyType) {
     case ':passageend':
       return waitForPassageEnd;

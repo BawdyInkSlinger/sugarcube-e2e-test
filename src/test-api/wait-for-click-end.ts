@@ -12,7 +12,8 @@ export function waitForClickEnd(debugNote = '', timeoutMillis = 2000) {
     `waitForClickEnd: entering waitForClickEnd debugNote=${debugNote}`
   );
   return promiseWithTimeout(
-    timeoutMillis,
+      timeoutMillis,
+      // todo: just return this instead of promiseWithTimeout?
     new Promise<void>((resolve) => {
       setTimeout(() => {
         logger.debug(
