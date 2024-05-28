@@ -12,16 +12,29 @@ export default class ReExecutablePromise<T> extends Promise<T> {
   private readonly _fn: ExecutorFn<T>;
   private _taskPromise: Promise<T> | null;
 
-  public constructor(executorFn: ExecutorFn<T>) {
+  // Added by BIS
+  private cause: Error;
+
+  public constructor(executorFn: ExecutorFn<T>, errorCause: Error) {
     super(noop);
 
     this._fn = executorFn;
     this._taskPromise = null;
+    this.cause = errorCause;
   }
 
   private _ensureExecuting(): void {
     if (this._taskPromise === null) {
-      this._taskPromise = new Promise(this._fn);
+      this._taskPromise = new Promise<T>((resolve, reject) => {
+        try {
+          this._fn(resolve, reject);
+        } catch (err: unknown) {
+          if (err instanceof Error) {
+            err.cause = this.cause;
+          }
+          throw err;
+        }
+      });
     }
   }
 
@@ -61,8 +74,9 @@ export default class ReExecutablePromise<T> extends Promise<T> {
   }
 
   public static fromFn<T>(asyncExecutorFn: () => T): ReExecutablePromise<T> {
-    return new ReExecutablePromise((resolve: Function) =>
-      resolve(asyncExecutorFn())
+    return new ReExecutablePromise(
+      (resolve: Function) => resolve(asyncExecutorFn()),
+      new Error(`ReExecutablePromise Error`)
     );
   }
 }
