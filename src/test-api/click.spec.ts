@@ -110,11 +110,11 @@ describe(`click`, () => {
     } catch (parentError) {
       expect(parentError.message).toEqual('Click error');
       const childError = parentError.cause;
-      expect(childError.message).toEqual('Click error');
-      const grandchildError = childError.cause;
-      expect(grandchildError.message).toEqual(
+      expect(childError.message).toEqual(
         'Attempted to click on selector that could not be found: Selector(`.passage button:contains(foobar)`)'
       );
+      const grandchildError = childError.cause;
+      expect(grandchildError).toBeUndefined();
     }
   });
 });

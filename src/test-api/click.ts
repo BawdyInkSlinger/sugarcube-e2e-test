@@ -43,7 +43,23 @@ export function click(
       if (waitStrategy === `:passageend`) {
         waitForPassageEndPromise = waitForPassageEnd(
           `click ${selector.toString()} and wait for ${waitStrategy}`
-        );
+        ).catch((err: Error) => {
+          if (err instanceof PromiseTimeoutError) {
+            source2.cause = new Error(
+              `The selector was clicked, but a timeout occurred 
+while waiting for a :passageend event. Does this click 
+go to a new passage? If not, click with a different wait strategy.`.replace(
+                /\n/,
+                ''
+              ) +
+                `\n\ne.g., await t.click(${selector.toString()}, { waitFor: 'click end' })`,
+              { cause: err }
+            );
+          } else {
+            source2.cause = err;
+          }
+          throw source2;
+        });
       }
 
       // Perform the click
@@ -58,23 +74,6 @@ export function click(
           `click ${selector.toString()} and wait for ${waitStrategy}`
         )
       );
-    })
-    .catch((err: Error) => {
-      if (err instanceof PromiseTimeoutError) {
-        source2.cause = new Error(
-          `The selector was clicked, but a timeout occurred 
-while waiting for a :passageend event. Does this click 
-go to a new passage? If not, click with a different wait strategy.`.replace(
-            /\n/,
-            ''
-          ) +
-            `\n\ne.g., await t.click(${selector.toString()}, { waitFor: 'click end' })`,
-          { cause: err }
-        );
-      } else {
-        source2.cause = err;
-      }
-      throw source2;
     })
     .finally(() => {
       const endMillis = Date.now();
