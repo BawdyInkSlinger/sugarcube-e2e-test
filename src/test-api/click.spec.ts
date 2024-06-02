@@ -101,8 +101,4 @@ describe(`click`, () => {
         'Attempted to click on selector that could not be found: Selector(`.passage button:contains(foobar)`)'
       );
     });
-
-  /*
-in another test: error when .expect(Selector(`#status`).innerText) cannot be found
-  */
 });

@@ -145,9 +145,7 @@ export const Selector: SelectorFactory = (
   // | SelectorPromise,
   // options?: SelectorOptions
 ): Selector => {
-  enterLogger.debug(
-    `selector: entering init='${init}'`
-  );
+  enterLogger.debug(`selector: entering init='${init}'`);
 
   const executionSteps: ExecutionStep[] = [
     { action: 'jQuerySelector', value: init, toString: () => init },
@@ -156,10 +154,16 @@ export const Selector: SelectorFactory = (
   const selectorImpl: Selector & { toString: () => string } = {
     execute: () => selectorExecute(executionSteps),
     innerText: ReExecutablePromise.fromFn(() => {
-        executionLogger.debug(
-          `selector: innerText on '${selectorToStringBuilder(executionSteps)}'`
+      executionLogger.debug(
+        `selector: innerText on '${selectorToStringBuilder(executionSteps)()}'`
+      );
+      const $nodes = selectorExecute(executionSteps);
+      if ($nodes.length === 0) {
+        throw new Error(
+          `${selectorToStringBuilder(executionSteps)()} does not exist`
         );
-      return innerText(selectorExecute(executionSteps)[0]);
+      }
+      return innerText($nodes[0]);
     }),
     exists: ReExecutablePromise.fromFn(
       () => selectorExecute(executionSteps).length > 0

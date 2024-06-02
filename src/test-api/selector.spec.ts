@@ -122,4 +122,27 @@ describe(`selector`, () => {
       .expect(Selector('.passage p.paragraph-3').count)
       .eql(0);
   });
+
+  it('fails fast when the selector does not exist', async () => {
+    const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'passage title',
+            tags: ['passage tag'],
+            text: `<h1>Passage 1</h1>`,
+          },
+        ],
+      });
+
+      await sugarcubeParser.testController
+        .goto('passage title')
+        .expect(Selector(`.passage h1`).innerText)
+        .eql(`Passage 1`);
+
+      await expectAsync(
+        sugarcubeParser.testController.expect(Selector('.passage h2').innerText).eql(`This selector does not exist`)
+      ).toBeRejectedWithError(
+        'Selector(`.passage h2`) does not exist'
+      );
+  });
 });
