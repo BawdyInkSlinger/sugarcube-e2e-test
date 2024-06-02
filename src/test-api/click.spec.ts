@@ -97,7 +97,7 @@ describe(`click`, () => {
    *         before the click has had a chance to modify the DOM (not sure if this is required,
    *         but better safe than sorry).
    * 
-   * I think this refactoring may require in lining the `buildWaitStrategy` code, because the behavior
+   * I think this refactoring may require inlining the `buildWaitStrategy` code, because the behavior
    * is very different between the two. 
    *
    * To get the test(s) consistently fail, run jasmine this way:
