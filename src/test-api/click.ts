@@ -36,7 +36,7 @@ export function click(
       // If the element does not exist...
       if (clickableElements.length === 0) {
         throw new Error(
-          `Attempted to click on selector that could not be found: ${selector.toString()}`
+          `Attempted to click on selector that could not be found: ${selector.toString()}`, { cause }
         );
       }
 
