@@ -31,7 +31,9 @@ export function click(
       );
 
       logger.debug(`Pre $(${selector.toString()}).trigger('click');`);
+      
       const clickableElements = selector.execute();
+      // If the element does not exist...
       if (clickableElements.length === 0) {
         throw new Error(
           `Attempted to click on selector that could not be found: ${selector.toString()}`
@@ -39,12 +41,14 @@ export function click(
       }
 
       let waitForPassageEndPromise = undefined;
+      // If we are waiting for :passageend, start listening for it BEFORE the click
       if (waitStrategy === `:passageend`) {
         waitForPassageEndPromise = waitForPassageEnd(
           `click ${selector.toString()} and wait for ${waitStrategy}`
         );
       }
 
+      // Perform the click
       clickableElements.trigger('click');
       logger.debug(
         `Post $(${selector.toString()}).trigger('click'); Waiting for ${waitStrategy}`
