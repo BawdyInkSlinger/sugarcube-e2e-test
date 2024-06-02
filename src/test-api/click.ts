@@ -8,7 +8,8 @@ import {
   TestControllerPromise,
   testController,
 } from './test-controller';
-import { buildWaitStrategy } from './wait-strategy';
+import { waitForClickEnd } from './wait-for-click-end';
+import { waitForPassageEnd } from './wait-for-passage-end';
 
 const logger = getLogger('DEFAULT');
 const performanceLogger = getLogger('DEBUG_PERFORMANCE');
@@ -29,23 +30,29 @@ export function click(
         `testController: entering asyncClick selector='${selector}' to wait for ${waitStrategy}`
       );
 
-      const waitUntil = buildWaitStrategy(waitStrategy)(
-        `click ${selector.toString()} and wait for ${waitStrategy}`
-      );
-
       logger.debug(`Pre $(${selector.toString()}).trigger('click');`);
-      const clickable = selector.execute();
-      if (clickable.length === 0) {
+      const clickableElements = selector.execute();
+      if (clickableElements.length === 0) {
         throw new Error(
           `Attempted to click on selector that could not be found: ${selector.toString()}`
         );
       }
-      clickable.trigger('click');
+
+      let waitForPassageEndPromise = undefined;
+      if (waitStrategy === `:passageend`) {
+        waitForPassageEndPromise = waitForPassageEnd(
+          `click ${selector.toString()} and wait for ${waitStrategy}`
+        );
+      }
+
+      clickableElements.trigger('click');
       logger.debug(
         `Post $(${selector.toString()}).trigger('click'); Waiting for ${waitStrategy}`
       );
 
-      return waitUntil;
+      return waitForPassageEndPromise ?? waitForClickEnd(
+        `click ${selector.toString()} and wait for ${waitStrategy}`
+      );
     })
     .catch((err: Error) => {
       err.cause = cause;

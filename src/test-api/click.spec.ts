@@ -106,33 +106,33 @@ describe(`click`, () => {
    * To get the test(s) consistently pass, run jasmine this way:
    * jasmine --random=true --seed=20222
    */
-  //   it('gives a useful error if the selector cannot be found', async () => {
-  //     const sugarcubeParser = await SugarcubeParser.create({
-  //       passages: [
-  //         {
-  //           title: 'passage title',
-  //           tags: ['passage tag'],
-  //           text: `<h1>Passage 1</h1><<button "Button" "passage 2">><</button>>`,
-  //         },
-  //         {
-  //           title: 'passage 2',
-  //           tags: ['passage tag'],
-  //           text: '<h1>Passage 2</h1>',
-  //         },
-  //       ],
-  //     });
+    it('gives a useful error if the selector cannot be found', async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'passage title',
+            tags: ['passage tag'],
+            text: `<h1>Passage 1</h1><<button "Button" "passage 2">><</button>>`,
+          },
+          {
+            title: 'passage 2',
+            tags: ['passage tag'],
+            text: '<h1>Passage 2</h1>',
+          },
+        ],
+      });
 
-  //     await sugarcubeParser.testController
-  //       .goto('passage title')
-  //       .expect(Selector(`.passage h1`).innerText)
-  //       .eql(`Passage 1`);
+      await sugarcubeParser.testController
+        .goto('passage title')
+        .expect(Selector(`.passage h1`).innerText)
+        .eql(`Passage 1`);
 
-  //     await expectAsync(
-  //       sugarcubeParser.testController.click(Selector('.passage button').withText('foobar'))
-  //     ).toBeRejectedWithError(
-  //       'Attempted to click on selector that could not be found: Selector(`.passage button:contains(foobar)`)'
-  //     );
-  //   });
+      await expectAsync(
+        sugarcubeParser.testController.click(Selector('.passage button').withText('foobar'))
+      ).toBeRejectedWithError(
+        'Attempted to click on selector that could not be found: Selector(`.passage button:contains(foobar)`)'
+      );
+    });
 
   /*
 in another test: error when .expect(Selector(`#status`).innerText) cannot be found
