@@ -4,7 +4,6 @@ import { durationFormat } from './internal/duration-format';
 import { PromiseTimeoutError } from './promise-with-timeout';
 import { Selector } from './selector';
 import {
-  TestController,
   TestControllerPromise,
   testController,
 } from './test-controller';
