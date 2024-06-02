@@ -6,13 +6,12 @@ export async function promiseWithTimeout<PR>(
   millis: number,
   promise: Promise<PR>
 ): Promise<PR> {
-  const cause = new Error();
   let timeoutPid: ReturnType<typeof setTimeout>;
   const timeoutPromise = new Promise<PR>((_resolve, reject) => {
     logger.debug(`entering timeout promise. millis='${millis}'`);
     timeoutPid = setTimeout(() => {
       logger.debug(`rejecting timeout promise`);
-      reject(new PromiseTimeoutError(millis, undefined, { cause }));
+      reject(new PromiseTimeoutError(millis, undefined));
     }, millis);
   });
   return Promise.race([promise, timeoutPromise]).finally(() => {

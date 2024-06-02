@@ -4,7 +4,7 @@ const logger = getLogger('DEFAULT');
 const enterLogger = getLogger('DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES');
 
 export function waitForClickEnd(debugNote = '', timeoutMillis = 2000) {
-  const cause = new Error(
+  const source = new Error(
     `Timeout after ${timeoutMillis}ms. debugNote=${debugNote}`
   );
   enterLogger.debug(
@@ -24,8 +24,8 @@ export function waitForClickEnd(debugNote = '', timeoutMillis = 2000) {
       );
     },
     (reason) => {
-      reason.cause = cause;
-      throw reason;
+      source.cause = reason;
+      throw source;
     }
   );
 }

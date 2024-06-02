@@ -3,10 +3,7 @@ import { ClickActionOptions } from './internal/click-action-options';
 import { durationFormat } from './internal/duration-format';
 import { PromiseTimeoutError } from './promise-with-timeout';
 import { Selector } from './selector';
-import {
-  TestControllerPromise,
-  testController,
-} from './test-controller';
+import { TestControllerPromise, testController } from './test-controller';
 import { waitForClickEnd } from './wait-for-click-end';
 import { waitForPassageEnd } from './wait-for-passage-end';
 
@@ -20,7 +17,8 @@ export function click(
   { waitFor: waitStrategy = ':passageend' }: ClickActionOptions = {}
 ): TestControllerPromise {
   const startMillis = Date.now();
-  const cause = new Error(`click error`);
+  const source1 = new Error(`Click error`);
+  const source2 = new Error(`Click error`);
   enterLogger.debug(`testController: entering click selector='${selector}'`);
 
   const asyncClick = thisAsPromise
@@ -30,13 +28,14 @@ export function click(
       );
 
       logger.debug(`Pre $(${selector.toString()}).trigger('click');`);
-      
+
       const clickableElements = selector.execute();
       // If the element does not exist...
       if (clickableElements.length === 0) {
-        throw new Error(
-          `Attempted to click on selector that could not be found: ${selector.toString()}`, { cause }
+        source1.cause = new Error(
+          `Attempted to click on selector that could not be found: ${selector.toString()}`
         );
+        throw source1;
       }
 
       let waitForPassageEndPromise = undefined;
@@ -53,14 +52,16 @@ export function click(
         `Post $(${selector.toString()}).trigger('click'); Waiting for ${waitStrategy}`
       );
 
-      return waitForPassageEndPromise ?? waitForClickEnd(
-        `click ${selector.toString()} and wait for ${waitStrategy}`
+      return (
+        waitForPassageEndPromise ??
+        waitForClickEnd(
+          `click ${selector.toString()} and wait for ${waitStrategy}`
+        )
       );
     })
     .catch((err: Error) => {
-      err.cause = cause;
       if (err instanceof PromiseTimeoutError) {
-        throw new Error(
+        source2.cause = new Error(
           `The selector was clicked, but a timeout occurred 
 while waiting for a :passageend event. Does this click 
 go to a new passage? If not, click with a different wait strategy.`.replace(
@@ -70,8 +71,10 @@ go to a new passage? If not, click with a different wait strategy.`.replace(
             `\n\ne.g., await t.click(${selector.toString()}, { waitFor: 'click end' })`,
           { cause: err }
         );
+      } else {
+        source2.cause = err;
       }
-      throw err;
+      throw source2;
     })
     .finally(() => {
       const endMillis = Date.now();

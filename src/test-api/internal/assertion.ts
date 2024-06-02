@@ -182,7 +182,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
     re: RegExp,
     options?: AssertionOptions
   ): TestControllerPromise<void> {
-    const cause = new Error();
+    const source = new Error();
     enterLogger.debug(
       `PromiseAssertions: entering notMatch this.actual=${this.actual}`
     );
@@ -200,7 +200,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
           );
           const matches = splitMatches(actualValue + '', re);
           if (matches.length > 1) {
-            cause.message = `\n  Expected:\n${highlightMatches(
+            source.message = `\n  Expected:\n${highlightMatches(
               matches,
               chalk.bgRed
             )}\n  To NOT match:\n${re}`;
@@ -209,7 +209,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
             // console.log(document.toPrettyString({includeHeadElement: false,
             //     includeSvgBody: false,
             //     selectorsToRemove: [`#before-passage-container`, `#after-passage-container`]}));
-            return Promise.reject(cause);
+            return Promise.reject(source);
           } else {
             return Promise.resolve();
           }
@@ -232,7 +232,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
     needle: EnsureString<A> | ElementOf<A> | Extend<A, R>,
     options?: AssertionOptions
   ): TestControllerPromise<void> {
-    const cause = new Error();
+    const source = new Error();
     enterLogger.debug(
       `PromiseAssertions: entering contains needle='${needle}' this.actual='${this.actual}'`
     );
@@ -273,8 +273,8 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
             return Promise.resolve();
           }
 
-          cause.message = `\n  Expected:\n${actualValue}\n  To Contain:\n${needle}`;
-          return Promise.reject(cause);
+          source.message = `\n  Expected:\n${actualValue}\n  To Contain:\n${needle}`;
+          return Promise.reject(source);
         })
         .finally(() => {
           const endMillis = Date.now();
@@ -293,7 +293,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
     needle: EnsureString<A> | ElementOf<A> | Extend<A, R>,
     options?: AssertionOptions
   ): TestControllerPromise<void> {
-    const cause = new Error();
+    const source = new Error();
     enterLogger.debug(
       `PromiseAssertions: entering notContains needle='${needle}' this.actual='${this.actual}'`
     );
@@ -334,8 +334,8 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
             return Promise.resolve();
           }
 
-          cause.message = `\n  Expected:\n${actualValue}\n  To NOT Contain:\n${needle}`;
-          return Promise.reject(cause);
+          source.message = `\n  Expected:\n${actualValue}\n  To NOT Contain:\n${needle}`;
+          return Promise.reject(source);
         })
         .finally(() => {
           const endMillis = Date.now();
@@ -362,7 +362,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
     messageOrOptions: string | AssertionOptions,
     options?: AssertionOptions
   ): TestControllerPromise<void> {
-    const cause = new Error();
+    const source = new Error();
     enterLogger.debug(
       `PromiseAssertions: entering eql expected='${expected}' this.actual='${this.actual}'`
     );
@@ -409,10 +409,10 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
                 return coloredText;
               })
               .join('');
-            cause.message = `${
+            source.message = `${
               typeof messageOrOptions === 'string' ? messageOrOptions : ''
             }\n  Expected:\n${expected}\n  Actual:\n${actualValue}\n  Diff:\n${diff}`;
-            return Promise.reject(cause);
+            return Promise.reject(source);
           } else {
             return Promise.resolve();
           }
@@ -428,7 +428,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
     );
   }
   ok(options?: AssertionOptions): TestControllerPromise<void> {
-    const cause = new Error();
+    const source = new Error();
     enterLogger.debug(
       `PromiseAssertions: entering ok this.actual=${this.actual}`
     );
@@ -449,8 +449,8 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
             `PromiseAssertions: resolving ok then actualValue=${actualValue}`
           );
           if (!actualValue) {
-            cause.message = `\n  Expected:\nTruthy\n  Actual:\n${actualValue}`;
-            return Promise.reject(cause);
+            source.message = `\n  Expected:\nTruthy\n  Actual:\n${actualValue}`;
+            return Promise.reject(source);
           } else {
             return Promise.resolve();
           }
@@ -466,7 +466,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
     );
   }
   notOk(options?: AssertionOptions): TestControllerPromise<void> {
-    const cause = new Error();
+    const source = new Error();
     enterLogger.debug(
       `PromiseAssertions: entering notOk this.actual=${this.actual}`
     );
@@ -483,8 +483,8 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
             `PromiseAssertions: resolving notOk then actualValue=${actualValue}`
           );
           if (actualValue) {
-            cause.message = `\n  Expected:\nFalsy\n  Actual:\n${actualValue}`;
-            return Promise.reject(cause);
+            source.message = `\n  Expected:\nFalsy\n  Actual:\n${actualValue}`;
+            return Promise.reject(source);
           } else {
             return Promise.resolve();
           }

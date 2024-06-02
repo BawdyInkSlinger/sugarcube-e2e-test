@@ -333,7 +333,7 @@ export const testController: TestController = {
     { waitFor: waitStrategy = ':passageend' }: GotoActionOptions = {}
   ): TestControllerPromise {
     const startMillis = Date.now();
-    const cause = new Error(`goto error`);
+    const source = new Error(`goto error`);
     enterLogger.debug(`testController: entering goto '${passageTitle}'`);
 
     return Object.assign(
@@ -342,8 +342,8 @@ export const testController: TestController = {
           `goto '${passageTitle}'`
         )
           .catch((reason) => {
-            reason.cause = cause;
-            throw reason;
+            source.cause = reason;
+            throw source;
           })
           .finally(() => {
             const endMillis = Date.now();
@@ -441,7 +441,7 @@ export const testController: TestController = {
     millis: number,
     resolveOrReject: 'resolve' | 'reject' = 'resolve'
   ): TestControllerPromise {
-    const cause = new Error(
+    const source = new Error(
       `wait(${millis}, '${resolveOrReject}') timeout reached`
     );
 
@@ -453,7 +453,7 @@ export const testController: TestController = {
       thisAsPromise(this).then(() => {
         return new Promise<void>((resolve, reject) => {
           const impl = () => {
-            return resolveOrReject === 'resolve' ? resolve() : reject(cause);
+            return resolveOrReject === 'resolve' ? resolve() : reject(source);
           };
           setTimeout(impl, millis);
         });
@@ -477,13 +477,13 @@ const wait = (
   millis: number,
   resolveOrReject: 'resolve' | 'reject' = 'resolve'
 ): Promise<void> => {
-  const cause = new Error('Timeout');
+  const source = new Error('Timeout');
   return new Promise<void>((resolve, reject) => {
     enterLogger.debug(`testController: entering waiting ${millis} seconds`);
     let impl = resolve;
     if (resolveOrReject === 'reject') {
       impl = () => {
-        reject(cause);
+        reject(source);
       };
     }
     setTimeout(impl, millis);

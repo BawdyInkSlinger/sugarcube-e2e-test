@@ -69,36 +69,52 @@ describe(`click`, () => {
       .expect(Selector(`#status`).innerText)
       .eql(`pending`);
 
-    await expectAsync(
-      sugarcubeParser.testController.click(Selector('.passage button'))
-    ).toBeRejectedWithError(/:passageend/);
+    try {
+      await sugarcubeParser.testController.click(Selector('.passage button'));
+      fail(`Error expected`);
+    } catch (parentError) {
+      expect(parentError.message).toEqual('Click error');
+      const childError = parentError.cause;
+      expect(childError.message).toMatch(/waiting for a :passageend/);
+      const grandchildError = childError.cause;
+      expect(grandchildError.message).toMatch(/Timed out after/);
+    }
   });
 
-    it('gives a useful error if the selector cannot be found', async () => {
-      const sugarcubeParser = await SugarcubeParser.create({
-        passages: [
-          {
-            title: 'passage title',
-            tags: ['passage tag'],
-            text: `<h1>Passage 1</h1><<button "Button" "passage 2">><</button>>`,
-          },
-          {
-            title: 'passage 2',
-            tags: ['passage tag'],
-            text: '<h1>Passage 2</h1>',
-          },
-        ],
-      });
+  it('gives a useful error if the selector cannot be found', async () => {
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag'],
+          text: `<h1>Passage 1</h1><<button "Button" "passage 2">><</button>>`,
+        },
+        {
+          title: 'passage 2',
+          tags: ['passage tag'],
+          text: '<h1>Passage 2</h1>',
+        },
+      ],
+    });
 
-      await sugarcubeParser.testController
-        .goto('passage title')
-        .expect(Selector(`.passage h1`).innerText)
-        .eql(`Passage 1`);
+    await sugarcubeParser.testController
+      .goto('passage title')
+      .expect(Selector(`.passage h1`).innerText)
+      .eql(`Passage 1`);
 
-      await expectAsync(
-        sugarcubeParser.testController.click(Selector('.passage button').withText('foobar'))
-      ).toBeRejectedWithError(
+    try {
+        await sugarcubeParser.testController.click(
+          Selector('.passage button').withText('foobar')
+        );
+      fail(`Error expected`);
+    } catch (parentError) {
+      expect(parentError.message).toEqual('Click error');
+      const childError = parentError.cause;
+      expect(childError.message).toEqual('Click error');
+      const grandchildError = childError.cause;
+      expect(grandchildError.message).toEqual(
         'Attempted to click on selector that could not be found: Selector(`.passage button:contains(foobar)`)'
       );
-    });
+    }
+  });
 });
