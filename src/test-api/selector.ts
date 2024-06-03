@@ -65,7 +65,7 @@ interface SelectorAPI {
   // getStyleProperty(propertyName: string): Promise<string>;
   getAttribute(attributeName: string): Promise<string | null>;
   // getBoundingClientRectProperty(propertyName: string): Promise<number>;
-  // hasAttribute(attributeName: string): Promise<boolean>;
+  hasAttribute(attributeName: string): Promise<boolean>;
   // shadowRoot(): Selector;
   nth(index: number): Selector;
   withText(text: string): Selector;
@@ -179,6 +179,17 @@ export const Selector: SelectorFactory = (
         action: 'jQuerySelector',
         value: `:contains(${text})`,
         toString: () => `:contains(${text})`,
+      });
+      return this;
+    },
+    hasAttribute(attributeName: string): Promise<boolean> {
+      enterLogger.debug(
+        `selector: entering hasAttribute init='${init}' attributeName='${attributeName}'`
+      );
+      executionSteps.push({
+        action: 'jQuerySelector',
+        value: `[${attributeName}]`,
+        toString: () => `[${attributeName}]`,
       });
       return this;
     },

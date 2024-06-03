@@ -145,4 +145,23 @@ describe(`selector`, () => {
         'Selector(`.passage h2`) does not exist'
       );
   });
+
+  it('has hasAttribute', async () => {
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag'],
+          text: `<h1>Passage 1</h1><button disabled>Disabled Button</button><button>Enabled Button</button>`,
+        },
+      ],
+    });
+
+    await sugarcubeParser.testController
+      .goto('passage title')
+      .expect(Selector(`.passage button`).withText('Disabled Button').hasAttribute('disabled'))
+      .ok()
+      .expect(Selector(`.passage button`).withText('Enabled Button').hasAttribute('disabled'))
+      .notOk()
+  });
 });
