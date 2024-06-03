@@ -3,7 +3,6 @@ import { Selector } from './selector';
 import { getLogger } from '../logging/logger';
 import { ClickActionOptions } from './internal/click-action-options';
 import { buildWaitStrategy } from './wait-strategy';
-import { GotoActionOptions } from './internal/goto-action-options';
 import { durationFormat } from './internal/duration-format';
 import { click } from './click';
 
@@ -312,8 +311,7 @@ export interface TestController {
   // report(...args: any[]): TestControllerPromise;
   goto(
     passageTitle: string,
-    temporaryVariables?: unknown,
-    options?: GotoActionOptions
+    temporaryVariables?: unknown
   ): TestControllerPromise;
   logDocument(
     this: Promise<void> | TestController,
@@ -329,56 +327,54 @@ export const testController: TestController = {
   goto(
     this: Promise<void> | TestController,
     passageTitle: string,
-    temporaryVariables?: unknown,
-    { waitFor: waitStrategy = ':passageend' }: GotoActionOptions = {}
+    temporaryVariables?: unknown
   ): TestControllerPromise {
     const startMillis = Date.now();
     const source = new Error(`goto error`);
     enterLogger.debug(`testController: entering goto '${passageTitle}'`);
 
-    return Object.assign(
-      thisAsPromise(this).then(() => {
-        const pageLoadPromise = buildWaitStrategy(waitStrategy)(
-          `goto '${passageTitle}'`
-        )
-          .catch((reason) => {
-            source.cause = reason;
-            throw source;
-          })
-          .finally(() => {
-            const endMillis = Date.now();
-            performanceLogger.isDebugEnabled() &&
-              performanceLogger.debug(
-                `goto performance: ${durationFormat(startMillis, endMillis)}`
-              );
-          });
-        if (temporaryVariables !== undefined) {
+    const gotoPromise = thisAsPromise(this).then(() => {
+      const pageLoadPromise = buildWaitStrategy(`:passageend`)(
+        `goto '${passageTitle}'`
+      )
+        .catch((reason) => {
+          source.cause = reason;
+          throw source;
+        })
+        .finally(() => {
+          const endMillis = Date.now();
+          performanceLogger.isDebugEnabled() &&
+            performanceLogger.debug(
+              `goto performance: ${durationFormat(startMillis, endMillis)}`
+            );
+        });
+      if (temporaryVariables !== undefined) {
+        logger.debug(
+          `temporaryVariables=${JSON.stringify(temporaryVariables)}`
+        );
+        $(document).one(':passagestart', () => {
           logger.debug(
-            `temporaryVariables=${JSON.stringify(temporaryVariables)}`
+            `:passagestart temporaryVariables=${JSON.stringify(
+              temporaryVariables
+            )}`
           );
-          $(document).one(':passagestart', () => {
-            logger.debug(
-              `:passagestart temporaryVariables=${JSON.stringify(
-                temporaryVariables
-              )}`
-            );
-            for (const key of Object.keys(temporaryVariables)) {
-              globalThis.State.temporary[key] = temporaryVariables[key];
-            }
-            logger.debug(
-              `globalThis.State.temporary=${JSON.stringify(
-                globalThis.State.temporary
-              )}`
-            );
-          });
-        }
+          for (const key of Object.keys(temporaryVariables)) {
+            globalThis.State.temporary[key] = temporaryVariables[key];
+          }
+          logger.debug(
+            `globalThis.State.temporary=${JSON.stringify(
+              globalThis.State.temporary
+            )}`
+          );
+        });
+      }
 
-        globalThis.Engine.play(passageTitle);
+      globalThis.Engine.play(passageTitle);
 
-        return pageLoadPromise;
-      }),
-      testController
-    );
+      return pageLoadPromise;
+    });
+
+    return Object.assign(gotoPromise, testController);
   },
 
   click(

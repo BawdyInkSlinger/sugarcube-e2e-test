@@ -120,6 +120,31 @@ describe('SugarcubeParser', () => {
     expect(lastUrl).toEqual(`https://www.google.com/`);
   });
 
+  // TODO: uncomment
+  xit('gives a useful error if the start passage does not exist', async () => {
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag'],
+          text: `foobar`,
+        },
+      ],
+    });
+
+    try {
+      await sugarcubeParser.assignStateAndReload(
+        { 'variable': '123' },
+        'foobar'
+      );
+
+      fail(`Error expected`);
+    } catch (parentError) {
+      expect(parentError.message).toMatch(/does not exist/);
+      expect(parentError.message).toMatch(/foobar/);
+    }
+  });
+
   describe(`resetState`, () => {
     it(`resets variables`, async () => {
       const sugarcubeParser = await SugarcubeParser.create({
