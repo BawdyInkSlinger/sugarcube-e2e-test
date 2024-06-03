@@ -5,6 +5,7 @@ import { ClickActionOptions } from './internal/click-action-options';
 import { buildWaitStrategy } from './wait-strategy';
 import { durationFormat } from './internal/duration-format';
 import { click } from './click';
+import { waitForPassageEnd } from './wait-for-passage-end';
 
 const logger = getLogger('DEFAULT');
 const performanceLogger = getLogger('DEBUG_PERFORMANCE');
@@ -334,9 +335,7 @@ export const testController: TestController = {
     enterLogger.debug(`testController: entering goto '${passageTitle}'`);
 
     const gotoPromise = thisAsPromise(this).then(() => {
-      const pageLoadPromise = buildWaitStrategy(`:passageend`)(
-        `goto '${passageTitle}'`
-      )
+      const pageLoadPromise = waitForPassageEnd(`goto '${passageTitle}'`)
         .catch((reason) => {
           source.cause = reason;
           throw source;
