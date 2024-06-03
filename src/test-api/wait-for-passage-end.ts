@@ -1,6 +1,5 @@
 import { getLogger } from '../logging/logger';
 import {
-  PromiseTimeoutError,
   promiseWithTimeout,
 } from './promise-with-timeout';
 
