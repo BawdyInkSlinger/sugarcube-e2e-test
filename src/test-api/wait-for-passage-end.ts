@@ -1,7 +1,7 @@
 import { getLogger } from '../logging/logger';
 import {
   promiseWithTimeout,
-} from './promise-with-timeout';
+} from './internal/promise-with-timeout';
 
 const logger = getLogger('DEFAULT');
 const enterLogger = getLogger('DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES');
