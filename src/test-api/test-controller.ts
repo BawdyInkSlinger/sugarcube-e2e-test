@@ -2,7 +2,6 @@ import { AssertionApi, PromiseAssertions } from './internal/assertion';
 import { Selector } from './selector';
 import { getLogger } from '../logging/logger';
 import { ClickActionOptions } from './internal/click-action-options';
-import { buildWaitStrategy } from './wait-strategy';
 import { durationFormat } from './internal/duration-format';
 import { click } from './click';
 import { waitForPassageEnd } from './wait-for-passage-end';

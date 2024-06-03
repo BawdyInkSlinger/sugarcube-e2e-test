@@ -1,4 +1,3 @@
-import { WaitStrategyType } from '../wait-strategy';
 import { ActionOptions } from './action-options';
 import { KeyModifiers } from './key-modifiers';
 
@@ -11,7 +10,7 @@ export interface ClickActionOptions
    */
   //   caretPos?: number;
 
-  waitFor?: WaitStrategyType;
+  waitFor?: ":passageend" | "click end";
 }
 
 interface OffsetOptions extends ActionOptions {
