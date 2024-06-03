@@ -182,16 +182,18 @@ export const Selector: SelectorFactory = (
       });
       return this;
     },
-    hasAttribute(attributeName: string): Promise<boolean> {
-      enterLogger.debug(
-        `selector: entering hasAttribute init='${init}' attributeName='${attributeName}'`
-      );
-      executionSteps.push({
-        action: 'jQuerySelector',
-        value: `[${attributeName}]`,
-        toString: () => `[${attributeName}]`,
+    hasAttribute: function (attributeName: string): Promise<boolean> {
+      return ReExecutablePromise.fromFn(() => {
+        enterLogger.debug(
+          `selector: entering hasAttribute init='${init}' attributeName='${attributeName}'`
+        );
+        executionSteps.push({
+          action: 'jQuerySelector',
+          value: `[${attributeName}]`,
+          toString: () => `[${attributeName}]`,
+        });
+        return selectorExecute(executionSteps).length > 0;
       });
-      return this;
     },
     nth(index: number): Selector {
       executionSteps.push({
