@@ -1,5 +1,5 @@
 import { getLogger } from '../../logging/logger';
-import { PromiseTimeoutError } from './promise-timeout-error';
+import { PromiseTimeoutError } from './error/promise-timeout-error';
 
 const logger = getLogger('DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES');
 

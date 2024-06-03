@@ -1,7 +1,7 @@
 import { getLogger } from '../logging/logger';
 import { ClickActionOptions } from './internal/click-action-options';
 import { durationFormat } from './internal/duration-format';
-import { PromiseTimeoutError } from './internal/promise-timeout-error';
+import { PromiseTimeoutError } from './internal/error/promise-timeout-error';
 import { Selector } from './selector';
 import { TestControllerPromise, testController } from './test-controller';
 import { waitForClickEnd } from './wait-for-click-end';
