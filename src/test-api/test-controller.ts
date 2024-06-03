@@ -330,10 +330,15 @@ export const testController: TestController = {
     temporaryVariables?: unknown
   ): TestControllerPromise {
     const startMillis = Date.now();
-    const source = new Error(`goto error`);
+    const source = new Error(`Goto error`);
     enterLogger.debug(`testController: entering goto '${passageTitle}'`);
 
     const gotoPromise = thisAsPromise(this).then(() => {
+      if (!globalThis.Story.has(passageTitle)) {
+        source.cause = new Error(`Passage '${passageTitle}' does not exist`);
+        throw source;
+      }
+
       const pageLoadPromise = waitForPassageEnd(`goto '${passageTitle}'`)
         .catch((reason) => {
           source.cause = reason;
