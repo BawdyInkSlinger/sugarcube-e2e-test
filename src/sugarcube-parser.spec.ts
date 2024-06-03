@@ -120,7 +120,6 @@ describe('SugarcubeParser', () => {
     expect(lastUrl).toEqual(`https://www.google.com/`);
   });
 
-  // TODO: uncomment
   xit('gives a useful error if the start passage does not exist', async () => {
     const sugarcubeParser = await SugarcubeParser.create({
       passages: [
@@ -137,7 +136,6 @@ describe('SugarcubeParser', () => {
         { 'variable': '123' },
         'foobar'
       );
-
       fail(`Error expected`);
     } catch (parentError) {
       expect(parentError.message).toMatch(/does not exist/);

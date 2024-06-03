@@ -11,9 +11,16 @@ import { TestController, testController } from './test-api/test-controller';
 import { getLogger } from './logging/logger';
 import { addToPrettyString } from './add-to-pretty-string';
 import { clearTimeouts } from './trigger-timeout';
-import type { State } from './internal/state';
 import jQueryFactory from 'jquery';
 import {} from 'node:path';
+import type { State } from './internal/state';
+import type { Story } from './internal/fakes/story';
+import type { Config } from './internal/config';
+import type { Engine } from './internal/fakes/engine';
+import type { Save } from './internal/fakes/save';
+import type { Setting } from './internal/fakes/setting';
+import type { Macro } from './internal/macro/macro';
+import type { Template } from './internal/template';
 
 const logger = getLogger('DEFAULT');
 const passagesLogger = getLogger('DEBUG_PASSAGES');
@@ -29,14 +36,14 @@ export type SugarcubeParserOptions = {
 
 export class SugarcubeParser {
   jQuery: JQueryStatic;
-  Config: any;
-  Macro: any;
-  Setting: any;
+  Config: typeof Config;
+  Macro: typeof Macro;
+  Setting: typeof Setting;
   State: typeof State;
-  Engine: any;
-  Save: any;
-  Template: any;
-  Story: any;
+  Engine: typeof Engine;
+  Save: typeof Save;
+  Template: typeof Template;
+  Story: typeof Story;
 
   private constructor() {
     this.jQuery = jQuery;
