@@ -8,6 +8,9 @@
 ***********************************************************************************************************************/
 /* global Has, L10n, safeActiveElement */
 import { getLogger } from '../logging/logger';
+import { Has } from './has';
+import { safeActiveElement } from './helpers';
+import { L10n } from './l10n';
 
 const logger = getLogger();
 
@@ -118,9 +121,12 @@ export const Dialog = (() => {
   }
 
   function dialogInit() {
+    /* BIS change:
     if (DEBUG) {
       console.log('[Dialog/dialogInit()]');
     }
+    */
+    logger.debug('[Dialog/dialogInit()]');
 
     if (document.getElementById('ui-dialog')) {
       return;
@@ -208,7 +214,7 @@ export const Dialog = (() => {
     $elems.insertBefore('body>script#script-sugarcube');
   }
 
-  function dialogIsOpen(classNames) {
+  function dialogIsOpen(classNames?) {
     return (
       _$dialog.hasClass('open') &&
       (classNames
@@ -271,7 +277,9 @@ export const Dialog = (() => {
       'resize.dialog-resize',
       null,
       { top },
-      jQuery.throttle(40, _resizeHandler)
+      // BIS Change:
+      //   jQuery.throttle(40, _resizeHandler)
+      _resizeHandler
     );
 
     // Add the dialog mutation resize handler.
@@ -293,7 +301,9 @@ export const Dialog = (() => {
         'DOMNodeInserted.dialog-resize DOMNodeRemoved.dialog-resize',
         null,
         { top },
-        jQuery.throttle(40, _resizeHandler)
+        // BIS Change:
+        //   jQuery.throttle(40, _resizeHandler)
+        _resizeHandler
       );
     }
 
@@ -354,7 +364,14 @@ export const Dialog = (() => {
   function _calcPosition(topPos) {
     const top = topPos != null ? topPos : 50; // lazy equality for null
     const $parent = jQuery(window);
-    const dialogPos = { left: '', right: '', top: '', bottom: '' };
+    
+    type DialogPos = {
+      left: '' | number;
+      right: '' | number;
+      top: '' | number;
+      bottom: '' | number;
+    };
+    const dialogPos: DialogPos = { left: '', right: '', top: '', bottom: '' };
 
     // Unset the dialog's positional properties before checking its dimensions.
     _$dialog.css(dialogPos);

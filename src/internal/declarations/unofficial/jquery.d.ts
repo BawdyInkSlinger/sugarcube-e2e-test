@@ -20,6 +20,18 @@ declare global {
       options: { cleanup?: boolean; profile: string },
       ...sources: string[]
     ): this;
+
+    attr(
+        attributeName: string,
+        value_function:
+            | string
+            | number
+            | boolean // BIS Change
+            | null
+            // BIS Change:
+            // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+            // | ((this: TElement, index: number, attr: string) => string | number | void | undefined),
+    ): this;
   }
 }
 
