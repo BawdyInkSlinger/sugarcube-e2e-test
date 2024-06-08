@@ -21,6 +21,7 @@ import type { Save } from './internal/fakes/save';
 import type { Setting } from './internal/fakes/setting';
 import type { Macro } from './internal/macro/macro';
 import type { Template } from './internal/template';
+import type { Dialog } from './internal/dialog';
 
 const logger = getLogger('DEFAULT');
 const passagesLogger = getLogger('DEBUG_PASSAGES');
@@ -29,7 +30,7 @@ const baseUrl = 'http://localhost';
 export type SugarcubeParserOptions = {
   passages: SimplePassage[];
   resourceLoader?: ResourceLoader | 'usable';
-//   customPassageLoadedHandler?: (debugNote: string) => Promise<void>;  TODO: turn TestController into a class so this (and timeoutMillis, for eg) can be passed into it?
+  //   customPassageLoadedHandler?: (debugNote: string) => Promise<void>;  TODO: turn TestController into a class so this (and timeoutMillis, for eg) can be passed into it?
   moduleScripts?: string[];
   sugarcubeScripts?: string[];
 };
@@ -44,6 +45,7 @@ export class SugarcubeParser {
   Save: typeof Save;
   Template: typeof Template;
   Story: typeof Story;
+  Dialog: typeof Dialog;
 
   private constructor() {
     this.jQuery = jQuery;
@@ -55,6 +57,7 @@ export class SugarcubeParser {
     this.Save = globalThis.Save;
     this.Template = globalThis.Template;
     this.Story = globalThis.Story;
+    this.Dialog = globalThis.Dialog;
   }
 
   static async create({
@@ -144,6 +147,9 @@ export class SugarcubeParser {
     const { Template } = await import('./internal/template');
     resetGlobal('Template', Template);
 
+    const { Dialog } = await import('./internal/dialog');
+    resetGlobal('Dialog', Dialog);
+
     resetGlobal('settings', {});
 
     const {
@@ -228,7 +234,7 @@ export class SugarcubeParser {
 
   resetState(urlParams = ''): void {
     logger.debug(`resetState(urlParams=\`${urlParams}\`)`);
-    
+
     const url = baseUrl + (urlParams.length > 0 ? `?${urlParams}` : '');
     logger.debug(`resetState(url=\`${url}\`)`);
     globalThis.jsdom.reconfigure({ url });
