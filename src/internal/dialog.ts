@@ -7,8 +7,11 @@
 
 ***********************************************************************************************************************/
 /* global Has, L10n, safeActiveElement */
+import { getLogger } from '../logging/logger';
 
-var Dialog = (() => { // eslint-disable-line no-unused-vars, no-var
+const logger = getLogger();
+
+export const Dialog = (() => { // eslint-disable-line no-unused-vars, no-var
 	'use strict';
 
 	// Dialog element caches.
