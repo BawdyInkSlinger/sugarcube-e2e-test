@@ -1,0 +1,1 @@
+export type OutputDestination = DocumentFragment | HTMLElement;

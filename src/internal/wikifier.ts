@@ -25,6 +25,7 @@ import { getLogger } from '../logging/logger';
 import { convertBreaks } from './helpers';
 import { objectDefineProperties } from './utils/object-define-properties';
 import { Util } from './util';
+import { OutputDestination } from './declarations/unofficial/output-destination';
 
 const logger = getLogger('DEFAULT');
 /*
@@ -42,7 +43,7 @@ export const Wikifier = (() => {
 		Wikifier Class.
 	*******************************************************************************************************************/
 
-  type OutputDestination = DocumentFragment | HTMLElement;
+  
 
   class Wikifier {
     declare output: OutputDestination;

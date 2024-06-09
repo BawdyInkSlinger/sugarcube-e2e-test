@@ -9,6 +9,7 @@
 /* global Config, L10n, State, Story, Util, Wikifier */
 
 import { Config } from './config';
+import { OutputDestination } from './declarations/unofficial/output-destination';
 import { Story } from './fakes/story';
 import { L10n } from './l10n';
 import { State } from './state';
@@ -319,7 +320,7 @@ export const {
   /*
 		Appends an error view to the passed DOM element.
 	*/
-  function throwError(place, message, source) {
+  function throwError(place: OutputDestination, message, source) {
     const $wrapper = jQuery(document.createElement('div'));
     const $toggle = jQuery(document.createElement('button'));
     const $source = jQuery(document.createElement('pre'));
