@@ -46,6 +46,7 @@ interface SelectorAPI {
   // focused: Promise<boolean>;
   // id: Promise<string>;
   innerText: Promise<string>;
+  innerHTML: Promise<string>; // Addition
   // namespaceURI: Promise<string | null>;
   // offsetHeight: Promise<number>;
   // offsetLeft: Promise<number>;
@@ -164,6 +165,18 @@ export const Selector: SelectorFactory = (
         );
       }
       return innerText($nodes[0]);
+    }),
+    innerHTML: ReExecutablePromise.fromFn(() => {
+      executionLogger.debug(
+        `selector: innerHTML on '${selectorToStringBuilder(executionSteps)()}'`
+      );
+      const $nodes = selectorExecute(executionSteps);
+      if ($nodes.length === 0) {
+        throw new Error(
+          `${selectorToStringBuilder(executionSteps)()} does not exist`
+        );
+      }
+      return $nodes[0].innerHTML;
     }),
     exists: ReExecutablePromise.fromFn(
       () => selectorExecute(executionSteps).length > 0

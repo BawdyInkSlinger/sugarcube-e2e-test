@@ -125,25 +125,25 @@ describe(`selector`, () => {
 
   it('fails fast when the selector does not exist', async () => {
     const sugarcubeParser = await SugarcubeParser.create({
-        passages: [
-          {
-            title: 'passage title',
-            tags: ['passage tag'],
-            text: `<h1>Passage 1</h1>`,
-          },
-        ],
-      });
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag'],
+          text: `<h1>Passage 1</h1>`,
+        },
+      ],
+    });
 
-      await sugarcubeParser.testController
-        .goto('passage title')
-        .expect(Selector(`.passage h1`).innerText)
-        .eql(`Passage 1`);
+    await sugarcubeParser.testController
+      .goto('passage title')
+      .expect(Selector(`.passage h1`).innerText)
+      .eql(`Passage 1`);
 
-      await expectAsync(
-        sugarcubeParser.testController.expect(Selector('.passage h2').innerText).eql(`This selector does not exist`)
-      ).toBeRejectedWithError(
-        'Selector(`.passage h2`) does not exist'
-      );
+    await expectAsync(
+      sugarcubeParser.testController
+        .expect(Selector('.passage h2').innerText)
+        .eql(`This selector does not exist`)
+    ).toBeRejectedWithError('Selector(`.passage h2`) does not exist');
   });
 
   it('has hasAttribute', async () => {
@@ -159,9 +159,34 @@ describe(`selector`, () => {
 
     await sugarcubeParser.testController
       .goto('passage title')
-      .expect(Selector(`.passage button`).withText('Disabled Button').hasAttribute('disabled'))
+      .expect(
+        Selector(`.passage button`)
+          .withText('Disabled Button')
+          .hasAttribute('disabled')
+      )
       .ok()
-      .expect(Selector(`.passage button`).withText('Enabled Button').hasAttribute('disabled'))
-      .notOk()
+      .expect(
+        Selector(`.passage button`)
+          .withText('Enabled Button')
+          .hasAttribute('disabled')
+      )
+      .notOk();
+  });
+
+  it('has innerHTML', async () => {
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag'],
+          text: ` <div> <div id="nested"> <p> Words words words <span> nest </span> </p> </div> </div> `,
+        },
+      ],
+    });
+
+    await sugarcubeParser.testController
+      .goto('passage title')
+      .expect(Selector('#nested').innerHTML)
+      .eql(` <p> Words words words <span> nest </span> </p> `);
   });
 });
