@@ -107,11 +107,11 @@ export interface AssertionApi<E = any> {
   //   options?: AssertionOptions
   // ): TestControllerPromise;
   // gt(expected: number, options?: AssertionOptions): TestControllerPromise;
-  // gte(
-  //   expected: number,
-  //   message?: string,
-  //   options?: AssertionOptions
-  // ): TestControllerPromise;
+  gte(
+    expected: number,
+    message?: string,
+    options?: AssertionOptions
+  ): TestControllerPromise;
   gte(expected: number, options?: AssertionOptions): TestControllerPromise;
   // lt(
   //   expected: number,
@@ -352,8 +352,15 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
     );
   }
 
+  gte(expected: number, options?: AssertionOptions): TestControllerPromise<void>;
   gte(
     expected: number,
+    errorMessage: string,
+    options?: AssertionOptions
+  ): TestControllerPromise<void>;
+  gte(
+    expected: number,
+    messageOrOptions: string | AssertionOptions,
     options?: AssertionOptions
   ): TestControllerPromise<void> {
     const source = new Error();
@@ -380,17 +387,18 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
             `PromiseAssertions: resolving gte then actualValue=${actualValue}`
           );
 
-          const actualNumber = _.toNumber(actualValue);
+          const customErrorMessage = typeof messageOrOptions === 'string' ? '\n' + messageOrOptions : '';
 
+          const actualNumber = _.toNumber(actualValue);
           if (Number.isNaN(actualNumber)) {
-            source.message = `\n  Expected:\n${JSON.stringify(
+            source.message = `${customErrorMessage}\n  Expected:\n${JSON.stringify(
               actualValue
             )} >= ${JSON.stringify(expected)}\n  Actual: ${JSON.stringify(
                 actualValue
               )} is not a number`;
             return Promise.reject(source);
           } else if (actualNumber < expected) {
-            source.message = `\n  Expected:\n${actualNumber} >= ${JSON.stringify(
+            source.message = `${customErrorMessage}\n  Expected:\n${actualNumber} >= ${JSON.stringify(
               expected
             )}`;
             return Promise.reject(source);

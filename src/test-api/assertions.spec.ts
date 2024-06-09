@@ -76,5 +76,30 @@ describe(`assertions`, () => {
           .gte(13)
       ).toBeRejectedWithError(/"foobar" is not a number/);
     });
+    
+    it('errors with a custom message', async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'passage title',
+            tags: ['passage tag'],
+            text: '<div id="value">3</div>',
+          },
+        ],
+      });
+
+      await sugarcubeParser.testController.goto('passage title');
+
+      await expectAsync(
+        sugarcubeParser.testController
+          .expect(Selector('#value').innerText)
+          .gte(13, 'custom message')
+      ).toBeRejectedWithError(/^3 >= 13$/m);
+      await expectAsync(
+        sugarcubeParser.testController
+          .expect(Selector('#value').innerText)
+          .gte(13, 'custom message')
+      ).toBeRejectedWithError(/custom message/);
+    });
   });
 });
