@@ -363,7 +363,7 @@ export const {
     $wrapper.addClass('error-view').appendTo(place);
 
     // return false;
-    throw new Error(`Error on passage=\`${State.passage}\``);
+    throw new Error(`Error on passage=\`${State.passage}\`\nmessage=\`${message}\``);
   }
 
   /*
