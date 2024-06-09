@@ -76,7 +76,7 @@ describe(`assertions`, () => {
           .gte(13)
       ).toBeRejectedWithError(/"foobar" is not a number/);
     });
-    
+
     it('errors with a custom message', async () => {
       const sugarcubeParser = await SugarcubeParser.create({
         passages: [
@@ -99,6 +99,70 @@ describe(`assertions`, () => {
         sugarcubeParser.testController
           .expect(Selector('#value').innerText)
           .gte(13, 'custom message')
+      ).toBeRejectedWithError(/custom message/);
+    });
+  });
+
+  describe(`notContains`, () => {
+    it('passes when actual does NOT contain expected', async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'passage title',
+            tags: ['passage tag'],
+            text: '<div id="value">foobar</div>',
+          },
+        ],
+      });
+
+      await sugarcubeParser.testController
+        .goto('passage title')
+        .expect(Selector('#value').innerText)
+        .notContains('baz');
+    });
+
+    it('errors when actual IS contained in expected', async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'passage title',
+            tags: ['passage tag'],
+            text: '<div id="value">foobar</div>',
+          },
+        ],
+      });
+
+      await sugarcubeParser.testController.goto('passage title');
+
+      await expectAsync(
+        sugarcubeParser.testController
+          .expect(Selector('#value').innerText)
+          .notContains('oob')
+      ).toBeRejectedWithError(/To NOT Contain:/);
+    });
+
+    it('errors with a custom message', async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'passage title',
+            tags: ['passage tag'],
+            text: '<div id="value">foobar</div>',
+          },
+        ],
+      });
+
+      await sugarcubeParser.testController.goto('passage title');
+
+      await expectAsync(
+        sugarcubeParser.testController
+          .expect(Selector('#value').innerText)
+          .notContains('oob', 'custom message')
+      ).toBeRejectedWithError(/To NOT Contain:/);
+      await expectAsync(
+        sugarcubeParser.testController
+          .expect(Selector('#value').innerText)
+          .notContains('oob', 'custom message')
       ).toBeRejectedWithError(/custom message/);
     });
   });

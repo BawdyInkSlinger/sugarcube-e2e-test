@@ -42,11 +42,11 @@ export interface AssertionApi<E = any> {
     expected: EnsureString<E> | ElementOf<E> | Extend<E, R>,
     options?: AssertionOptions
   ): TestControllerPromise;
-  // notContains<R>(
-  //   unexpected: EnsureString<E> | ElementOf<E> | Extend<E, R>,
-  //   message?: string,
-  //   options?: AssertionOptions
-  // ): TestControllerPromise;
+  notContains<R>(
+    unexpected: EnsureString<E> | ElementOf<E> | Extend<E, R>,
+    message?: string,
+    options?: AssertionOptions
+  ): TestControllerPromise;
   notContains<R>(
     unexpected: EnsureString<E> | ElementOf<E> | Extend<E, R>,
     options?: AssertionOptions
@@ -290,9 +290,19 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
       testController
     );
   }
+
+  notContains<R>(
+    needle: EnsureString<A> | ElementOf<A> | Extend<A, R>,
+    message?: string,
+    options?: AssertionOptions
+  ): TestControllerPromise;
   notContains<R>(
     needle: EnsureString<A> | ElementOf<A> | Extend<A, R>,
     options?: AssertionOptions
+  ): TestControllerPromise;
+  notContains<R>(
+    needle: EnsureString<A> | ElementOf<A> | Extend<A, R>,
+    messageOrOptions?: string | AssertionOptions
   ): TestControllerPromise<void> {
     const source = new Error();
     enterLogger.debug(
@@ -335,7 +345,9 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
             return Promise.resolve();
           }
 
-          source.message = `\n  Expected:\n${actualValue}\n  To NOT Contain:\n${needle}`;
+          const customErrorMessage =
+            typeof messageOrOptions === 'string' ? '\n' + messageOrOptions : '';
+          source.message = `${customErrorMessage}\n  Expected:\n${actualValue}\n  To NOT Contain:\n${needle}`;
           return Promise.reject(source);
         })
         .finally(() => {
@@ -352,7 +364,10 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
     );
   }
 
-  gte(expected: number, options?: AssertionOptions): TestControllerPromise<void>;
+  gte(
+    expected: number,
+    options?: AssertionOptions
+  ): TestControllerPromise<void>;
   gte(
     expected: number,
     errorMessage: string,
@@ -387,15 +402,16 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
             `PromiseAssertions: resolving gte then actualValue=${actualValue}`
           );
 
-          const customErrorMessage = typeof messageOrOptions === 'string' ? '\n' + messageOrOptions : '';
+          const customErrorMessage =
+            typeof messageOrOptions === 'string' ? '\n' + messageOrOptions : '';
 
           const actualNumber = _.toNumber(actualValue);
           if (Number.isNaN(actualNumber)) {
             source.message = `${customErrorMessage}\n  Expected:\n${JSON.stringify(
               actualValue
             )} >= ${JSON.stringify(expected)}\n  Actual: ${JSON.stringify(
-                actualValue
-              )} is not a number`;
+              actualValue
+            )} is not a number`;
             return Promise.reject(source);
           } else if (actualNumber < expected) {
             source.message = `${customErrorMessage}\n  Expected:\n${actualNumber} >= ${JSON.stringify(
