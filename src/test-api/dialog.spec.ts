@@ -9,9 +9,13 @@ describe(`dialog`, () => {
           title: 'passage title',
           tags: ['passage tag'],
           text: `
-Dialog.setup("Character Sheet");
-Dialog.wiki('<<button "Close Dialog">><<run Dialog.close()>><</button>>');
-Dialog.open();
+<<button "Open Dialog">>
+    <<script>>
+        Dialog.setup("Character Sheet");
+        Dialog.wiki('<<button "Close Dialog">><<run Dialog.close()>><</button>>');
+        Dialog.open();
+    <</script>>
+<</button>>
           `,
         },
       ],
@@ -19,8 +23,19 @@ Dialog.open();
 
     await sugarcubeParser.testController
       .goto('passage title')
-      .click(Selector('.passage button').withText(`Close Dialog`), {
+      .expect(Selector('#ui-dialog.open').exists)
+      .notOk()
+      // click the button to open the dialog
+      .click(Selector('.passage button').withText(`Open Dialog`), {
         waitFor: 'click end',
-      });
+      })
+      .expect(Selector('#ui-dialog.open').exists)
+      .ok()
+      // click the button to close the dialog
+      .click(Selector('#ui-dialog-body button').withText(`Close Dialog`), {
+        waitFor: 'click end',
+      })
+      .expect(Selector('#ui-dialog.open').exists)
+      .notOk();
   });
 });

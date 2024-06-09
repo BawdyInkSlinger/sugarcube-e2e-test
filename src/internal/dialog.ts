@@ -11,6 +11,7 @@ import { getLogger } from '../logging/logger';
 import { Has } from './has';
 import { safeActiveElement } from './helpers';
 import { L10n } from './l10n';
+import { objectDefineProperties } from './utils/object-define-properties';
 
 const logger = getLogger();
 
@@ -123,12 +124,16 @@ export const Dialog = (() => {
   function dialogInit() {
     /* BIS change:
     if (DEBUG) {
-      console.log('[Dialog/dialogInit()]');
+        console.log('[Dialog/dialogInit()]');
     }
     */
     logger.debug('[Dialog/dialogInit()]');
 
     if (document.getElementById('ui-dialog')) {
+      // BIS addition:
+      logger.info(
+        "[Dialog/dialogInit(): returning early because document.getElementById('ui-dialog')]"
+      );
       return;
     }
 
@@ -364,7 +369,7 @@ export const Dialog = (() => {
   function _calcPosition(topPos) {
     const top = topPos != null ? topPos : 50; // lazy equality for null
     const $parent = jQuery(window);
-    
+
     type DialogPos = {
       left: '' | number;
       right: '' | number;
@@ -430,7 +435,7 @@ export const Dialog = (() => {
 	*******************************************************************************/
 
   return Object.freeze(
-    Object.defineProperties(
+    objectDefineProperties(
       {},
       {
         append: { value: dialogBodyAppend },

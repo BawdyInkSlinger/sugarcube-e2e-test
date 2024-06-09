@@ -11,6 +11,7 @@ import { SimplePassage } from '../declarations/unofficial/simple-passage';
 import { getLogger } from '../../logging/logger';
 import { L10n } from '../l10n';
 import { Util } from '../util';
+import { Dialog } from '../dialog';
 
 let storyPassages: Passage[] = [];
 const logger = getLogger('DEFAULT');
@@ -263,6 +264,7 @@ function start(moduleScripts: Script[], storyScripts: Script[]) {
     indirectEval(script.content);
   });
 
+  Dialog.init();
   // primarily deals with StoryInterface Dom modifications
   Engine.init();
 
