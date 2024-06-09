@@ -320,7 +320,7 @@ export const {
   /*
 		Appends an error view to the passed DOM element.
 	*/
-  function throwError(place: OutputDestination, message, source) {
+  function throwError(place: OutputDestination, message: string, source) {
     const $wrapper = jQuery(document.createElement('div'));
     const $toggle = jQuery(document.createElement('button'));
     const $source = jQuery(document.createElement('pre'));
