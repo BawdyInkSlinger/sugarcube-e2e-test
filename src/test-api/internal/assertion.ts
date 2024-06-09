@@ -33,11 +33,11 @@ export interface AssertionApi<E = any> {
   ok(options?: AssertionOptions): TestControllerPromise;
   // notOk(message?: string, options?: AssertionOptions): TestControllerPromise;
   notOk(options?: AssertionOptions): TestControllerPromise;
-  // contains<R>(
-  //   expected: EnsureString<E> | ElementOf<E> | Extend<E, R>,
-  //   message?: string,
-  //   options?: AssertionOptions
-  // ): TestControllerPromise;
+  contains<R>(
+    expected: EnsureString<E> | ElementOf<E> | Extend<E, R>,
+    message?: string,
+    options?: AssertionOptions
+  ): TestControllerPromise;
   contains<R>(
     expected: EnsureString<E> | ElementOf<E> | Extend<E, R>,
     options?: AssertionOptions
@@ -230,8 +230,17 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
   }
 
   contains<R>(
+    expected: EnsureString<A> | ElementOf<A> | Extend<A, R>,
+    message?: string,
+    options?: AssertionOptions
+  ): TestControllerPromise;
+  contains<R>(
     needle: EnsureString<A> | ElementOf<A> | Extend<A, R>,
     options?: AssertionOptions
+  ): TestControllerPromise<void>;
+  contains<R>(
+    needle: EnsureString<A> | ElementOf<A> | Extend<A, R>,
+    messageOrOptions?: string | AssertionOptions
   ): TestControllerPromise<void> {
     const source = new Error();
     enterLogger.debug(
@@ -274,7 +283,9 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
             return Promise.resolve();
           }
 
-          source.message = `\n  Expected:\n${actualValue}\n  To Contain:\n${needle}`;
+          const customErrorMessage =
+            typeof messageOrOptions === 'string' ? '\n' + messageOrOptions : '';
+          source.message = `${customErrorMessage}\n  Expected:\n${actualValue}\n  To Contain:\n${needle}`;
           return Promise.reject(source);
         })
         .finally(() => {

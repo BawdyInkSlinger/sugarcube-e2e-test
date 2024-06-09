@@ -166,4 +166,68 @@ describe(`assertions`, () => {
       ).toBeRejectedWithError(/custom message/);
     });
   });
+
+  describe(`contains`, () => {
+    it('passes when actual IS contained in expected', async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'passage title',
+            tags: ['passage tag'],
+            text: '<div id="value">foobar</div>',
+          },
+        ],
+      });
+
+      await sugarcubeParser.testController
+        .goto('passage title')
+        .expect(Selector('#value').innerText)
+        .contains('oob');
+    });
+
+    it('errors when actual does NOT contain expected', async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'passage title',
+            tags: ['passage tag'],
+            text: '<div id="value">foobar</div>',
+          },
+        ],
+      });
+
+      await sugarcubeParser.testController.goto('passage title');
+
+      await expectAsync(
+        sugarcubeParser.testController
+          .expect(Selector('#value').innerText)
+          .contains('baz')
+      ).toBeRejectedWithError(/To Contain:/);
+    });
+
+    it('errors with a custom message', async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'passage title',
+            tags: ['passage tag'],
+            text: '<div id="value">foobar</div>',
+          },
+        ],
+      });
+
+      await sugarcubeParser.testController.goto('passage title');
+
+      await expectAsync(
+        sugarcubeParser.testController
+          .expect(Selector('#value').innerText)
+          .contains('baz', 'custom message')
+      ).toBeRejectedWithError(/To Contain:/);
+      await expectAsync(
+        sugarcubeParser.testController
+          .expect(Selector('#value').innerText)
+          .contains('baz', 'custom message')
+      ).toBeRejectedWithError(/custom message/);
+    });
+  });
 });
