@@ -8,6 +8,7 @@ import { getLogger } from '../../logging/logger';
 import { splitMatches } from './split-matches';
 import { highlightMatches } from './highlight-matches';
 import { durationFormat } from './duration-format';
+import { Util } from '../../internal/util';
 
 export type ElementOf<T> = T extends (infer E)[] ? E : never;
 export type Extend<T, E> = T extends E ? E : never;
@@ -111,7 +112,7 @@ export interface AssertionApi<E = any> {
   //   message?: string,
   //   options?: AssertionOptions
   // ): TestControllerPromise;
-  // gte(expected: number, options?: AssertionOptions): TestControllerPromise;
+  gte(expected: number, options?: AssertionOptions): TestControllerPromise;
   // lt(
   //   expected: number,
   //   message?: string,
@@ -345,6 +346,63 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
                 this.startMillis,
                 endMillis
               )}`
+            );
+        }),
+      testController
+    );
+  }
+
+  gte(
+    expected: number,
+    options?: AssertionOptions
+  ): TestControllerPromise<void> {
+    const source = new Error();
+    enterLogger.debug(
+      `PromiseAssertions: entering gte expected='${expected}' this.actual='${this.actual}'`
+    );
+    return Object.assign(
+      this.currentPromise
+        .then(() => {
+          logger.debug(
+            `PromiseAssertions: resolving gte then expected='${expected}' this.actual='${this.actual}'`
+          );
+          if (this.actual instanceof ReExecutablePromise) {
+            logger.debug(
+              `PromiseAssertions: re-executing!='${expected}' this.actual='${this.actual}'`
+            );
+            return this.actual._reExecute();
+          } else {
+            return this.actual;
+          }
+        })
+        .then((actualValue: A) => {
+          logger.debug(
+            `PromiseAssertions: resolving gte then actualValue=${actualValue}`
+          );
+
+          const actualNumber = _.toNumber(actualValue);
+
+          if (Number.isNaN(actualNumber)) {
+            source.message = `\n  Expected:\n${JSON.stringify(
+              actualValue
+            )} >= ${JSON.stringify(expected)}\n  Actual: ${JSON.stringify(
+                actualValue
+              )} is not a number`;
+            return Promise.reject(source);
+          } else if (actualNumber < expected) {
+            source.message = `\n  Expected:\n${actualNumber} >= ${JSON.stringify(
+              expected
+            )}`;
+            return Promise.reject(source);
+          } else {
+            return Promise.resolve();
+          }
+        })
+        .finally(() => {
+          const endMillis = Date.now();
+          performanceLogger.isDebugEnabled() &&
+            performanceLogger.debug(
+              `gte performance: ${durationFormat(this.startMillis, endMillis)}`
             );
         }),
       testController
