@@ -199,20 +199,14 @@ export const Selector: SelectorFactory = (
         if (styleKey === `display` && styleValue === `none`) {
           return false;
         }
-        if (styleKey === `visibility` && styleValue === `hidden`) {
-          return false;
-        }
-        if (styleKey === `visibility` && styleValue === `collapse`) {
-          return false;
-        }
         if (
-          styleKey === `width` &&
-          styleValue.replaceAll(/[^0-9]/g, ``) === `0`
+          styleKey === `visibility` &&
+          (styleValue === `hidden` || styleValue === `collapse`)
         ) {
           return false;
         }
         if (
-          styleKey === `height` &&
+          (styleKey === `width` || styleKey === `height`) &&
           styleValue.replaceAll(/[^0-9]/g, ``) === `0`
         ) {
           return false;
