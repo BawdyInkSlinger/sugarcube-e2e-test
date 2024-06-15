@@ -23,12 +23,12 @@ export interface AssertionApi<E = any> {
     options?: AssertionOptions
   ): TestControllerPromise;
   eql(expected: E, options?: AssertionOptions): TestControllerPromise;
-  // notEql(
-  //   unexpected: E,
-  //   message?: string,
-  //   options?: AssertionOptions
-  // ): TestControllerPromise;
-  // notEql(unexpected: E, options?: AssertionOptions): TestControllerPromise;
+  notEql(
+    unexpected: E,
+    message?: string,
+    options?: AssertionOptions
+  ): TestControllerPromise;
+  notEql(unexpected: E, options?: AssertionOptions): TestControllerPromise;
   // ok(message?: string, options?: AssertionOptions): TestControllerPromise;
   ok(options?: AssertionOptions): TestControllerPromise;
   // notOk(message?: string, options?: AssertionOptions): TestControllerPromise;
@@ -577,6 +577,87 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
       testController
     );
   }
+
+  notEql(expected: A, options?: AssertionOptions): TestControllerPromise<void>;
+  notEql(
+    expected: A,
+    errorMessage: string,
+    options?: AssertionOptions
+  ): TestControllerPromise<void>;
+  notEql(
+    expected: A,
+    messageOrOptions: string | AssertionOptions,
+    options?: AssertionOptions
+  ): TestControllerPromise<void> {
+    const source = new Error();
+    enterLogger.debug(
+      `PromiseAssertions: entering notEql expected='${expected}' this.actual='${this.actual}'`
+    );
+    return Object.assign(
+      this.currentPromise
+        .then(() => {
+          logger.debug(
+            `PromiseAssertions: resolving notEql then expected='${expected}' this.actual='${this.actual}'`
+          );
+          if (this.actual instanceof ReExecutablePromise) {
+            logger.debug(
+              `PromiseAssertions: re-executing!='${expected}' this.actual='${this.actual}'`
+            );
+            return this.actual._reExecute();
+          } else {
+            return this.actual;
+          }
+        })
+        .then((actualValue: A) => {
+          logger.debug(
+            `PromiseAssertions: resolving notEql then expected='${expected}' actualValue='${actualValue}'`
+          );
+          if (actualValue === expected) {
+            // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#escape_sequences
+            const oldStr = (expected + '')
+              .replaceAll(/\n/g, `\\n\n`)
+              .replaceAll(/\t/g, `\\t\t`)
+              .replaceAll(/ /g, '·');
+            const newStr = (actualValue + '')
+              .replaceAll(/\n/g, `\\n\n`)
+              .replaceAll(/\t/g, `\\t\t`)
+              .replaceAll(/ /g, '·');
+            const diff = diffChars(oldStr, newStr)
+              .map((change, index, arr) => {
+                // green for additions, red for deletions
+                // grey for common parts
+                const color = change.added
+                  ? chalk.bgGreen
+                  : change.removed
+                    ? chalk.bgRed
+                    : (x: string): string => x;
+
+                const coloredText = color(change.value);
+                return coloredText;
+              })
+              .join('');
+            source.message = `${
+              typeof messageOrOptions === 'string' ? messageOrOptions : ''
+            }\n  Expected:\n${expected}\n  To NOT Equal:\n${actualValue}\n  Diff:\n${diff}`;
+            return Promise.reject(source);
+          } else {
+            return Promise.resolve();
+          }
+        })
+        .finally(() => {
+          const endMillis = Date.now();
+          performanceLogger.isDebugEnabled() &&
+            performanceLogger.debug(
+              `notEql performance: ${durationFormat(
+                this.startMillis,
+                endMillis
+              )}`
+            );
+        }),
+      testController
+    );
+  }
+
   ok(options?: AssertionOptions): TestControllerPromise<void> {
     const source = new Error();
     enterLogger.debug(

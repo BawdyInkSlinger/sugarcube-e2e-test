@@ -294,4 +294,68 @@ describe(`assertions`, () => {
       ).toBeRejectedWithError(/custom message/);
     });
   });
+
+  describe(`notEql`, () => {
+    it('passes when actual notEql to expected', async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'passage title',
+            tags: ['passage tag'],
+            text: '<div id="value">foobar</div>',
+          },
+        ],
+      });
+
+      await sugarcubeParser.testController
+        .goto('passage title')
+        .expect(Selector('#value').innerText)
+        .notEql(`oob`);
+    });
+
+    it('errors when actual equals expected', async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'passage title',
+            tags: ['passage tag'],
+            text: '<div id="value">foobar</div>',
+          },
+        ],
+      });
+
+      await sugarcubeParser.testController.goto('passage title');
+
+      await expectAsync(
+        sugarcubeParser.testController
+          .expect(Selector('#value').innerText)
+          .notEql(`foobar`)
+      ).toBeRejectedWithError(/To NOT Equal:/);
+    });
+
+    it('errors with a custom message', async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'passage title',
+            tags: ['passage tag'],
+            text: '<div id="value">foobar</div>',
+          },
+        ],
+      });
+
+      await sugarcubeParser.testController.goto('passage title');
+
+      await expectAsync(
+        sugarcubeParser.testController
+          .expect(Selector('#value').innerText)
+          .notEql(`foobar`, 'custom message')
+      ).toBeRejectedWithError(/To NOT Equal:/);
+      await expectAsync(
+        sugarcubeParser.testController
+          .expect(Selector('#value').innerText)
+          .notEql(`foobar`, 'custom message')
+      ).toBeRejectedWithError(/custom message/);
+    });
+  });
 });
