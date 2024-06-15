@@ -61,7 +61,7 @@ interface SelectorAPI {
   // style: Promise<{[prop: string]: string}>;
   // tagName: Promise<string>;
   // value: Promise<string | undefined>;
-  // visible: Promise<boolean>;
+  visible: Promise<boolean>;
   // hasClass(className: string): Promise<boolean>;
   // getStyleProperty(propertyName: string): Promise<string>;
   getAttribute(attributeName: string): Promise<string | null>;
@@ -177,6 +177,48 @@ export const Selector: SelectorFactory = (
         );
       }
       return $nodes[0].innerHTML;
+    }),
+    visible: ReExecutablePromise.fromFn(() => {
+      executionLogger.debug(
+        `selector: visible on '${selectorToStringBuilder(executionSteps)()}'`
+      );
+      const $nodes = selectorExecute(executionSteps);
+      if ($nodes.length === 0) {
+        throw new Error(
+          `${selectorToStringBuilder(executionSteps)()} does not exist`
+        );
+      }
+      const styles = window.getComputedStyle($nodes.get(0));
+
+      for (let i = 0; i < styles.length; i++) {
+        const styleKey = styles[i];
+        const styleValue = styles[styleKey];
+
+        // console.log(`!!! '${styleKey}' '${styleValue}'`);
+
+        if (styleKey === `display` && styleValue === `none`) {
+          return false;
+        }
+        if (styleKey === `visibility` && styleValue === `hidden`) {
+          return false;
+        }
+        if (styleKey === `visibility` && styleValue === `collapse`) {
+          return false;
+        }
+        if (
+          styleKey === `width` &&
+          styleValue.replaceAll(/[^0-9]/g, ``) === `0`
+        ) {
+          return false;
+        }
+        if (
+          styleKey === `height` &&
+          styleValue.replaceAll(/[^0-9]/g, ``) === `0`
+        ) {
+          return false;
+        }
+      }
+      return true;
     }),
     exists: ReExecutablePromise.fromFn(
       () => selectorExecute(executionSteps).length > 0
