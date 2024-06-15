@@ -53,6 +53,23 @@ fdescribe(`visible`, () => {
       .notOk();
   });
 
+  it('returns false when PARENT element has display: none', async () => {
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag'],
+          text: '<div style="display: none"><button>Button 1</button></div>',
+        },
+      ],
+    });
+
+    await sugarcubeParser.testController
+      .goto('passage title')
+      .expect(Selector('.passage button').visible)
+      .notOk();
+  });
+
   it('returns false for elements with visibility: hidden', async () => {
     const sugarcubeParser = await SugarcubeParser.create({
       passages: [
