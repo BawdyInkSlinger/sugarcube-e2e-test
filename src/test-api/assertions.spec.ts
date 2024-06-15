@@ -230,4 +230,68 @@ describe(`assertions`, () => {
       ).toBeRejectedWithError(/custom message/);
     });
   });
+  
+  describe(`match`, () => {
+    it('passes when actual matches expected', async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'passage title',
+            tags: ['passage tag'],
+            text: '<div id="value">foobar</div>',
+          },
+        ],
+      });
+
+      await sugarcubeParser.testController
+        .goto('passage title')
+        .expect(Selector('#value').innerText)
+        .match(/oob/);
+    });
+
+    it('errors when actual does NOT match expected', async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'passage title',
+            tags: ['passage tag'],
+            text: '<div id="value">foobar</div>',
+          },
+        ],
+      });
+
+      await sugarcubeParser.testController.goto('passage title');
+
+      await expectAsync(
+        sugarcubeParser.testController
+          .expect(Selector('#value').innerText)
+          .match(/baz/)
+      ).toBeRejectedWithError(/To Match:/);
+    });
+
+    it('errors with a custom message', async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'passage title',
+            tags: ['passage tag'],
+            text: '<div id="value">foobar</div>',
+          },
+        ],
+      });
+
+      await sugarcubeParser.testController.goto('passage title');
+
+      await expectAsync(
+        sugarcubeParser.testController
+          .expect(Selector('#value').innerText)
+          .match(/baz/, 'custom message')
+      ).toBeRejectedWithError(/To Match:/);
+      await expectAsync(
+        sugarcubeParser.testController
+          .expect(Selector('#value').innerText)
+          .match(/baz/, 'custom message')
+      ).toBeRejectedWithError(/custom message/);
+    });
+  });
 });

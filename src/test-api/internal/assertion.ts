@@ -147,12 +147,12 @@ export interface AssertionApi<E = any> {
   //   finish: number,
   //   options?: AssertionOptions
   // ): TestControllerPromise;
-  // match(
-  //   re: RegExp,
-  //   message?: string,
-  //   options?: AssertionOptions
-  // ): TestControllerPromise;
-  // match(re: RegExp, options?: AssertionOptions): TestControllerPromise;
+  match(
+    re: RegExp,
+    message?: string,
+    options?: AssertionOptions
+  ): TestControllerPromise;
+  match(re: RegExp, options?: AssertionOptions): TestControllerPromise;
   // notMatch(
   //   re: RegExp,
   //   message?: string,
@@ -179,6 +179,63 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
     this.actual = actual;
     this.startMillis = startMillis;
   }
+
+  match(
+    re: RegExp,
+    message?: string,
+    options?: AssertionOptions
+  ): TestControllerPromise;
+  match(re: RegExp, options?: AssertionOptions): TestControllerPromise;
+  match(
+    re: RegExp,
+    messageOrOptions?: AssertionOptions | string
+  ): TestControllerPromise {
+    const source = new Error();
+    enterLogger.debug(
+      `PromiseAssertions: entering match this.actual=${this.actual}`
+    );
+    return Object.assign(
+      this.currentPromise
+        .then(() => {
+          logger.debug(
+            `PromiseAssertions: resolving match then1 regexp='${re}' this.actual=${this.actual}`
+          );
+          return this.actual;
+        })
+        .then((actualValue: A) => {
+          logger.debug(
+            `PromiseAssertions: resolving match then2 regexp='${re}' actualValue=${actualValue}`
+          );
+          const matches = splitMatches(actualValue + '', re);
+          if (matches.length === 1 && matches[0].isMatch === false) {
+            const customErrorMessage =
+              typeof messageOrOptions === 'string'
+                ? '\n' + messageOrOptions
+                : '';
+            source.message = `${customErrorMessage}\n  Expected:\n${highlightMatches(
+              matches,
+              chalk.bgRed
+            )}\n  To Match:\n${re}`;
+
+            return Promise.reject(source);
+          } else {
+            return Promise.resolve();
+          }
+        })
+        .finally(() => {
+          const endMillis = Date.now();
+          performanceLogger.isDebugEnabled() &&
+            performanceLogger.debug(
+              `match performance: ${durationFormat(
+                this.startMillis,
+                endMillis
+              )}`
+            );
+        }),
+      testController
+    );
+  }
+
   notMatch(
     re: RegExp,
     options?: AssertionOptions
