@@ -189,30 +189,7 @@ export const Selector: SelectorFactory = (
         );
       }
       const styles = window.getComputedStyle($nodes.get(0));
-
-      for (let i = 0; i < styles.length; i++) {
-        const styleKey = styles[i];
-        const styleValue = styles[styleKey];
-
-        // console.log(`!!! '${styleKey}' '${styleValue}'`);
-
-        if (styleKey === `display` && styleValue === `none`) {
-          return false;
-        }
-        if (
-          styleKey === `visibility` &&
-          (styleValue === `hidden` || styleValue === `collapse`)
-        ) {
-          return false;
-        }
-        if (
-          (styleKey === `width` || styleKey === `height`) &&
-          styleValue.replaceAll(/[^0-9]/g, ``) === `0`
-        ) {
-          return false;
-        }
-      }
-      return true;
+      return isVisible(styles);
     }),
     exists: ReExecutablePromise.fromFn(
       () => selectorExecute(executionSteps).length > 0
@@ -261,3 +238,29 @@ export const Selector: SelectorFactory = (
   };
   return selectorImpl;
 };
+
+function isVisible(styles: CSSStyleDeclaration): boolean {
+  for (let i = 0; i < styles.length; i++) {
+    const styleKey = styles[i];
+    const styleValue = styles[styleKey];
+
+    // console.log(`!!! '${styleKey}' '${styleValue}'`);
+
+    if (styleKey === `display` && styleValue === `none`) {
+      return false;
+    }
+    if (
+      styleKey === `visibility` &&
+      (styleValue === `hidden` || styleValue === `collapse`)
+    ) {
+      return false;
+    }
+    if (
+      (styleKey === `width` || styleKey === `height`) &&
+      styleValue.replaceAll(/[^0-9]/g, ``) === `0`
+    ) {
+      return false;
+    }
+  }
+  return true;
+}
