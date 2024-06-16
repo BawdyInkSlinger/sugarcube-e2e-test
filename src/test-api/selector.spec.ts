@@ -173,6 +173,60 @@ describe(`selector`, () => {
       .notOk();
   });
 
+  it(`lets you use nth and hasAttribute together`, async () => {
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag', 'nobr'],
+          text: `
+<div class="a unrelated">
+  <div class="a1">Foo</div>
+  <div class="a2" data-nokey="true">
+    <div class="b">
+      <button
+        class="c"
+        title=""
+        tabindex="0"
+      >
+        <div class="c1"></div>
+        <span class="c2">1</span>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="a unrelated">
+  <div class="a1">Bar</div>
+  <div class="a2" data-nokey="true">
+    <div class="b">
+      <button
+        disabled=""
+        class="c"
+        title=""
+        tabindex="0"
+      >
+        <div class="c1"></div>
+        <span class="c2">2</span>
+      </button>
+    </div>
+  </div>
+</div>
+`,
+        },
+      ],
+    });
+
+    const baseSelector = '.passage .a .a2 button';
+    await sugarcubeParser.testController
+      .goto('passage title')
+      .expect(Selector(baseSelector).count)
+      .eql(2)
+      .expect(Selector(baseSelector).nth(1).innerHTML)
+      .contains('<span class="c2">2</span>')
+      .expect(Selector(baseSelector).nth(1).hasAttribute('disabled'))
+      .ok();
+  });
+
   it('has innerHTML', async () => {
     const sugarcubeParser = await SugarcubeParser.create({
       passages: [

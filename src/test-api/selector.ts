@@ -217,12 +217,11 @@ export const Selector: SelectorFactory = (
         enterLogger.debug(
           `selector: entering hasAttribute init='${init}' attributeName='${attributeName}'`
         );
-        executionSteps.push({
-          action: 'jQuerySelector',
-          value: `[${attributeName}]`,
-          toString: () => `[${attributeName}]`,
-        });
-        return selectorExecute(executionSteps).length > 0;
+        return selectorExecute(executionSteps)
+          .toArray()
+          .every((el) => {
+            return el.hasAttribute(attributeName);
+          });
       });
     },
     nth(index: number): Selector {
