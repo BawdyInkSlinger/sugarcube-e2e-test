@@ -100,12 +100,12 @@ export interface AssertionApi<E = any> {
   //     | 'regexp',
   //   options?: AssertionOptions
   // ): TestControllerPromise;
-  // gt(
-  //   expected: number,
-  //   message?: string,
-  //   options?: AssertionOptions
-  // ): TestControllerPromise;
-  // gt(expected: number, options?: AssertionOptions): TestControllerPromise;
+  gt(
+    expected: number,
+    message?: string,
+    options?: AssertionOptions
+  ): TestControllerPromise;
+  gt(expected: number, options?: AssertionOptions): TestControllerPromise;
   gte(
     expected: number,
     message?: string,
@@ -425,6 +425,77 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
                 this.startMillis,
                 endMillis
               )}`
+            );
+        }),
+      testController
+    );
+  }
+
+  gt(expected: number, options?: AssertionOptions): TestControllerPromise<void>;
+  gt(
+    expected: number,
+    errorMessage: string,
+    options?: AssertionOptions
+  ): TestControllerPromise<void>;
+  gt(
+    expected: number,
+    messageOrOptions: string | AssertionOptions,
+    options?: AssertionOptions
+  ): TestControllerPromise<void> {
+    const source = new Error();
+    enterLogger.debug(
+      `PromiseAssertions: entering gt expected='${expected}' this.actual='${this.actual}'`
+    );
+    return Object.assign(
+      this.currentPromise
+        .then(() => {
+          logger.debug(
+            `PromiseAssertions: resolving gt then expected='${expected}' this.actual='${this.actual}'`
+          );
+          if (this.actual instanceof ReExecutablePromise) {
+            logger.debug(
+              `PromiseAssertions: re-executing!='${expected}' this.actual='${this.actual}'`
+            );
+            return this.actual._reExecute();
+          } else {
+            return this.actual;
+          }
+        })
+        .then((actualValue: A) => {
+          logger.debug(
+            `PromiseAssertions: resolving gt then actualValue=${actualValue}`
+          );
+
+          const customErrorMessage =
+            typeof messageOrOptions === 'string' ? '\n' + messageOrOptions : '';
+
+          const actualNumber = _.toNumber(actualValue);
+          if (Number.isNaN(actualNumber)) {
+            source.message = `${customErrorMessage}\n  Expected:\n${JSON.stringify(
+              actualValue
+            )} > ${JSON.stringify(expected)}\n  Actual: ${JSON.stringify(
+              actualValue
+            )} is not a number`;
+            return Promise.reject(source);
+          } else if (actualNumber === expected) {
+            source.message = `${customErrorMessage}\n  Expected:\n${actualNumber} > ${JSON.stringify(
+              expected
+            )}\n  Actual:\n${actualNumber} == ${JSON.stringify(expected)}`;
+            return Promise.reject(source);
+          } else if (actualNumber < expected) {
+            source.message = `${customErrorMessage}\n  Expected:\n${actualNumber} > ${JSON.stringify(
+              expected
+            )}`;
+            return Promise.reject(source);
+          } else {
+            return Promise.resolve();
+          }
+        })
+        .finally(() => {
+          const endMillis = Date.now();
+          performanceLogger.isDebugEnabled() &&
+            performanceLogger.debug(
+              `gt performance: ${durationFormat(this.startMillis, endMillis)}`
             );
         }),
       testController

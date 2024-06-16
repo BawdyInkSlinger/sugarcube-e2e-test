@@ -103,6 +103,110 @@ describe(`assertions`, () => {
     });
   });
 
+  describe(`gt`, () => {
+    it('passes when actual is greater than expected', async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'passage title',
+            tags: ['passage tag'],
+            text: '<div id="value">5</div>',
+          },
+        ],
+      });
+
+      await sugarcubeParser.testController
+        .goto('passage title')
+        .expect(Selector('#value').innerText)
+        .gt(3);
+    });
+
+    it('fails when actual is equal to expected', async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'passage title',
+            tags: ['passage tag'],
+            text: '<div id="value">7</div>',
+          },
+        ],
+      });
+
+      await sugarcubeParser.testController.goto('passage title');
+      
+      await expectAsync(
+        sugarcubeParser.testController
+          .expect(Selector('#value').innerText)
+          .gt(7)
+      ).toBeRejectedWithError(/^7 == 7$/m);
+    });
+
+    it('errors when actual is less than expected', async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'passage title',
+            tags: ['passage tag'],
+            text: '<div id="value">2</div>',
+          },
+        ],
+      });
+
+      await sugarcubeParser.testController.goto('passage title');
+
+      await expectAsync(
+        sugarcubeParser.testController
+          .expect(Selector('#value').innerText)
+          .gt(13)
+      ).toBeRejectedWithError(/^2 > 13$/m);
+    });
+
+    it('errors when actual is not a number', async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'passage title',
+            tags: ['passage tag'],
+            text: '<div id="value">foobar</div>',
+          },
+        ],
+      });
+
+      await sugarcubeParser.testController.goto('passage title');
+
+      await expectAsync(
+        sugarcubeParser.testController
+          .expect(Selector('#value').innerText)
+          .gt(13)
+      ).toBeRejectedWithError(/"foobar" is not a number/);
+    });
+
+    it('errors with a custom message', async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'passage title',
+            tags: ['passage tag'],
+            text: '<div id="value">3</div>',
+          },
+        ],
+      });
+
+      await sugarcubeParser.testController.goto('passage title');
+
+      await expectAsync(
+        sugarcubeParser.testController
+          .expect(Selector('#value').innerText)
+          .gt(13, 'custom message')
+      ).toBeRejectedWithError(/^3 > 13$/m);
+      await expectAsync(
+        sugarcubeParser.testController
+          .expect(Selector('#value').innerText)
+          .gt(13, 'custom message')
+      ).toBeRejectedWithError(/custom message/);
+    });
+  });
+
   describe(`notContains`, () => {
     it('passes when actual does NOT contain expected', async () => {
       const sugarcubeParser = await SugarcubeParser.create({
@@ -230,7 +334,7 @@ describe(`assertions`, () => {
       ).toBeRejectedWithError(/custom message/);
     });
   });
-  
+
   describe(`match`, () => {
     it('passes when actual matches expected', async () => {
       const sugarcubeParser = await SugarcubeParser.create({
