@@ -71,7 +71,7 @@ interface SelectorAPI {
   nth(index: number): Selector;
   withText(text: string): Selector;
   // withText(re: RegExp): Selector;
-  // withExactText(text: string): Selector;
+  withExactText(text: string): Selector;
   // withAttribute(attrName: string | RegExp, attrValue?: string | RegExp): Selector;
   // filter(cssSelector: string): Selector;
   // filter(filterFn: (node: Element, idx: number) => boolean,
@@ -191,6 +191,23 @@ export const Selector: SelectorFactory = (
       executionSteps.push({
         action: 'jQuerySelector',
         value: `:contains(${text})`,
+        toString: () => `:contains(${text})`,
+      });
+      return this;
+    },
+    withExactText: function (text: string): Selector {
+      enterLogger.debug(
+        `selector: entering withExactText init='${init}' text='${text}'`
+      );
+      executionSteps.push({
+        action: 'filter',
+        value: function (
+          this: HTMLElement,
+          index: number,
+          element: HTMLElement
+        ): boolean {
+          return jQuery(element).text() === text;
+        },
         toString: () => `:contains(${text})`,
       });
       return this;

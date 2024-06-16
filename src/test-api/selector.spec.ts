@@ -189,4 +189,42 @@ describe(`selector`, () => {
       .expect(Selector('#nested').innerHTML)
       .eql(` <p> Words words words <span> nest </span> </p> `);
   });
+
+  it('has withExactText', async () => {
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag'],
+          text: `<button disabled>Button A</button> <<button "Button ZA">><</button>> <button disabled>Button ABC</button> <button>Button A</button>`,
+        },
+      ],
+    });
+
+    await sugarcubeParser.testController
+      .goto('passage title')
+      .expect(Selector('button').withText(`Button A`).count)
+      .eql(3)
+      .expect(Selector('button').withExactText(`Button A`).count)
+      .eql(2);
+  });
+
+  it('has withExactText with complex selector', async () => {
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag'],
+          text: `<div id="outer"><div class="inner"><button disabled>Button A</button> <<button "Button ZA">><</button>> <button disabled>Button ABC</button> <button>Button A</button></div></div>`,
+        },
+      ],
+    });
+
+    await sugarcubeParser.testController
+      .goto('passage title')
+      .expect(Selector('#outer .inner button').withText(`Button A`).count)
+      .eql(3)
+      .expect(Selector('#outer .inner button').withExactText(`Button A`).count)
+      .eql(2);
+  });
 });

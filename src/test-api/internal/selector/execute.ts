@@ -1,10 +1,20 @@
 import { getLogger } from '../../../logging/logger';
+import { unreachableStatement } from '../unreachable-statement';
 import { selectorToStringBuilder } from './selector-to-string-builder';
 
 const executionLogger = getLogger('DEBUG_SELECTOR_EXECUTION_LOG_MESSAGES');
 
 export type ExecutionStep =
   | { action: 'jQuerySelector'; value: string; toString: () => string }
+  | {
+      action: 'filter';
+      value: (
+        this: HTMLElement,
+        index: number,
+        element: HTMLElement
+      ) => boolean;
+      toString: () => string;
+    }
   | { action: 'nth'; value: number; toString: () => string };
 
 export const execute = (executionSteps: ExecutionStep[]) => {
@@ -30,9 +40,14 @@ export const execute = (executionSteps: ExecutionStep[]) => {
         );
         jQuery = jQuery.find(executionStep.value);
       }
+    } else if (executionStep.action === 'filter') {
+      executionLogger.debug(`executionSteps filter='${executionStep}'`);
+      jQuery = jQuery.filter(executionStep.value);
     } else if (executionStep.action === 'nth') {
       executionLogger.debug(`executionSteps nth='${executionStep}'`);
       jQuery = $(jQuery[executionStep.value]);
+    } else {
+      return unreachableStatement(executionStep);
     }
   });
   return jQuery;
