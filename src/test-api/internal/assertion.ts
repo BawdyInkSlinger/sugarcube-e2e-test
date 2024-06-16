@@ -8,7 +8,6 @@ import { getLogger } from '../../logging/logger';
 import { splitMatches } from './split-matches';
 import { highlightMatches } from './highlight-matches';
 import { durationFormat } from './duration-format';
-import { Util } from '../../internal/util';
 
 export type ElementOf<T> = T extends (infer E)[] ? E : never;
 export type Extend<T, E> = T extends E ? E : never;
@@ -29,9 +28,9 @@ export interface AssertionApi<E = any> {
     options?: AssertionOptions
   ): TestControllerPromise;
   notEql(unexpected: E, options?: AssertionOptions): TestControllerPromise;
-  // ok(message?: string, options?: AssertionOptions): TestControllerPromise;
+  ok(message?: string, options?: AssertionOptions): TestControllerPromise;
   ok(options?: AssertionOptions): TestControllerPromise;
-  // notOk(message?: string, options?: AssertionOptions): TestControllerPromise;
+  notOk(message?: string, options?: AssertionOptions): TestControllerPromise;
   notOk(options?: AssertionOptions): TestControllerPromise;
   contains<R>(
     expected: EnsureString<E> | ElementOf<E> | Extend<E, R>,
@@ -658,7 +657,16 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
     );
   }
 
-  ok(options?: AssertionOptions): TestControllerPromise<void> {
+  ok(options?: AssertionOptions): TestControllerPromise<void>;
+  ok(
+    errorMessage: string,
+    options?: AssertionOptions
+  ): TestControllerPromise<void>;
+  ok(
+    messageOrOptions: string | AssertionOptions,
+    options?: AssertionOptions
+  ): TestControllerPromise<void> {
+    //   ok(options?: AssertionOptions): TestControllerPromise<void> {
     const source = new Error();
     enterLogger.debug(
       `PromiseAssertions: entering ok this.actual=${this.actual}`
@@ -680,7 +688,11 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
             `PromiseAssertions: resolving ok then actualValue=${actualValue}`
           );
           if (!actualValue) {
-            source.message = `\n  Expected:\nTruthy\n  Actual:\n${actualValue}`;
+            const customErrorMessage =
+              typeof messageOrOptions === 'string'
+                ? '\n' + messageOrOptions
+                : '';
+            source.message = `${customErrorMessage}\n  Expected:\nTruthy\n  Actual:\n${actualValue}`;
             return Promise.reject(source);
           } else {
             return Promise.resolve();
@@ -696,7 +708,16 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
       testController
     );
   }
-  notOk(options?: AssertionOptions): TestControllerPromise<void> {
+
+  notOk(options?: AssertionOptions): TestControllerPromise<void>;
+  notOk(
+    errorMessage: string,
+    options?: AssertionOptions
+  ): TestControllerPromise<void>;
+  notOk(
+    messageOrOptions: string | AssertionOptions,
+    options?: AssertionOptions
+  ): TestControllerPromise<void> {
     const source = new Error();
     enterLogger.debug(
       `PromiseAssertions: entering notOk this.actual=${this.actual}`
@@ -714,7 +735,11 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
             `PromiseAssertions: resolving notOk then actualValue=${actualValue}`
           );
           if (actualValue) {
-            source.message = `\n  Expected:\nFalsy\n  Actual:\n${actualValue}`;
+            const customErrorMessage =
+              typeof messageOrOptions === 'string'
+                ? '\n' + messageOrOptions
+                : '';
+            source.message = `${customErrorMessage}\n  Expected:\nFalsy\n  Actual:\n${actualValue}`;
             return Promise.reject(source);
           } else {
             return Promise.resolve();
