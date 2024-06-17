@@ -225,8 +225,10 @@ export const Selector: SelectorFactory = (
     find: function (cssSelector: string): Selector {
       enterLogger.debug(`selector: entering find init='${init}'`);
       executionSteps.push({
-        action: 'find',
-        value: cssSelector,
+        action: 'function',
+        implementation: (jQuery) => {
+          return jQuery.find(cssSelector);
+        },
         toString: () => `:find(${cssSelector})`,
       });
       return this;

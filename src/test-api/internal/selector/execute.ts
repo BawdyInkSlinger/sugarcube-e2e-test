@@ -7,6 +7,11 @@ const executionLogger = getLogger('DEBUG_SELECTOR_EXECUTION_LOG_MESSAGES');
 export type ExecutionStep =
   | { action: 'jQuerySelector'; value: string; toString: () => string }
   | {
+      action: 'function';
+      implementation: (jQuery: JQuery<HTMLElement>) => JQuery<HTMLElement>;
+      toString: () => string;
+    }
+  | {
       action: 'filter';
       value: (
         this: HTMLElement,
@@ -16,8 +21,7 @@ export type ExecutionStep =
       toString: () => string;
     }
   | { action: 'nth'; value: number; toString: () => string }
-  | { action: 'parent'; toString: () => string }
-  | { action: 'find'; value: string; toString: () => string };
+  | { action: 'parent'; toString: () => string };
 
 export const execute = (executionSteps: ExecutionStep[]) => {
   const selectorToString = selectorToStringBuilder(executionSteps);
@@ -51,9 +55,9 @@ export const execute = (executionSteps: ExecutionStep[]) => {
     } else if (executionStep.action === 'parent') {
       executionLogger.debug(`executionSteps parent='${executionStep}'`);
       jQuery = $(jQuery.parent());
-    } else if (executionStep.action === 'find') {
-      executionLogger.debug(`executionSteps find='${executionStep}'`);
-      jQuery = $(jQuery.find(executionStep.value));
+    } else if (executionStep.action === 'function') {
+      executionLogger.debug(`executionSteps function='${executionStep}'`);
+      jQuery = executionStep.implementation(jQuery);
     } else {
       return unreachableStatement(executionStep);
     }
