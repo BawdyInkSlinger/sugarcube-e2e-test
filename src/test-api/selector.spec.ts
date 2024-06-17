@@ -400,4 +400,47 @@ describe(`selector`, () => {
       ).exists)
       .ok()
   });
+  
+  fit('counts as "exact text" when the exact text is nested within child elements2', async () => {
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag'],
+          text: `
+<div class="journal-row even-row">
+    <div class="monster-girl-name">
+        <span class="monster-girl-name-4">E2EGirl</span>
+    </div>
+    <div class="monster-girl-affection-level">
+        <strong>Scenes:</strong> 2 / 3
+    </div>
+</div>
+<div class="journal-row odd-row">
+    <div class="monster-girl-name">
+        <span class="monster-girl-name-5">E2EGirl2</span>
+    </div>
+    <div class="monster-girl-affection-level">
+        <strong>Scenes:</strong> 0 / 0
+    </div>
+</div>
+                `,
+        },
+      ],
+    });
+
+    const e2eGirlRow = Selector('.passage .journal-row .monster-girl-name')
+      .withExactText('E2EGirl')
+    //   .parent();
+
+      
+      await sugarcubeParser.testController
+      .goto('passage title');
+      
+      console.log(`e2eGirlRow`, await e2eGirlRow.outerHTML);
+
+      await sugarcubeParser.testController
+      .expect(e2eGirlRow.exists)
+      .ok()
+  });
 });
