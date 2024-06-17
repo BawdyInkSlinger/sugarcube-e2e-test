@@ -216,7 +216,10 @@ export const Selector: SelectorFactory = (
     parent: function (): Selector {
       enterLogger.debug(`selector: entering parent init='${init}'`);
       executionSteps.push({
-        action: 'parent',
+        action: 'function',
+        implementation: (jQuery) => {
+          return jQuery.parent();
+        },
         toString: () => `:parent()`,
       });
       return this;
