@@ -217,8 +217,8 @@ export const Selector: SelectorFactory = (
       enterLogger.debug(`selector: entering parent init='${init}'`);
       executionSteps.push({
         action: 'function',
-        implementation: (jQuery) => {
-          return jQuery.parent();
+        implementation: (lastLink) => {
+          return lastLink.parent();
         },
         toString: () => `:parent()`,
       });
@@ -229,8 +229,8 @@ export const Selector: SelectorFactory = (
       enterLogger.debug(`selector: entering find init='${init}'`);
       executionSteps.push({
         action: 'function',
-        implementation: (jQuery) => {
-          return jQuery.find(cssSelector);
+        implementation: (lastLink) => {
+          return lastLink.find(cssSelector);
         },
         toString: () => `:find(${cssSelector})`,
       });
@@ -251,8 +251,10 @@ export const Selector: SelectorFactory = (
     },
     nth(index: number): Selector {
       executionSteps.push({
-        action: 'nth',
-        value: index,
+        action: 'function',
+        implementation: (lastLink) => {
+          return jQuery(lastLink[index]);
+        },
         toString: () => `:nth(${index})`,
       });
       return this;

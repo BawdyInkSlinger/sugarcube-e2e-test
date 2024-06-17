@@ -19,8 +19,7 @@ export type ExecutionStep =
         element: HTMLElement
       ) => boolean;
       toString: () => string;
-    }
-  | { action: 'nth'; value: number; toString: () => string };
+    };
 
 export const execute = (executionSteps: ExecutionStep[]) => {
   const selectorToString = selectorToStringBuilder(executionSteps);
@@ -48,9 +47,6 @@ export const execute = (executionSteps: ExecutionStep[]) => {
     } else if (executionStep.action === 'filter') {
       executionLogger.debug(`executionSteps filter='${executionStep}'`);
       jQuery = jQuery.filter(executionStep.value);
-    } else if (executionStep.action === 'nth') {
-      executionLogger.debug(`executionSteps nth='${executionStep}'`);
-      jQuery = $(jQuery[executionStep.value]);
     } else if (executionStep.action === 'function') {
       executionLogger.debug(`executionSteps function='${executionStep}'`);
       jQuery = executionStep.implementation(jQuery);
