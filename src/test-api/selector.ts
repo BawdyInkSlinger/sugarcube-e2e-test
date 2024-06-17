@@ -47,6 +47,7 @@ interface SelectorAPI {
   // id: Promise<string>;
   innerText: Promise<string>;
   innerHTML: Promise<string>; // Addition
+  outerHTML: Promise<string>; // Addition
   // namespaceURI: Promise<string | null>;
   // offsetHeight: Promise<number>;
   // offsetLeft: Promise<number>;
@@ -178,6 +179,18 @@ export const Selector: SelectorFactory = (
       }
       return $nodes[0].innerHTML;
     }),
+    outerHTML: ReExecutablePromise.fromFn(() => {
+      executionLogger.debug(
+        `selector: outerHTML on '${selectorToStringBuilder(executionSteps)()}'`
+      );
+      const $nodes = selectorExecute(executionSteps);
+      if ($nodes.length === 0) {
+        throw new Error(
+          `${selectorToStringBuilder(executionSteps)()} does not exist`
+        );
+      }
+      return $nodes[0].outerHTML;
+    }),
     exists: ReExecutablePromise.fromFn(
       () => selectorExecute(executionSteps).length > 0
     ),
@@ -208,7 +221,7 @@ export const Selector: SelectorFactory = (
         ): boolean {
           return jQuery(element).text() === text;
         },
-        toString: () => `:contains(${text})`,
+        toString: () => `:containsExact(${text})`,
       });
       return this;
     },
