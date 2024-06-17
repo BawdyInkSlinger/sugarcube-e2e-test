@@ -81,7 +81,7 @@ interface SelectorAPI {
   // find(cssSelector: string): Selector;
   // find(filterFn: (node: Element, idx: number, originNode: Element) => boolean,
   //      dependencies?: {[key: string]: any}): Selector;
-  // parent(): Selector;
+  parent(): Selector;
   // parent(index: number): Selector;
   // parent(cssSelector: string): Selector;
   // parent(filterFn: (node: Element, idx: number, originNode: Element) => boolean,
@@ -212,6 +212,18 @@ export const Selector: SelectorFactory = (
       });
       return this;
     },
+
+    parent: function (): Selector {
+      enterLogger.debug(
+        `selector: entering parent init='${init}'`
+      );
+      executionSteps.push({
+        action: 'parent',
+        toString: () => `:parent()`,
+      });
+      return this;
+    },
+
     hasAttribute: function (attributeName: string): Promise<boolean> {
       return ReExecutablePromise.fromFn(() => {
         enterLogger.debug(

@@ -227,6 +227,40 @@ describe(`selector`, () => {
       .ok();
   });
 
+  it(`has parent()`, async () => {
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag', 'nobr'],
+          text: `
+<div>
+    <div>
+        <p class="with-content">p1</p>
+        <div class="with-content">div1</div>
+    </div>
+</div>
+<div>
+    <div>
+        <p class="with-content">p2</p>
+        <div class="with-content">div2</div>
+    </div>
+</div>
+`,
+        },
+      ],
+    });
+
+    await sugarcubeParser.testController
+      .goto('passage title')
+      .expect(Selector(`.passage div.with-content`).nth(1).innerText)
+      .eql(`div2`)
+      .expect(Selector(`.passage div.with-content`).nth(1).parent().innerText)
+      .contains(`p2`)
+      .expect(Selector(`.passage div.with-content`).nth(1).parent().innerText)
+      .contains(`div2`)
+  });
+
   it('has innerHTML', async () => {
     const sugarcubeParser = await SugarcubeParser.create({
       passages: [
