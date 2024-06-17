@@ -381,4 +381,23 @@ describe(`selector`, () => {
       .expect(reExecutablePromise)
       .eql(2);
   });
+  
+  it('counts as "exact text" when the exact text is nested within child elements', async () => {
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag'],
+          text: `<div id="nested-one-child"><span>foobar</span></div>`,
+        },
+      ],
+    });
+
+    await sugarcubeParser.testController
+      .goto('passage title')
+      .expect(Selector('#nested-one-child').withExactText(
+        `foobar`
+      ).exists)
+      .ok()
+  });
 });
