@@ -16,7 +16,8 @@ export type ExecutionStep =
       toString: () => string;
     }
   | { action: 'nth'; value: number; toString: () => string }
-  | { action: 'parent'; toString: () => string };
+  | { action: 'parent'; toString: () => string }
+  | { action: 'find'; value: string; toString: () => string };
 
 export const execute = (executionSteps: ExecutionStep[]) => {
   const selectorToString = selectorToStringBuilder(executionSteps);
@@ -50,6 +51,9 @@ export const execute = (executionSteps: ExecutionStep[]) => {
     } else if (executionStep.action === 'parent') {
       executionLogger.debug(`executionSteps parent='${executionStep}'`);
       jQuery = $(jQuery.parent());
+    } else if (executionStep.action === 'find') {
+      executionLogger.debug(`executionSteps find='${executionStep}'`);
+      jQuery = $(jQuery.find(executionStep.value));
     } else {
       return unreachableStatement(executionStep);
     }

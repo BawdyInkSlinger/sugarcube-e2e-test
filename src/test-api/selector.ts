@@ -78,7 +78,7 @@ interface SelectorAPI {
   //        dependencies?: {[key: string]: any}): Selector;
   // filterVisible(): Selector;
   // filterHidden(): Selector;
-  // find(cssSelector: string): Selector;
+  find(cssSelector: string): Selector;
   // find(filterFn: (node: Element, idx: number, originNode: Element) => boolean,
   //      dependencies?: {[key: string]: any}): Selector;
   parent(): Selector;
@@ -214,12 +214,20 @@ export const Selector: SelectorFactory = (
     },
 
     parent: function (): Selector {
-      enterLogger.debug(
-        `selector: entering parent init='${init}'`
-      );
+      enterLogger.debug(`selector: entering parent init='${init}'`);
       executionSteps.push({
         action: 'parent',
         toString: () => `:parent()`,
+      });
+      return this;
+    },
+
+    find: function (cssSelector: string): Selector {
+      enterLogger.debug(`selector: entering find init='${init}'`);
+      executionSteps.push({
+        action: 'find',
+        value: cssSelector,
+        toString: () => `:find(${cssSelector})`,
       });
       return this;
     },
