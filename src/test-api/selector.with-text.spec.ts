@@ -93,11 +93,11 @@ describe(`selector withText`, () => {
       Selector(`#nested-two-child`).withText(`foobar `).exists
     ).toBeResolvedTo(false);
     await expectAsync(
-      Selector(`#deeply-nested-one-child-with-white-space`).withText(`foobar `)
+      Selector(`#deeply-nested-one-child-with-whitespace`).withText(`foobar `)
         .exists
     ).toBeResolvedTo(false);
     await expectAsync(
-      Selector(`#nested-two-child-with-white-space`).withText(`foobar `).exists
+      Selector(`#nested-two-child-with-whitespace`).withText(`foobar `).exists
     ).toBeResolvedTo(false);
 
     // `On one of two children:`
