@@ -47,13 +47,10 @@ describe(`selector withExactText`, () => {
       Selector(`#nested-two-child`).withExactText(`foobar`).exists
     ).toBeResolvedTo(true);
     await expectAsync(
-      Selector(`#deeply-nested-one-child-with-whitespace`).withExactText(
-        `foobar`
-      ).exists
+      Selector(`#deeply-nested-one-child-with-whitespace`).withExactText(`foobar`).exists
     ).toBeResolvedTo(true);
     await expectAsync(
-      Selector(`#nested-two-child-with-whitespace`).withExactText(`foobar`)
-        .exists
+      Selector(`#nested-two-child-with-whitespace`).withExactText(`foobar`).exists
     ).toBeResolvedTo(false);
 
     // `Space at end:`
@@ -70,13 +67,10 @@ describe(`selector withExactText`, () => {
       Selector(`#nested-two-child`).withExactText(`foobar `).exists
     ).toBeResolvedTo(false);
     await expectAsync(
-      Selector(`#deeply-nested-one-child-with-white-space`).withExactText(
-        `foobar `
-      ).exists
+      Selector(`#deeply-nested-one-child-with-white-space`).withExactText(`foobar `).exists
     ).toBeResolvedTo(false);
     await expectAsync(
-      Selector(`#nested-two-child-with-white-space`).withExactText(`foobar `)
-        .exists
+      Selector(`#nested-two-child-with-white-space`).withExactText(`foobar `).exists
     ).toBeResolvedTo(false);
 
     // `On one of two children:`
