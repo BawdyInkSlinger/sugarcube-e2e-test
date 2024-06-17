@@ -27,67 +27,191 @@ describe(`selector withText and withExactText`, () => {
       .eql(`Destination`);
   });
 
-  it('has withExactText', async () => {
-    const sugarcubeParser = await SugarcubeParser.create({
-      passages: [
-        {
-          title: 'passage title',
-          tags: ['passage tag'],
-          text: `<button disabled>Button A</button> <<button "Button ZA">><</button>> <button disabled>Button ABC</button> <button>Button A</button>`,
-        },
-      ],
+  describe(`withText`, () => {
+    it('behaves identical to testcafe', async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'passage title',
+            tags: ['passage tag'],
+            text: `
+<div id="whitespace">
+  foobar
+</div>
+<div id="nested-one-child"><span>foobar</span></div>
+<div id="deeply-nested-one-child"><div><span>foobar</span></div></div>
+<div id="nested-two-child"><div><span>foo</span><span>bar</span></div></div>
+<div id="deeply-nested-one-child-with-whitespace">
+  <div>
+    <span>foobar</span>
+  </div>
+</div>
+<div id="nested-two-child-with-whitespace">
+  <div>
+    <span>foo</span>
+    <span>bar</span>
+  </div>
+</div>
+`,
+          },
+        ],
+      });
+
+      await sugarcubeParser.testController.goto('passage title');
+
+      // `As one word:
+      await expectAsync(
+        Selector(`#whitespace`).withText(`foobar`).exists
+      ).toBeResolvedTo(true);
+      await expectAsync(
+        Selector(`#nested-one-child`).withText(`foobar`).exists
+      ).toBeResolvedTo(true);
+      await expectAsync(
+        Selector(`#deeply-nested-one-child`).withText(`foobar`).exists
+      ).toBeResolvedTo(true);
+      await expectAsync(
+        Selector(`#nested-two-child`).withText(`foobar`).exists
+      ).toBeResolvedTo(true);
+      await expectAsync(
+        Selector(`#deeply-nested-one-child-with-whitespace`).withText(`foobar`)
+          .exists
+      ).toBeResolvedTo(true);
+      await expectAsync(
+        Selector(`#nested-two-child-with-whitespace`).withText(`foobar`).exists
+      ).toBeResolvedTo(false);
+
+      // `Space at end:`
+      await expectAsync(
+        Selector(`#whitespace`).withText(`foobar `).exists
+      ).toBeResolvedTo(false);
+      await expectAsync(
+        Selector(`#nested-one-child`).withText(`foobar `).exists
+      ).toBeResolvedTo(false);
+      await expectAsync(
+        Selector(`#deeply-nested-one-child`).withText(`foobar `).exists
+      ).toBeResolvedTo(false);
+      await expectAsync(
+        Selector(`#nested-two-child`).withText(`foobar `).exists
+      ).toBeResolvedTo(false);
+      await expectAsync(
+        Selector(`#deeply-nested-one-child-with-white-space`).withText(
+          `foobar `
+        ).exists
+      ).toBeResolvedTo(false);
+      await expectAsync(
+        Selector(`#nested-two-child-with-white-space`).withText(`foobar `)
+          .exists
+      ).toBeResolvedTo(false);
+
+      // `On one of two children:`
+      await expectAsync(
+        Selector(`#nested-two-child`).withText(`foo`).exists
+      ).toBeResolvedTo(true);
+      await expectAsync(
+        Selector(`#nested-two-child-with-whitespace`).withText(`foo`).exists
+      ).toBeResolvedTo(true);
+
+      // `Substring across two children:`
+      await expectAsync(
+        Selector(`#nested-two-child`).withText(`ooba`).exists
+      ).toBeResolvedTo(true);
+      await expectAsync(
+        Selector(`#nested-two-child-with-whitespace`).withText(`ooba`).exists
+      ).toBeResolvedTo(false);
     });
-
-    const reExecutablePromise =
-      Selector('button').withExactText(`Button A`).count;
-
-    await sugarcubeParser.testController
-      .goto('passage title')
-      .expect(Selector('button').withText(`Button A`).count)
-      .eql(3)
-      .expect(reExecutablePromise)
-      .eql(2);
   });
 
-  it('has withExactText with complex selector', async () => {
-    const sugarcubeParser = await SugarcubeParser.create({
-      passages: [
-        {
-          title: 'passage title',
-          tags: ['passage tag'],
-          text: `<div id="outer"><div class="inner"><button disabled>Button A</button> <<button "Button ZA">><</button>> <button disabled>Button ABC</button> <button>Button A</button></div></div>`,
-        },
-      ],
+  describe(`withExactText`, () => {
+    it('behaves identical to testcafe', async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'passage title',
+            tags: ['passage tag'],
+            text: `
+<div id="whitespace">
+  foobar
+</div>
+<div id="nested-one-child"><span>foobar</span></div>
+<div id="deeply-nested-one-child"><div><span>foobar</span></div></div>
+<div id="nested-two-child"><div><span>foo</span><span>bar</span></div></div>
+<div id="deeply-nested-one-child-with-whitespace">
+  <div>
+    <span>foobar</span>
+  </div>
+</div>
+<div id="nested-two-child-with-whitespace">
+  <div>
+    <span>foo</span>
+    <span>bar</span>
+  </div>
+</div>
+`,
+          },
+        ],
+      });
+
+      await sugarcubeParser.testController.goto('passage title');
+
+      // `As one word:
+      await expectAsync(
+        Selector(`#whitespace`).withExactText(`foobar`).exists
+      ).toBeResolvedTo(true);
+      await expectAsync(
+        Selector(`#nested-one-child`).withExactText(`foobar`).exists
+      ).toBeResolvedTo(true);
+      await expectAsync(
+        Selector(`#deeply-nested-one-child`).withExactText(`foobar`).exists
+      ).toBeResolvedTo(true);
+      await expectAsync(
+        Selector(`#nested-two-child`).withExactText(`foobar`).exists
+      ).toBeResolvedTo(true);
+      await expectAsync(
+        Selector(`#deeply-nested-one-child-with-whitespace`).withExactText(`foobar`)
+          .exists
+      ).toBeResolvedTo(true);
+      await expectAsync(
+        Selector(`#nested-two-child-with-whitespace`).withExactText(`foobar`).exists
+      ).toBeResolvedTo(false);
+
+      // `Space at end:`
+      await expectAsync(
+        Selector(`#whitespace`).withExactText(`foobar `).exists
+      ).toBeResolvedTo(false);
+      await expectAsync(
+        Selector(`#nested-one-child`).withExactText(`foobar `).exists
+      ).toBeResolvedTo(false);
+      await expectAsync(
+        Selector(`#deeply-nested-one-child`).withExactText(`foobar `).exists
+      ).toBeResolvedTo(false);
+      await expectAsync(
+        Selector(`#nested-two-child`).withExactText(`foobar `).exists
+      ).toBeResolvedTo(false);
+      await expectAsync(
+        Selector(`#deeply-nested-one-child-with-white-space`).withExactText(
+          `foobar `
+        ).exists
+      ).toBeResolvedTo(false);
+      await expectAsync(
+        Selector(`#nested-two-child-with-white-space`).withExactText(`foobar `)
+          .exists
+      ).toBeResolvedTo(false);
+
+      // `On one of two children:`
+      await expectAsync(
+        Selector(`#nested-two-child`).withExactText(`foo`).exists
+      ).toBeResolvedTo(false);
+      await expectAsync(
+        Selector(`#nested-two-child-with-whitespace`).withExactText(`foo`).exists
+      ).toBeResolvedTo(false);
+
+      // `Substring across two children:`
+      await expectAsync(
+        Selector(`#nested-two-child`).withExactText(`ooba`).exists
+      ).toBeResolvedTo(false);
+      await expectAsync(
+        Selector(`#nested-two-child-with-whitespace`).withExactText(`ooba`).exists
+      ).toBeResolvedTo(false);
     });
-
-    const reExecutablePromise = Selector('#outer .inner button').withExactText(
-      `Button A`
-    ).count;
-
-    await sugarcubeParser.testController
-      .goto('passage title')
-      .expect(Selector('#outer .inner button').withText(`Button A`).count)
-      .eql(3)
-      .expect(reExecutablePromise)
-      .eql(2);
-  });
-  
-  it('counts as "exact text" when the exact text is nested within child elements', async () => {
-    const sugarcubeParser = await SugarcubeParser.create({
-      passages: [
-        {
-          title: 'passage title',
-          tags: ['passage tag'],
-          text: `<div id="nested-one-child"><span>foobar</span></div>`,
-        },
-      ],
-    });
-
-    await sugarcubeParser.testController
-      .goto('passage title')
-      .expect(Selector('#nested-one-child').withExactText(
-        `foobar`
-      ).exists)
-      .ok()
   });
 });
