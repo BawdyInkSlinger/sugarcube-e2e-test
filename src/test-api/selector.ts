@@ -201,14 +201,14 @@ export const Selector: SelectorFactory = (
       enterLogger.debug(
         `selector: entering withText init='${init}' text='${text}'`
       );
-    executionSteps.push({
+      executionSteps.push({
         action: 'filter',
         value: function (
           this: HTMLElement,
           index: number,
           element: HTMLElement
         ): boolean {
-            return innerText(element).indexOf(text) !== -1
+          return innerText(element).indexOf(text) !== -1;
         },
         toString: () => `:contains(${text})`,
       });
@@ -225,7 +225,7 @@ export const Selector: SelectorFactory = (
           index: number,
           element: HTMLElement
         ): boolean {
-            return innerText(element) === text
+          return innerText(element) === text;
         },
         toString: () => `:containsExact(${text})`,
       });
