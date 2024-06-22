@@ -140,7 +140,7 @@ export interface SelectorOptions {
 export interface SelectorPromise extends SelectorAPI, Promise<NodeSnapshot> {}
 
 export const Selector: SelectorFactory = (
-  init: string
+  init: string | ExecutionStep[]
   // | ((...args: any[]) => Node | Node[] | NodeList | HTMLCollection)
   // | Selector,
   // | NodeSnapshot
@@ -149,9 +149,14 @@ export const Selector: SelectorFactory = (
 ): Selector => {
   enterLogger.debug(`selector: entering init='${init}'`);
 
-  const executionSteps: ExecutionStep[] = [
-    { action: 'jQuerySelector', value: init, toString: () => init },
-  ];
+  let executionSteps: ExecutionStep[];
+  if (typeof init === 'string') {
+    executionSteps = [
+      { action: 'jQuerySelector', value: init, toString: () => init },
+    ];
+  } else {
+    executionSteps = init;
+  }
 
   const selectorImpl: Selector & { toString: () => string } = {
     execute: () => selectorExecute(executionSteps),
