@@ -207,7 +207,8 @@ const internalSelector = (
       enterLogger.debug(
         `selector: entering withText init='${init}' text='${text}'`
       );
-      executionSteps.push({
+      const clonedExecutionSteps = _.clone(executionSteps);
+      clonedExecutionSteps.push({
         action: 'filter',
         value: function (
           this: HTMLElement,
@@ -218,13 +219,14 @@ const internalSelector = (
         },
         toString: () => `:contains(${text})`,
       });
-      return this;
+      return internalSelector(clonedExecutionSteps);
     },
     withExactText: function (text: string): Selector {
       enterLogger.debug(
         `selector: entering withExactText init='${init}' text='${text}'`
       );
-      executionSteps.push({
+      const clonedExecutionSteps = _.clone(executionSteps);
+      clonedExecutionSteps.push({
         action: 'filter',
         value: function (
           this: HTMLElement,
@@ -235,7 +237,7 @@ const internalSelector = (
         },
         toString: () => `:containsExact(${text})`,
       });
-      return this;
+      return internalSelector(clonedExecutionSteps);
     },
 
     parent: function (): Selector {
@@ -289,7 +291,7 @@ const internalSelector = (
 
       return internalSelector(clonedExecutionSteps);
     },
-    
+
     getAttribute(attributeName: string): Promise<string | null> {
       return ReExecutablePromise.fromFn(() =>
         selectorExecute(executionSteps).attr(attributeName)
