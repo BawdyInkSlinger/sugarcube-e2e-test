@@ -242,14 +242,15 @@ const internalSelector = (
 
     parent: function (): Selector {
       enterLogger.debug(`selector: entering parent init='${init}'`);
-      executionSteps.push({
+      const clonedExecutionSteps = _.clone(executionSteps);
+      clonedExecutionSteps.push({
         action: 'function',
         implementation: (lastLink) => {
           return lastLink.parent();
         },
         toString: () => `:parent()`,
       });
-      return this;
+      return internalSelector(clonedExecutionSteps);
     },
 
     find: function (cssSelector: string): Selector {
