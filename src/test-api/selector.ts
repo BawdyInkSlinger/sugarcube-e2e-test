@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { getLogger } from '../logging/logger';
 import { innerText } from './internal/inner-text/inner-text';
 import { NodeSnapshot } from './internal/node-snapshot';
@@ -139,7 +140,7 @@ export interface SelectorOptions {
 
 export interface SelectorPromise extends SelectorAPI, Promise<NodeSnapshot> {}
 
-export const Selector: SelectorFactory = (
+const internalSelector = (
   init: string | ExecutionStep[]
   // | ((...args: any[]) => Node | Node[] | NodeList | HTMLCollection)
   // | Selector,
@@ -251,14 +252,16 @@ export const Selector: SelectorFactory = (
 
     find: function (cssSelector: string): Selector {
       enterLogger.debug(`selector: entering find init='${init}'`);
-      executionSteps.push({
+      const clonedExecutionSteps = _.clone(executionSteps);
+      clonedExecutionSteps.push({
         action: 'function',
         implementation: (lastLink) => {
           return lastLink.find(cssSelector);
         },
         toString: () => `:find(${cssSelector})`,
       });
-      return this;
+
+      return internalSelector(clonedExecutionSteps);
     },
 
     hasAttribute: function (attributeName: string): Promise<boolean> {
@@ -273,16 +276,20 @@ export const Selector: SelectorFactory = (
           });
       });
     },
+
     nth(index: number): Selector {
-      executionSteps.push({
+      const clonedExecutionSteps = _.clone(executionSteps);
+      clonedExecutionSteps.push({
         action: 'function',
         implementation: (lastLink) => {
           return jQuery(lastLink[index]);
         },
         toString: () => `:nth(${index})`,
       });
-      return this;
+
+      return internalSelector(clonedExecutionSteps);
     },
+    
     getAttribute(attributeName: string): Promise<string | null> {
       return ReExecutablePromise.fromFn(() =>
         selectorExecute(executionSteps).attr(attributeName)
@@ -292,3 +299,5 @@ export const Selector: SelectorFactory = (
   };
   return selectorImpl;
 };
+
+export const Selector: SelectorFactory = internalSelector;

@@ -293,6 +293,48 @@ describe(`selector`, () => {
       .eql(`p2`);
   });
 
+  it(`returns a new selector for find() and nth()`, async () => {
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag', 'nobr'],
+          text: `
+<p class="with-content">p0</p>
+<div>
+    <div>
+        <p class="with-content">p1</p>
+        <div class="with-content">div1</div>
+    </div>
+</div>
+<div>
+    <div>
+        <p class="with-content">p2</p>
+        <div class="with-content">div2</div>
+    </div>
+</div>
+<div class="with-content">div3</div>
+`,
+        },
+      ],
+    });
+
+    const rootSelector = Selector(`.passage > div > div`);
+    const findSecondP = rootSelector
+      .nth(1)
+      .find(`p`);
+    const findFirstDiv = rootSelector
+      .nth(0)
+      .find(`div`);
+
+    await sugarcubeParser.testController
+      .goto('passage title')
+      .expect(findSecondP.innerText)
+      .eql(`p2`)
+      .expect(findFirstDiv.innerText)
+      .eql(`div1`)
+  });
+
   it('has innerHTML', async () => {
     const sugarcubeParser = await SugarcubeParser.create({
       passages: [
