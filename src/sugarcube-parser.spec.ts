@@ -1,3 +1,4 @@
+import './test-api/internal/monkey-patching/jsdom/strings'
 import { Selector, SugarcubeParser } from '.';
 import {
   ResourceLoaderConstructorOptions,

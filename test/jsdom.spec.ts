@@ -1,3 +1,4 @@
+import './../src/test-api/internal/monkey-patching/jsdom/strings'
 import { JSDOM } from 'jsdom';
 
 describe(`jsdom`, () => {

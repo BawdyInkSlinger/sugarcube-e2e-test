@@ -1,3 +1,4 @@
+import './test-api/internal/monkey-patching/jsdom/strings'
 export * from './sugarcube-parser';
 export * from './logging/logger';
 export * from './trigger-timeout';

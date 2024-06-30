@@ -31,16 +31,13 @@ const logMessage = (
   globalPropertyKey: string,
   functionName: 'reset' | 'restart'
 ): void => {
+  if (!logger.isDebugEnabled()) {
+    return;
+  }
   const prefix = `Calling \`globalThis[${globalPropertyKey}].${functionName}()\` because the global already exists`;
   let postfix = '.';
-  if (logger.isDebugEnabled()) {
-    postfix = `: ${JSON.stringify(globalThis[globalPropertyKey])}`;
-  }
+  postfix = `: ${JSON.stringify(globalThis[globalPropertyKey])}`;
 
   const message = prefix + postfix;
-  if (logger.isInfoEnabled()) {
-    logger.info(message);
-  } else if (logger.isDebugEnabled()) {
-    logger.debug(message);
-  }
+  logger.debug(message);
 };

@@ -14,7 +14,7 @@ export type Adapter = {
 
 export const InMemoryStorageAdapter: Adapter = {
   init: function (storageId: string, persistent: boolean): boolean {
-    logger.info('InMemoryStorageAdapter: Function not implemented.');
+    logger.debug('InMemoryStorageAdapter: Function not implemented.');
     return true;
   },
 
@@ -23,15 +23,15 @@ export const InMemoryStorageAdapter: Adapter = {
   },
 
   delete: function (value: string): boolean {
-    logger.info('InMemoryStorageAdapter: Function not implemented.');
+    logger.debug('InMemoryStorageAdapter: Function not implemented.');
     return true;
   },
   set: function (key: string, value: object): boolean {
-    logger.info('InMemoryStorageAdapter: Function not implemented.');
+    logger.debug('InMemoryStorageAdapter: Function not implemented.');
     return true;
   },
   get: function (key: string): object {
-    logger.info('InMemoryStorageAdapter: Function not implemented.');
+    logger.debug('InMemoryStorageAdapter: Function not implemented.');
     return null;
   },
 };

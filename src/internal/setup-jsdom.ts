@@ -1,3 +1,4 @@
+import './../test-api/internal/monkey-patching/jsdom/strings'
 import { JSDOM, ConstructorOptions } from 'jsdom';
 import { getLogger } from '../logging/logger';
 

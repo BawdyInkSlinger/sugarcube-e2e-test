@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import fs from 'fs/promises';
+import './test-api/internal/monkey-patching/jsdom/strings'
 import { DOMWindow, JSDOM, ResourceLoader } from 'jsdom';
 import seedrandom from 'seedrandom';
 import { SimplePassage } from './internal/declarations/unofficial/simple-passage';

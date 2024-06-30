@@ -4,8 +4,8 @@
   "description": "Write end to end tests for your sugarcube project without firing up a browser.",
   "main": "dist/src/index.js",
   "scripts": {
-    "test": "NODE_OPTIONS='--stack-trace-limit=100' jasmine --random=true --config=\"spec/support/jasmine-spec.json\" && npm run compile-typescript",
-    "profile": "NODE_OPTIONS='--stack-trace-limit=100 --require cpupro/file/data' jasmine --random=true --config=\"spec/support/jasmine-spec.json\" && npm run compile-typescript",
+    "test": "JSDOM_NAIVE_STRINGS_IMPLEMENTATION=true NODE_OPTIONS='--stack-trace-limit=100' jasmine --random=true --config=\"spec/support/jasmine-spec.json\" && npm run compile-typescript",
+    "profile": "JSDOM_NAIVE_STRINGS_IMPLEMENTATION=true NODE_OPTIONS='--stack-trace-limit=100 --require cpupro/file/data' jasmine --random=true --config=\"spec/support/jasmine-spec.json\" && npm run compile-typescript",
     "lint": "echo \"lint\" && eslint '**/*.ts' --fix",
     "compile-typescript": "echo \"compile ts\" && tsc --build --verbose && cp -r src/internal/declarations dist/src/internal/declarations && cp src/internal/html.tpl dist/src/internal/html.tpl",
     "only-build": "npm run compile-typescript",
