@@ -19,6 +19,27 @@ export type Category =
 const logLevels = ['error', 'warn', 'info', 'debug'] as const;
 export type LogLevel = (typeof logLevels)[number];
 
+const loggerPool = new Map<LogLevel, Logger>([
+  ['debug', createLogger(buildLoggerOptions('debug'))],
+  ['info', createLogger(buildLoggerOptions('info'))],
+  ['warn', createLogger(buildLoggerOptions('warn'))],
+  ['error', createLogger(buildLoggerOptions('error'))],
+]);
+
+function buildLoggerOptions(configuredLevel: LogLevel) {
+  return {
+    level: configuredLevel,
+    format: format.combine(
+      logPrefix({ loggerLevel: configuredLevel }),
+      format.simple()
+    ),
+    transports: new transports.Console(),
+    exceptionHandlers: new transports.Console(),
+    rejectionHandlers: new transports.Console(),
+    exitOnError: false,
+  };
+}
+
 export const getLogger = (categoryName: Category = 'DEFAULT'): Logger => {
   if (getEnvLevelValue('DEFAULT') === undefined) {
     throw new Error(
@@ -39,24 +60,6 @@ export const getLogger = (categoryName: Category = 'DEFAULT'): Logger => {
 
   return loggerPool.get(configuredLevel ?? 'debug');
 };
-
-const buildLoggerOptions = (configuredLevel: LogLevel) => {
-  return {
-    level: configuredLevel,
-    format: format.combine(logPrefix(), format.simple()),
-    transports: new transports.Console(),
-    exceptionHandlers: new transports.Console(),
-    rejectionHandlers: new transports.Console(),
-    exitOnError: false,
-  };
-};
-
-const loggerPool = new Map<LogLevel, Logger>([
-  ['debug', createLogger(buildLoggerOptions('debug'))],
-  ['info', createLogger(buildLoggerOptions('info'))],
-  ['warn', createLogger(buildLoggerOptions('warn'))],
-  ['error', createLogger(buildLoggerOptions('error'))],
-]);
 
 const getEnvLevelKey = (categoryName: Category): string => {
   return `logger.${categoryName}.level`;

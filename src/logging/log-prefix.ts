@@ -1,9 +1,19 @@
 import { parse } from 'stacktrace-parser';
-import { format } from 'winston';
+import { format, config } from 'winston';
+import { TransformFunction } from 'logform';
 import { basename } from 'node:path';
 
-export const logPrefix = format((info, opts) => {
-  const stackFrames = parse(new Error().stack);
+const levelToNumber = config.npm.levels;
+
+const transform: TransformFunction = (info, opts) => {
+  if (opts?.loggerLevel !== undefined) {
+    if (levelToNumber[opts?.loggerLevel] < levelToNumber[info.level]) {
+      return false;
+    }
+  }
+
+  const stack = new Error().stack;
+  const stackFrames = parse(stack);
   const logFrameIndex =
     stackFrames.findIndex((stackFrame) => {
       return stackFrame.file.endsWith(`create-logger.js`);
@@ -13,15 +23,13 @@ export const logPrefix = format((info, opts) => {
     info.message = `unknown: ${info.message}`;
   } else {
     const logFrame = stackFrames[logFrameIndex];
-    // console.log(`\n`, logFrame);
     let prefix = new Date().toISOString();
     prefix += ' ' + basename(logFrame.file);
-    // if (logFrame.methodName !== `<unknown>`) {
-    //   prefix += `@${logFrame.methodName}`;
-    // }
     prefix += `#${logFrame.lineNumber}`;
     info.message = `${prefix}: ${info.message}`;
   }
 
   return info;
-});
+};
+
+export const logPrefix = format(transform);
