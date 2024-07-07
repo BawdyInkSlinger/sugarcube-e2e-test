@@ -28,7 +28,6 @@
   },
   "homepage": "https://github.com/BawdyInkSlinger/sugarcube-e2e-test#readme",
   "devDependencies": {
-    "@prettier/sync": "0.3.0",
     "@types/diff": "5.0.9",
     "@types/format-duration": "^1.0.3",
     "@types/jasmine": "5.1.4",
@@ -57,7 +56,8 @@
     "console-table-printer": "file:.yalc/console-table-printer",
     "format-duration": "3",
     "seedrandom": "2.3.3",
-    "stacktrace-parser": "^0.1.10"
+    "stacktrace-parser": "^0.1.10",
+    "@prettier/sync": "0.5.2"
   },
   "peerDependencies": {
     "console-table-printer": "file:.yalc/console-table-printer",
