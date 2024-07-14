@@ -12,6 +12,7 @@ import { getLogger } from '../../logging/logger';
 import { L10n } from '../l10n';
 import { Util } from '../util';
 import { Dialog } from '../dialog';
+import { Setting } from './setting';
 
 let storyPassages: Passage[] = [];
 const logger = getLogger('DEFAULT');
@@ -95,6 +96,7 @@ export const Story = {
   },
 
   reset() {
+    logger.debug(`Reset Story`);
     SimpleStore.adapters.length = 0;
     SimpleStore.adapters.push(InMemoryStorageAdapter);
     StorageContainer.storage = SimpleStore.create(Story.id, true); // eslint-disable-line no-undef
@@ -107,6 +109,9 @@ export const Story = {
     _scripts.length = 0;
   },
 };
+
+// Side effect
+Story.reset();
 
 function filter(predicate: (passage: Passage) => boolean, thisArg?: undefined) {
   if (typeof predicate !== 'function') {
@@ -285,6 +290,12 @@ function start(moduleScripts: Script[], storyScripts: Script[]) {
   });
 
   L10n.init();
+
+  // Initialize the saves (must be done after story initialization, but before engine start).
+  //   Save.init();
+
+  // Initialize the settings.
+  Setting.init();
 
   Macro.init();
   // past this point is supposed to be in a Promise then() See sugarcube.js

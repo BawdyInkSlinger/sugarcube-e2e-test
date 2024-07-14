@@ -90,6 +90,7 @@ export class SugarcubeParser {
     resetGlobal('scroll', () => {});
     resetGlobal('_', _);
 
+    resetGlobal('SugarCube', {});
     resetGlobal('setup', {});
 
     const { initialize: initializeJQueryExtensions } = await import(
@@ -133,9 +134,6 @@ export class SugarcubeParser {
       resetGlobal('initializeParserLibs', initializeParserLibs);
     }
 
-    const { Setting } = await import('./internal/fakes/setting');
-    resetGlobal('Setting', Setting);
-
     const { State } = await import('./internal/state');
     resetGlobal('State', State);
 
@@ -158,13 +156,18 @@ export class SugarcubeParser {
 
     resetGlobal('settings', {});
 
+    
     const {
-      initialize: initializeStory,
-      runStoryInit,
-      Story,
+        initialize: initializeStory,
+        runStoryInit,
+        Story,
     } = await import('./internal/fakes/story');
-
+    
     resetGlobal('Story', Story);
+    
+    const { Setting } = await import('./internal/fakes/setting');
+    resetGlobal('Setting', Setting);
+    
     resetGlobal('initializeStory', initializeStory);
     resetGlobal('runStoryInit', runStoryInit);
 

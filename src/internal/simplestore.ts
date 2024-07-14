@@ -7,8 +7,11 @@
 
 ***********************************************************************************************************************/
 
+import { getLogger } from '../logging/logger';
 import { Adapter } from './fakes/in-memory-storage-adapter';
 import { objectDefineProperties } from './utils/object-define-properties';
+
+const logger = getLogger();
 
 export const SimpleStore = (() => {
   // eslint-disable-line no-unused-vars, no-var
@@ -24,6 +27,7 @@ export const SimpleStore = (() => {
 		SimpleStore Functions.
 	*******************************************************************************************************************/
   function storeCreate(storageId: string, persistent: boolean) {
+    logger.debug(`SimpleStore.storeCreate: storageId=${storageId} persistent=${persistent} _initialized=${JSON.stringify(_initialized)}`);
     if (_initialized) {
       return _initialized.create(storageId, persistent);
     }
