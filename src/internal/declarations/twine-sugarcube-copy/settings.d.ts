@@ -201,6 +201,9 @@ export interface SettingsAPI {
    * @since 2.0.0
    */
   save(): void;
+
+  // Added by BIS
+  isEmpty(): boolean;
 }
 
 export {};

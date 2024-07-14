@@ -11,20 +11,40 @@
 	       errorPrologRegExp, settings
 */
 
+import { getLogger } from "../logging/logger";
+import { errorPrologRegExp, Alert } from "./alert";
+import { Config } from "./config";
+import { Dialog } from "./dialog";
+import { Engine } from "./fakes/engine";
+import { Save } from "./fakes/save";
+import { Setting, settings } from "./setting";
+import { Story } from "./fakes/story";
+import { Has } from "./has";
+import { L10n } from "./l10n";
+import { State } from "./state";
+import { UIBar } from "./uibar";
+import { Util } from "./util";
+import { objectDefineProperties } from "./utils/object-define-properties";
+import { Wikifier } from "./wikifier";
+
+const logger = getLogger();
+
 export const UI = (() => { // eslint-disable-line no-unused-vars, no-var
 	'use strict';
 
 	/*******************************************************************************************************************
 		UI Functions, Core.
 	*******************************************************************************************************************/
-	function uiAssembleLinkList(passage, listEl) {
+	function uiAssembleLinkList(passage, listEl?) {
 		let list = listEl;
 
 		// Cache the values of `Config.debug` and `Config.cleanupWikifierOutput`,
 		// then disable them during this method's run.
 		const debugState = Config.debug;
 		const cleanState = Config.cleanupWikifierOutput;
+        // @ts-ignore
 		Config.debug = false;
+        // @ts-ignore
 		Config.cleanupWikifierOutput = false;
 
 		try {
@@ -63,7 +83,9 @@ export const UI = (() => { // eslint-disable-line no-unused-vars, no-var
 		}
 		finally {
 			// Restore the `Config` settings to their original values.
+            // @ts-ignore
 			Config.cleanupWikifierOutput = cleanState;
+            // @ts-ignore
 			Config.debug = debugState;
 		}
 
@@ -110,7 +132,7 @@ export const UI = (() => { // eslint-disable-line no-unused-vars, no-var
 	}
 
 	function uiBuildAutoload() {
-		if (DEBUG) { console.log('[UI/uiBuildAutoload()]'); }
+		logger.debug('[UI/uiBuildAutoload()]');
 
 		jQuery(Dialog.setup(L10n.get('autoloadTitle'), 'autoload'))
 			.append(
@@ -126,7 +148,7 @@ export const UI = (() => { // eslint-disable-line no-unused-vars, no-var
 		jQuery(document).one('click.autoload', '.ui-close', ev => {
 			const isAutoloadOk = ev.target.id === 'autoload-ok';
 			jQuery(document).one(':dialogclosed', () => {
-				if (DEBUG) { console.log(`\tattempting autoload: "${Save.autosave.get().title}"`); }
+				logger.debug(`\tattempting autoload: "${Save.autosave.get().title}"`); 
 
 				if (!isAutoloadOk || !Save.autosave.load()) {
 					Engine.play(Config.passages.start);
@@ -138,7 +160,7 @@ export const UI = (() => { // eslint-disable-line no-unused-vars, no-var
 	}
 
 	function uiBuildJumpto() {
-		if (DEBUG) { console.log('[UI/uiBuildJumpto()]'); }
+		logger.debug('[UI/uiBuildJumpto()]'); 
 
 		const list = document.createElement('ul');
 
@@ -174,7 +196,7 @@ export const UI = (() => { // eslint-disable-line no-unused-vars, no-var
 	}
 
 	function uiBuildRestart() {
-		if (DEBUG) { console.log('[UI/uiBuildRestart()]'); }
+		logger.debug('[UI/uiBuildRestart()]'); 
 
 		jQuery(Dialog.setup(L10n.get('restartTitle'), 'restart'))
 			.append(
@@ -225,7 +247,7 @@ export const UI = (() => { // eslint-disable-line no-unused-vars, no-var
 		}
 
 		function createSaveList() {
-			function createButton(bId, bClass, bText, bSlot, bAction) {
+			function createButton(bId, bClass, bText, bSlot, bAction?) {
 				const $btn = jQuery(document.createElement('button'))
 					.attr('id', `saves-${bId}-${bSlot}`)
 					.addClass(bId)
@@ -331,7 +353,9 @@ export const UI = (() => { // eslint-disable-line no-unused-vars, no-var
 				const $tdDele = jQuery(document.createElement('td'));
 
 				// Add the slot ID.
-				$tdSlot.append(document.createTextNode(i + 1));
+				$tdSlot.append(document.createTextNode((i + 1) + ""));
+				// BIS change. Was:
+                // $tdSlot.append(document.createTextNode(i + 1));
 
 				if (saves.slots[i]) {
 					// Add the load button.
@@ -390,11 +414,13 @@ export const UI = (() => { // eslint-disable-line no-unused-vars, no-var
 				.append($tbody);
 		}
 
-		if (DEBUG) { console.log('[UI/uiBuildSaves()]'); }
+		logger.debug('[UI/uiBuildSaves()]'); 
 
 		const $dialogBody = jQuery(Dialog.setup(L10n.get('savesTitle'), 'saves'));
 		const savesOk     = Save.ok();
-		const fileOk      = Has.fileAPI && (Config.saves.tryDiskOnMobile || !Browser.isMobile.any());
+		const fileOk      = Has.fileAPI && true;
+        // BIS change. Was:
+		// const fileOk      = Has.fileAPI && (Config.saves.tryDiskOnMobile || !Browser.isMobile.any());
 
 		// Add saves list.
 		if (savesOk) {
@@ -438,7 +464,7 @@ export const UI = (() => { // eslint-disable-line no-unused-vars, no-var
 						tabindex      : -1,
 						'aria-hidden' : true
 					})
-					.on('change', ev => {
+					.on('change', (ev: Event) => {
 						jQuery(document).one(':dialogclosed', () => Save.import(ev));
 						Dialog.close();
 					})
@@ -467,7 +493,7 @@ export const UI = (() => { // eslint-disable-line no-unused-vars, no-var
 	}
 
 	function uiBuildSettings() {
-		if (DEBUG) { console.log('[UI/uiBuildSettings()]'); }
+		logger.debug('[UI/uiBuildSettings()]'); 
 
 		const $dialogBody = jQuery(Dialog.setup(L10n.get('settingsTitle'), 'settings'));
 
@@ -675,15 +701,18 @@ export const UI = (() => { // eslint-disable-line no-unused-vars, no-var
 	}
 
 	function uiBuildShare() {
-		if (DEBUG) { console.log('[UI/uiBuildShare()]'); }
+		logger.debug('[UI/uiBuildShare()]'); 
 
 		try {
 			jQuery(Dialog.setup(L10n.get('shareTitle'), 'share list'))
 				.append(uiAssembleLinkList('StoryShare'));
 		}
 		catch (ex) {
-			console.error(ex);
-			Alert.error('StoryShare', ex.message);
+            // Block changed by BIS
+            logger.error(ex);
+            if (typeof ex === 'object' && "message" in ex) {
+                logger.error('StoryShare', ex.message);
+            }
 			return false;
 		}
 
@@ -694,7 +723,7 @@ export const UI = (() => { // eslint-disable-line no-unused-vars, no-var
 	/*******************************************************************************************************************
 		Module Exports.
 	*******************************************************************************************************************/
-	return Object.freeze(Object.defineProperties({}, {
+	return Object.freeze(objectDefineProperties({}, {
 		/*
 			UI Functions, Core.
 		*/
@@ -727,8 +756,14 @@ export const UI = (() => { // eslint-disable-line no-unused-vars, no-var
 		// `Dialog` methods.
 		isOpen                   : { value : (...args) => Dialog.isOpen(...args) },
 		body                     : { value : () => Dialog.body() },
-		setup                    : { value : (...args) => Dialog.setup(...args) },
-		addClickHandler          : { value : (...args) => Dialog.addClickHandler(...args) },
+		setup                    : { value : (...args) => Dialog.setup(
+            // @ts-ignore
+            ...args
+        ) },
+		addClickHandler          : { value : (...args) => Dialog.addClickHandler(
+            // @ts-ignore
+            ...args
+        ) },
 		open                     : { value : (...args) => Dialog.open(...args) },
 		close                    : { value : (...args) => Dialog.close(...args) },
 		resize                   : { value : () => Dialog.resize() },

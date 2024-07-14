@@ -10,7 +10,23 @@
 	global Alert, Dialog, Engine, L10n, Setting, State, Story, UI, Config, setDisplayTitle, setPageElement
 */
 
-var UIBar = (() => { // eslint-disable-line no-unused-vars, no-var
+import { TWINE1 } from "../constants";
+import { getLogger } from "../logging/logger";
+import { Config } from "./config";
+import { Dialog } from "./dialog";
+import { Engine } from "./fakes/engine";
+import { Setting } from "./setting";
+import { Story } from "./fakes/story";
+import { setDisplayTitle, setPageElement } from "./helpers";
+import { L10n } from "./l10n";
+import { State } from "./state";
+import { UI } from "./ui";
+import { objectDefineProperties } from "./utils/object-define-properties";
+
+const logger = getLogger();
+
+
+export const UIBar = (() => { // eslint-disable-line no-unused-vars, no-var
 	'use strict';
 
 	// UI bar element cache.
@@ -22,7 +38,7 @@ var UIBar = (() => { // eslint-disable-line no-unused-vars, no-var
 	*******************************************************************************/
 
 	function uiBarDestroy() {
-		if (DEBUG) { console.log('[UIBar/uiBarDestroy()]'); }
+		logger.debug('[UIBar/uiBarDestroy()]');
 
 		if (!_$uiBar) {
 			return;
@@ -53,7 +69,7 @@ var UIBar = (() => { // eslint-disable-line no-unused-vars, no-var
 	}
 
 	function uiBarInit() {
-		if (DEBUG) { console.log('[UIBar/uiBarInit()]'); }
+		logger.debug('[UIBar/uiBarInit()]');
 
 		if (document.getElementById('ui-bar')) {
 			return;
@@ -140,7 +156,7 @@ var UIBar = (() => { // eslint-disable-line no-unused-vars, no-var
 	}
 
 	function uiBarStart() {
-		if (DEBUG) { console.log('[UIBar/uiBarStart()]'); }
+		logger.debug('[UIBar/uiBarStart()]');
 
 		if (!_$uiBar) {
 			return;
@@ -271,7 +287,7 @@ var UIBar = (() => { // eslint-disable-line no-unused-vars, no-var
 		}
 	}
 
-	function uiBarStow(noAnimation) {
+	function uiBarStow(noAnimation?) {
 		if (_$uiBar && !_$uiBar.hasClass('stowed')) {
 			let $story;
 
@@ -294,7 +310,7 @@ var UIBar = (() => { // eslint-disable-line no-unused-vars, no-var
 		return this;
 	}
 
-	function uiBarUnstow(noAnimation) {
+	function uiBarUnstow(noAnimation?) {
 		if (_$uiBar && _$uiBar.hasClass('stowed')) {
 			let $story;
 
@@ -318,7 +334,7 @@ var UIBar = (() => { // eslint-disable-line no-unused-vars, no-var
 	}
 
 	function uiBarUpdate() {
-		if (DEBUG) { console.log('[UIBar/uiBarUpdate()]'); }
+		logger.debug('[UIBar/uiBarUpdate()]');
 
 		// Set up the display title, both the document title and page element.
 		if (Story.has('StoryDisplayTitle')) {
@@ -346,8 +362,11 @@ var UIBar = (() => { // eslint-disable-line no-unused-vars, no-var
 					UI.assembleLinkList('StoryMenu', menuStory);
 				}
 				catch (ex) {
-					console.error(ex);
-					Alert.error('StoryMenu', ex.message);
+                    // Block changed by BIS
+					logger.error(ex);
+                    if (typeof ex === 'object' && "message" in ex) {
+                        logger.error('StoryMenu', ex.message);
+                    }
 				}
 			}
 		}
@@ -358,7 +377,7 @@ var UIBar = (() => { // eslint-disable-line no-unused-vars, no-var
 		Object Exports.
 	*******************************************************************************/
 
-	return Object.freeze(Object.defineProperties({}, {
+	return Object.freeze(objectDefineProperties({}, {
 		destroy  : { value : uiBarDestroy },
 		hide     : { value : uiBarHide },
 		init     : { value : uiBarInit },

@@ -10,7 +10,6 @@
 
 import {
   LoadHandler,
-  SaveEventAPI,
   SaveHandler,
 } from './declarations/twine-sugarcube-copy/save';
 import { Save } from './fakes/save';

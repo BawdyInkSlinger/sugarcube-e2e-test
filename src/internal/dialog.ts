@@ -69,7 +69,7 @@ export const Dialog = (() => {
     return _$dialogBody.get(0);
   }
 
-  function dialogClose(ev) {
+  function dialogClose(ev?) {
     // Trigger a `:dialogclosing` event on the dialog body.
     _$dialogBody.trigger(':dialogclosing');
 
@@ -230,7 +230,7 @@ export const Dialog = (() => {
     );
   }
 
-  function dialogOpen(options, closeFn) {
+  function dialogOpen(options?, closeFn?) {
     // Trigger a `:dialogopening` event on the dialog body.
     _$dialogBody.trigger(':dialogopening');
 
@@ -337,7 +337,7 @@ export const Dialog = (() => {
     return Dialog;
   }
 
-  function dialogResize(data) {
+  function dialogResize(data?) {
     return _resizeHandler(typeof data === 'object' ? { data } : undefined);
   }
 

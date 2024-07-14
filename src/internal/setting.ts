@@ -97,6 +97,7 @@ export const Setting = (() => { // eslint-disable-line no-unused-vars, no-var
 	}
 
 	function settingsLoad() {
+		logger.debug(`[Setting/settingLoad(StorageContainer.storage=${JSON.stringify(StorageContainer.storage)})]`);
 		const defaultSettings = settingsCreate();
 		const loadedSettings  = StorageContainer.storage.get('settings') || settingsCreate();
 
@@ -110,12 +111,16 @@ export const Setting = (() => { // eslint-disable-line no-unused-vars, no-var
 	}
 
 	function settingsClear() {
+		logger.debug(`[Setting/settingClear(StorageContainer.storage=${JSON.stringify(StorageContainer.storage)})]`);
 		window.SugarCube.settings = settings = settingsCreate();
 		StorageContainer.storage.delete('settings');
+        // Added by BIS:
+        _definitions.length = 0;
 		return true;
 	}
 
-	function settingsReset(name) {
+	function settingsReset(name?) {
+		logger.debug(`[Setting/settingsReset(StorageContainer.storage=${JSON.stringify(StorageContainer.storage)}, name=${name})]`);
 		if (arguments.length === 0) {
 			settingsClear();
 			settingsLoad();
@@ -139,11 +144,12 @@ export const Setting = (() => { // eslint-disable-line no-unused-vars, no-var
 	/*******************************************************************************************************************
 		Definitions Functions.
 	*******************************************************************************************************************/
-	function definitionsForEach(callback, thisArg) {
+	function definitionsForEach(callback, thisArg?) {
 		_definitions.forEach(callback, thisArg);
 	}
 
 	function definitionsAdd(type, name, def) {
+		logger.debug(`[Setting/definitionsAdd(StorageContainer.storage=${JSON.stringify(StorageContainer.storage)}, type=${type}, name=${name}, def=${JSON.stringify(def)})]`);
 		if (arguments.length < 3) {
 			const errors = [];
 			if (arguments.length < 1) { errors.push('type'); }

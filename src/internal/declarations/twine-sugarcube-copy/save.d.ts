@@ -18,6 +18,7 @@ export interface SavedState {
   seed?: string | undefined;
 }
 
+// BIS Note: Anywhere this SaveObject is returned was modified by me
 export interface SaveObject {
   /** The story's save ID. */
   id: string;
@@ -72,6 +73,8 @@ export interface SaveEventAPI<HandlerType extends SaveHandler | LoadHandler> {
    */
   size: number;
 }
+
+// BIS Note: Anywhere this SaveAPI is returned was modified by me
 export interface SaveAPI {
   // added by BIS
   MAX_IDX: number;
@@ -85,7 +88,7 @@ export interface SaveAPI {
    * Returns the saves object.
    * @since 2.0.0
    */
-  get(): object;
+  get(): SaveAPI;
 
   /**
    * Returns whether both the slot saves and autosave are available and ready.
@@ -172,6 +175,11 @@ export interface SaveAPI {
   };
 
   autosave: {
+    // Added by BIS:
+    title: string;
+    // Added by BIS:
+    date: Date;
+
     /**
      * Deletes the autosave.
      * @since 2.0.0
@@ -194,7 +202,7 @@ export interface SaveAPI {
      * Loads the autosave.
      * @since 2.0.0
      */
-    load(): void;
+    load(): boolean;
 
     /**
      * Returns whether the autosave is available and ready.

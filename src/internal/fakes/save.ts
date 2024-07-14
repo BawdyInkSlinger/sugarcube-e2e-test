@@ -12,7 +12,7 @@ export const Save: SaveAPI = {
   clear: function (): void {
     logger.info('FAKE SAVE: Function not implemented.');
   },
-  get: function (): object {
+  get: function (): SaveAPI {
     logger.info('FAKE SAVE: Function not implemented.');
     return this;
   },
@@ -83,27 +83,30 @@ export const Save: SaveAPI = {
     },
   },
   autosave: {
-    delete: function (): void {
-      logger.info('FAKE SAVE: Function not implemented.');
-    },
-    get: function (): SaveObject {
-      logger.info('FAKE SAVE: Function not implemented.');
-      return {} as SaveObject;
-    },
-    has: function (): boolean {
-      logger.info('FAKE SAVE: Function not implemented.');
-      return true;
-    },
-    load: function (): void {
-      logger.info('FAKE SAVE: Function not implemented.');
-    },
-    ok: function (): boolean {
-      logger.info('FAKE SAVE: Function not implemented.');
-      return true;
-    },
-    save: function (title?: string, metadata?: any): void {
-      logger.info('FAKE SAVE: Function not implemented.');
-    },
+      delete: function (): void {
+          logger.info('FAKE AUTOSAVE: Function not implemented.');
+      },
+      get: function (): SaveObject {
+          logger.info('FAKE AUTOSAVE: Function not implemented.');
+          return {} as SaveObject;
+      },
+      has: function (): boolean {
+          logger.info('FAKE AUTOSAVE: Function not implemented.');
+          return true;
+      },
+      load: function (): boolean {
+          logger.info('FAKE AUTOSAVE: Function not implemented.');
+          return true;
+      },
+      ok: function (): boolean {
+          logger.info('FAKE AUTOSAVE: Function not implemented.');
+          return true;
+      },
+      save: function (title?: string, metadata?: any): void {
+          logger.info('FAKE AUTOSAVE: Function not implemented.');
+      },
+      title: 'FAKE AUTOSAVE',
+      date: new Date(),
   },
   export: function (filename?: string, metadata?: any): void {
     logger.info('FAKE SAVE: Function not implemented.');
