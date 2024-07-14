@@ -8,10 +8,10 @@
 ***********************************************************************************************************************/
 /* global Util, settings:true, storage */
 
-import { getLogger } from "../../logging/logger";
-import { Util } from "../util";
-import { objectDefineProperties } from "../utils/object-define-properties";
-import { StorageContainer } from "./storage";
+import { getLogger } from "../logging/logger";
+import { Util } from "./util";
+import { objectDefineProperties } from "./utils/object-define-properties";
+import { StorageContainer } from "./fakes/storage";
 
 const logger = getLogger();
 

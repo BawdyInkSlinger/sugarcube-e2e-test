@@ -19,7 +19,7 @@ import type { Story } from './internal/fakes/story';
 import type { Config } from './internal/config';
 import type { Engine } from './internal/fakes/engine';
 import type { Save } from './internal/fakes/save';
-import type { Setting } from './internal/fakes/setting';
+import type { Setting } from './internal/setting';
 import type { Macro } from './internal/macro/macro';
 import type { Template } from './internal/template';
 import type { Dialog } from './internal/dialog';
@@ -165,7 +165,7 @@ export class SugarcubeParser {
     
     resetGlobal('Story', Story);
     
-    const { Setting } = await import('./internal/fakes/setting');
+    const { Setting } = await import('./internal/setting');
     resetGlobal('Setting', Setting);
     
     resetGlobal('initializeStory', initializeStory);

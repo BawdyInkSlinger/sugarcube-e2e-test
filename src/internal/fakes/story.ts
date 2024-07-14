@@ -12,7 +12,7 @@ import { getLogger } from '../../logging/logger';
 import { L10n } from '../l10n';
 import { Util } from '../util';
 import { Dialog } from '../dialog';
-import { Setting } from './setting';
+import { Setting } from '../setting';
 
 let storyPassages: Passage[] = [];
 const logger = getLogger('DEFAULT');
@@ -110,8 +110,7 @@ export const Story = {
   },
 };
 
-// Side effect
-Story.reset();
+Story.reset(); // Side effect. Reset at the beginning so the storage/session containers are I initialize to before first use
 
 function filter(predicate: (passage: Passage) => boolean, thisArg?: undefined) {
   if (typeof predicate !== 'function') {
