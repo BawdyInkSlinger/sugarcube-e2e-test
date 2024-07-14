@@ -1,6 +1,6 @@
 // This comes from sugarcube.js
 
-import { Adapter } from './in-memory-storage-adapter';
+import { Adapter } from './adapter';
 
 // eslint-disable-next-line prefer-const, @typescript-eslint/no-explicit-any
 let _session: Adapter = null;

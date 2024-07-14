@@ -8,7 +8,7 @@
 ***********************************************************************************************************************/
 
 import { getLogger } from '../logging/logger';
-import { Adapter } from './fakes/in-memory-storage-adapter';
+import { Adapter } from './fakes/adapter';
 import { objectDefineProperties } from './utils/object-define-properties';
 
 const logger = getLogger();

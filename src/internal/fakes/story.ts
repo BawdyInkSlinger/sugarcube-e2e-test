@@ -2,7 +2,7 @@ import { Macro } from '../macro/macro';
 import { Scripting } from '../scripting';
 import { Wikifier } from '../wikifier';
 import { SimpleStore } from '../simplestore';
-import { InMemoryStorageAdapter } from './in-memory-storage-adapter';
+import { InMemoryStorageAdapter } from './adapter';
 import { Engine } from './engine';
 import { Passage, PassageClass } from './passage';
 import { SessionContainer } from './session';
