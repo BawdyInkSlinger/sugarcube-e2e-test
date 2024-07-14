@@ -32,4 +32,28 @@ describe(`Settings`, () => {
 
     await sugarcubeParser.testController.goto('passage title');
   });
+  
+  it('can use settings without callback functions', async () => {
+    const passages = [
+      {
+        title: 'passage title',
+        tags: ['passage tag'],
+        text: 'abc',
+      },
+      {
+        title: 'Script',
+        tags: ['script'],
+        text: `
+    Setting.addToggle('my-toggle-name', {
+      label: 'My Toggle',
+      default: true,
+    });
+          `,
+      },
+    ];
+
+    await SugarcubeParser.create({
+      passages,
+    });
+  });
 });

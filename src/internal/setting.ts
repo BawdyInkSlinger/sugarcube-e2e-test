@@ -37,8 +37,8 @@ export const Setting = (() => { // eslint-disable-line no-unused-vars, no-var
 		Settings Functions.
 	*******************************************************************************************************************/
 	function settingsInit() {
-		logger.debug(`[Setting/settingsInit(StorageContainer.storage=${JSON.stringify(StorageContainer.storage)})]`);
-
+		logger.debug(`[Setting/settingsInit(StorageContainer.storage=${StorageContainer.storage}, _definitions=${JSON.stringify(_definitions)})]`);
+        
 		/* legacy */
 		// Attempt to migrate an existing `options` store to `settings`.
 		if (StorageContainer.storage.has('options')) {
@@ -52,6 +52,7 @@ export const Setting = (() => { // eslint-disable-line no-unused-vars, no-var
 			StorageContainer.storage.delete('options');
 		}
 		/* /legacy */
+        logger.debug(`[Setting/settingsInit/postLegacy(StorageContainer.storage=${StorageContainer.storage}, _definitions=${JSON.stringify(_definitions)})]`);
 
 		// Load existing settings.
 		settingsLoad();
@@ -97,7 +98,7 @@ export const Setting = (() => { // eslint-disable-line no-unused-vars, no-var
 	}
 
 	function settingsLoad() {
-		logger.debug(`[Setting/settingLoad(StorageContainer.storage=${JSON.stringify(StorageContainer.storage)})]`);
+		logger.debug(`[Setting/settingLoad(StorageContainer.storage=${StorageContainer.storage}, _definitions=${JSON.stringify(_definitions)})]`);
 		const defaultSettings = settingsCreate();
 		const loadedSettings  = StorageContainer.storage.get('settings') || settingsCreate();
 
@@ -111,7 +112,7 @@ export const Setting = (() => { // eslint-disable-line no-unused-vars, no-var
 	}
 
 	function settingsClear() {
-		logger.debug(`[Setting/settingClear(StorageContainer.storage=${JSON.stringify(StorageContainer.storage)})]`);
+		logger.debug(`[Setting/settingClear(StorageContainer.storage=${StorageContainer.storage}, _definitions=${JSON.stringify(_definitions)})]`);
 		window.SugarCube.settings = settings = settingsCreate();
 		StorageContainer.storage.delete('settings');
         // Added by BIS:
@@ -120,7 +121,7 @@ export const Setting = (() => { // eslint-disable-line no-unused-vars, no-var
 	}
 
 	function settingsReset(name?) {
-		logger.debug(`[Setting/settingsReset(StorageContainer.storage=${JSON.stringify(StorageContainer.storage)}, name=${name})]`);
+		logger.debug(`[Setting/settingsReset(StorageContainer.storage=${StorageContainer.storage}, _definitions=${JSON.stringify(_definitions)}, name=${name})]`);
 		if (arguments.length === 0) {
 			settingsClear();
 			settingsLoad();
@@ -149,7 +150,7 @@ export const Setting = (() => { // eslint-disable-line no-unused-vars, no-var
 	}
 
 	function definitionsAdd(type, name, def) {
-		logger.debug(`[Setting/definitionsAdd(StorageContainer.storage=${JSON.stringify(StorageContainer.storage)}, type=${type}, name=${name}, def=${JSON.stringify(def)})]`);
+		logger.debug(`[Setting/definitionsAdd(StorageContainer.storage=${StorageContainer.storage}, _definitions=${JSON.stringify(_definitions)}, type=${type}, name=${name}, def=${JSON.stringify(def)})]`);
 		if (arguments.length < 3) {
 			const errors = [];
 			if (arguments.length < 1) { errors.push('type'); }
@@ -188,18 +189,10 @@ export const Setting = (() => { // eslint-disable-line no-unused-vars, no-var
 				onInit    →  (all)   → function
 				onChange  →  (all)   → function
 		*/
-		const definition = {
+		const definition: any = {
 			type,
 			name,
 			label : typeof def.label === 'string' ? def.label.trim() : '',
-            desc: undefined,
-            default: undefined,
-            list: undefined,
-            min: undefined,
-            max: undefined,
-            step: undefined,
-            onInit: undefined,
-            onChange: undefined,
 		};
 
 		if (typeof def.desc === 'string') {

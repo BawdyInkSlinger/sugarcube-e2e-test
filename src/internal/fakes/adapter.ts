@@ -13,11 +13,10 @@ export interface Adapter {
   create: (storageId: string, persistent: boolean) => Adapter;
 }
 
-// const inMemoryStores: {[index: string]: Map<string, object>} = {};
-
 class InMemoryStorageAdapterImpl implements Adapter {
   inMemoryStore = new Map<string, object>();
   init(storageId: string, persistent: boolean): boolean {
+    logger.debug(`InMemoryStorageAdapterImpl/init(${storageId}, ${persistent}})`)
     this.inMemoryStore.clear();
     return true;
   }
@@ -36,6 +35,11 @@ class InMemoryStorageAdapterImpl implements Adapter {
   }
   has(key: string): boolean {
     return this.inMemoryStore.has(key);
+  }
+  toString() {
+      return `{` + [...this.inMemoryStore].map((entry) => {
+        return `\n  ${entry[0]}: ${entry[1]},`
+      }).join("") + `}`
   }
 }
 

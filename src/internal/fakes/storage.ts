@@ -6,10 +6,10 @@ import { Adapter } from './adapter';
 let _storage: Adapter = {} as any;
 
 globalThis.storage = {
-  get() {
+  get(): Adapter {
     return _storage;
   },
-  set(val: typeof _storage) {
+  set(val: Adapter) {
     _storage = val;
   },
 };

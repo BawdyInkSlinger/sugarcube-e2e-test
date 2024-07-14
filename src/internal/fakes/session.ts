@@ -6,7 +6,7 @@ import { Adapter } from './adapter';
 let _session: Adapter = null;
 
 globalThis.session = {
-  get() {
+  get(): Adapter {
     return _session;
   },
   set(val: Adapter) {

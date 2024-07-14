@@ -21,7 +21,7 @@ export const SimpleStore = (() => {
   const _adapters: Adapter[] = [];
 
   // The initialized adapter.
-  let _initialized = null;
+  let _initialized: Adapter = null;
 
   /*******************************************************************************************************************
 		SimpleStore Functions.
