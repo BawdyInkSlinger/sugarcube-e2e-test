@@ -18,7 +18,7 @@ import type { State } from './internal/state';
 import type { Story } from './internal/fakes/story';
 import type { Config } from './internal/config';
 import type { Engine } from './internal/fakes/engine';
-import type { Save } from './internal/fakes/save';
+import type { Save } from './internal/save';
 import type { Setting } from './internal/setting';
 import type { Macro } from './internal/macro/macro';
 import type { Template } from './internal/template';
@@ -140,7 +140,7 @@ export class SugarcubeParser {
     const { Engine } = await import('./internal/fakes/engine');
     resetGlobal('Engine', Engine);
 
-    const { Save } = await import('./internal/fakes/save');
+    const { Save } = await import('./internal/save');
     resetGlobal('Save', Save);
 
     const { Template } = await import('./internal/template');

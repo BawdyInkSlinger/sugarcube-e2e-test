@@ -1,9 +1,9 @@
-import { getLogger } from '../../logging/logger';
+import { getLogger } from '../logging/logger';
 import {
   SaveAPI,
   SaveDetails,
   SaveObject,
-} from '../declarations/twine-sugarcube-copy/save';
+} from './declarations/twine-sugarcube-copy/save';
 
 const logger = getLogger('DEFAULT');
 

@@ -12,7 +12,7 @@ import {
   LoadHandler,
   SaveHandler,
 } from './declarations/twine-sugarcube-copy/save';
-import { Save } from './fakes/save';
+import { Save } from './save';
 import { Util } from './util';
 
 export const Config = (() => {

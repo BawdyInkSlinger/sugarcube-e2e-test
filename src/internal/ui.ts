@@ -16,7 +16,7 @@ import { errorPrologRegExp, Alert } from "./alert";
 import { Config } from "./config";
 import { Dialog } from "./dialog";
 import { Engine } from "./fakes/engine";
-import { Save } from "./fakes/save";
+import { Save } from "./save";
 import { Setting, settings } from "./setting";
 import { Story } from "./fakes/story";
 import { Has } from "./has";
