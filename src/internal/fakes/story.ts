@@ -13,6 +13,7 @@ import { L10n } from '../l10n';
 import { Util } from '../util';
 import { Dialog } from '../dialog';
 import { Setting } from '../setting';
+import { UIBar } from '../uibar';
 
 let storyPassages: Passage[] = [];
 const logger = getLogger('DEFAULT');
@@ -269,6 +270,7 @@ function start(moduleScripts: Script[], storyScripts: Script[]) {
   });
 
   Dialog.init();
+  UIBar.init();
   // primarily deals with StoryInterface Dom modifications
   Engine.init();
 
@@ -321,6 +323,8 @@ export function runStoryInit() {
 
   // Start the engine.
   Engine.start();
+
+  UIBar.start();
 
   // Trigger the `:storyready` global synthetic event.
   jQuery.event.trigger(':storyready');

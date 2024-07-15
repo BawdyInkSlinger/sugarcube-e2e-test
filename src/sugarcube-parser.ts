@@ -148,6 +148,9 @@ export class SugarcubeParser {
 
     const { Dialog } = await import('./internal/dialog');
     resetGlobal('Dialog', Dialog);
+    
+    const { UIBar } = await import('./internal/uibar');
+    resetGlobal('UIBar', UIBar);
 
     const helpers = await import('./internal/helpers');
     Object.keys(helpers).forEach((helperFunctionName: string) => {
