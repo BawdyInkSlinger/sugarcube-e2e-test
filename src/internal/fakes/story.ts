@@ -14,6 +14,7 @@ import { Util } from '../util';
 import { Dialog } from '../dialog';
 import { Setting } from '../setting';
 import { UIBar } from '../uibar';
+import { Save } from '../save';
 
 let storyPassages: Passage[] = [];
 const logger = getLogger('DEFAULT');
@@ -293,7 +294,7 @@ function start(moduleScripts: Script[], storyScripts: Script[]) {
   L10n.init();
 
   // Initialize the saves (must be done after story initialization, but before engine start).
-  //   Save.init();
+  Save.init();
 
   // Initialize the settings.
   Setting.init();

@@ -1,74 +1,64 @@
 import { getLogger } from '../../logging/logger';
+import { SaveAPI } from '../declarations/twine-sugarcube-copy/save';
 
 const logger = getLogger('DEFAULT');
 
 export type StoreValue = object;
+type KeyValue = {
+  saves: SaveAPI;
+  options: StoreValue;
+  settings: StoreValue;
+  remember: StoreValue;
+  metadata: StoreValue;
+};
 
 export interface Adapter {
-  delete(value: string): boolean;
-  set(key: string, value: StoreValue): boolean;
-  get(key: string): StoreValue;
-  has(key: string): boolean;
+  name: string;
+  delete(value: keyof KeyValue): boolean;
+  set<Key extends keyof KeyValue>(key: Key, value: KeyValue[Key]): boolean;
+  get<Key extends keyof KeyValue>(key: Key): KeyValue[Key] | null;
+  has(key: keyof KeyValue): boolean;
   init: (storageId: string, persistent: boolean) => boolean;
   create: (storageId: string, persistent: boolean) => Adapter;
 }
 
 class InMemoryStorageAdapterImpl implements Adapter {
-  inMemoryStore = new Map<string, object>();
+  name: 'InMemoryStorageAdapterImpl';
+  inMemoryStore = new Map<keyof KeyValue, KeyValue[keyof KeyValue]>();
   init(storageId: string, persistent: boolean): boolean {
-    logger.debug(`InMemoryStorageAdapterImpl/init(${storageId}, ${persistent}})`)
+    logger.debug(
+      `InMemoryStorageAdapterImpl/init(${storageId}, ${persistent}})`
+    );
     this.inMemoryStore.clear();
     return true;
   }
   create(storageId: string, persistent: boolean): Adapter {
     return this;
   }
-  delete(key: string): boolean {
+  delete(key: keyof KeyValue): boolean {
     return this.inMemoryStore.delete(key);
   }
-  set(key: string, value: object): boolean {
+  set<Key extends keyof KeyValue>(key: Key, value: object): boolean {
     this.inMemoryStore.set(key, value);
     return true;
   }
-  get(key: string): object {
-    return this.inMemoryStore.get(key);
+  get<Key extends keyof KeyValue>(key: Key): KeyValue[Key] {
+    return this.inMemoryStore.get(key) as KeyValue[Key] ?? null;
   }
-  has(key: string): boolean {
+  has(key: keyof KeyValue): boolean {
     return this.inMemoryStore.has(key);
   }
   toString() {
-      return `{` + [...this.inMemoryStore].map((entry) => {
-        return `\n  ${entry[0]}: ${entry[1]},`
-      }).join("") + `}`
+    return (
+      `{` +
+      [...this.inMemoryStore]
+        .map((entry) => {
+          return `\n  ${entry[0]}: ${entry[1]},`;
+        })
+        .join('') +
+      `}`
+    );
   }
 }
 
 export const InMemoryStorageAdapter = new InMemoryStorageAdapterImpl();
-
-export const FakeStorageAdapter: Adapter = {
-  init: function (storageId: string, persistent: boolean): boolean {
-    logger.debug('InMemoryStorageAdapter: Function not implemented.');
-    return true;
-  },
-
-  create: function (storageId: string, persistent: boolean): Adapter {
-    return this;
-  },
-
-  delete: function (value: string): boolean {
-    logger.debug('InMemoryStorageAdapter: Function not implemented.');
-    return true;
-  },
-  set: function (key: string, value: object): boolean {
-    logger.debug('InMemoryStorageAdapter: Function not implemented.');
-    return true;
-  },
-  get: function (key: string): object {
-    logger.debug('InMemoryStorageAdapter: Function not implemented.');
-    return null;
-  },
-  has: function (key: string): boolean {
-    logger.debug('InMemoryStorageAdapter: Function not implemented.');
-    return true;
-  },
-};

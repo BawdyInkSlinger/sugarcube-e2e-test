@@ -12,6 +12,9 @@ import { L10n } from './l10n';
 import { State } from './state';
 import { UI } from './ui';
 import { Util } from './util';
+import { objectDefineProperties } from './utils/object-define-properties';
+import { StorageContainer } from './fakes/storage';
+import { LZString } from './lz-string.min';
 
 const logger = getLogger();
 
@@ -50,13 +53,16 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 		Saves Functions.
 	*******************************************************************************************************************/
 	function savesInit() {
-		if (DEBUG) { console.log('[Save/savesInit()]'); }
+		logger.debug('[Save/savesInit()]'); 
 
 		// Disable save slots and the autosave when Web Storage is unavailable.
-		if (storage.name === 'cookie') {
+		if (StorageContainer.storage.name === 'cookie') {
 			savesObjClear();
+            // @ts-ignore
 			Config.saves.autoload = undefined;
+            // @ts-ignore
 			Config.saves.autosave = undefined;
+            // @ts-ignore
 			Config.saves.slots = 0;
 			return false;
 		}
@@ -68,9 +74,9 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 		// Convert an ancient saves array into a new saves object.
 		if (Array.isArray(saves)) {
 			saves = {
-				autosave : null,
-				slots    : saves
-			};
+                autosave: null,
+                slots: saves
+            } as unknown as SaveAPI;
 			updated = true;
 		}
 		/* /legacy */
@@ -80,8 +86,10 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 			if (Config.saves.slots < saves.slots.length) {
 				// Attempt to decrease the number of slots; this will only compact
 				// the slots array, by removing empty slots, no saves will be deleted.
+                // @ts-ignore
 				saves.slots.reverse();
 
+                // @ts-ignore
 				saves.slots = saves.slots.filter(function (val) {
 					if (val === null && this.count > 0) {
 						--this.count;
@@ -91,6 +99,7 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 					return true;
 				}, { count : saves.slots.length - Config.saves.slots });
 
+                // @ts-ignore
 				saves.slots.reverse();
 			}
 			else if (Config.saves.slots > saves.slots.length) {
@@ -115,7 +124,7 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 
 		// Remove save stores which are empty.
 		if (_savesObjIsEmpty(saves)) {
-			storage.delete('saves');
+			StorageContainer.storage.delete('saves');
 			updated = false;
 		}
 		/* /legacy */
@@ -130,20 +139,20 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 		return true;
 	}
 
-	function savesObjCreate() {
+	function savesObjCreate(): SaveAPI {
 		return {
 			autosave : null,
 			slots    : _appendSlots([], Config.saves.slots)
-		};
+		} as SaveAPI;
 	}
 
-	function savesObjGet() {
-		const saves = storage.get('saves');
+	function savesObjGet(): SaveAPI {
+		const saves = StorageContainer.storage.get('saves');
 		return saves === null ? savesObjCreate() : saves;
 	}
 
 	function savesObjClear() {
-		storage.delete('saves');
+		StorageContainer.storage.delete('saves');
 		return true;
 	}
 
@@ -156,7 +165,7 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 		Autosave Functions.
 	*******************************************************************************************************************/
 	function autosaveOk() {
-		return storage.name !== 'cookie' && typeof Config.saves.autosave !== 'undefined';
+		return StorageContainer.storage.name !== 'cookie' && typeof Config.saves.autosave !== 'undefined';
 	}
 
 	function autosaveHas() {
@@ -190,7 +199,7 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 		}
 
 		const saves        = savesObjGet();
-		const supplemental = {
+		const supplemental: any = {
 			title : title || Story.get(State.passage).description(),
 			date  : Date.now()
 		};
@@ -215,7 +224,7 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 		Slots Functions.
 	*******************************************************************************************************************/
 	function slotsOk() {
-		return storage.name !== 'cookie' && _slotsUBound !== -1;
+		return StorageContainer.storage.name !== 'cookie' && _slotsUBound !== -1;
 	}
 
 	function slotsLength() {
@@ -306,7 +315,7 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 			return false;
 		}
 
-		const supplemental = {
+		const supplemental: any = {
 			title : title || Story.get(State.passage).description(),
 			date  : Date.now()
 		};
@@ -339,7 +348,7 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 	/*******************************************************************************************************************
 		Disk Import/Export Functions.
 	*******************************************************************************************************************/
-	function exportToDisk(filename, metadata) {
+	function exportToDisk(filename?: string, metadata?) {
 		if (typeof Config.saves.isAllowed === 'function' && !Config.saves.isAllowed()) {
 			if (Dialog.isOpen()) {
 				$(document).one(':dialogclosed', () => UI.alert(L10n.get('savesDisallowed')));
@@ -353,11 +362,11 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 
 		function getDatestamp() {
 			const now = new Date();
-			let MM = now.getMonth() + 1;
-			let DD = now.getDate();
-			let hh = now.getHours();
-			let mm = now.getMinutes();
-			let ss = now.getSeconds();
+			let MM: number | string = now.getMonth() + 1;
+			let DD: number | string = now.getDate();
+			let hh: number | string = now.getHours();
+			let mm: number | string = now.getMinutes();
+			let ss: number | string = now.getSeconds();
 
 			if (MM < 10) { MM = `0${MM}`; }
 			if (DD < 10) { DD = `0${DD}`; }
@@ -396,6 +405,7 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 
 			try {
 				saveObj = JSON.parse(
+                    // @ts-ignore
 					/* legacy */ /\.json$/i.test(file.name) || /^\{/.test(reader.result)
 						? reader.result
 						: /* /legacy */ LZString.decompressFromBase64(reader.result)
@@ -524,13 +534,13 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 		return saves.autosave === null && isSlotsEmpty;
 	}
 
-	function _savesObjSave(saves) {
+	function _savesObjSave(saves: SaveAPI): boolean {
 		if (_savesObjIsEmpty(saves)) {
-			storage.delete('saves');
+			StorageContainer.storage.delete('saves');
 			return true;
 		}
 
-		return storage.set('saves', saves);
+		return StorageContainer.storage.set('saves', saves);
 	}
 
 	function _savesObjUpdate(saveObj) {
@@ -611,7 +621,7 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 	}
 
 	function _marshal(supplemental, details) {
-		if (DEBUG) { console.log(`[Save/_marshal(…, { type : '${details.type}' })]`); }
+		logger.debug(`[Save/_marshal(…, { type : '${details.type}' })]`); 
 
 		if (supplemental != null && typeof supplemental !== 'object') { // lazy equality for null
 			throw new Error('supplemental parameter must be an object');
@@ -626,7 +636,7 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 			saveObj.version = Config.saves.version;
 		}
 
-		_onSaveHandlers.forEach(fn => fn(saveObj, details));
+		_onSaveHandlers.forEach((fn: any) => fn(saveObj, details));
 
 		// Delta encode the state history and delete the non-encoded property.
 		saveObj.state.delta = State.deltaEncode(saveObj.state.history);
@@ -636,7 +646,7 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 	}
 
 	function _unmarshal(saveObj) {
-		if (DEBUG) { console.log('[Save/_unmarshal()]'); }
+		logger.debug('[Save/_unmarshal()]'); 
 
 		try {
 			/* eslint-disable no-param-reassign */
@@ -653,7 +663,7 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 			saveObj.state.history = State.deltaDecode(saveObj.state.delta);
 			delete saveObj.state.delta;
 
-			_onLoadHandlers.forEach(fn => fn(saveObj));
+			_onLoadHandlers.forEach((fn: any) => fn(saveObj));
 
 			if (saveObj.id !== Config.saves.id) {
 				throw new Error(L10n.get('errorSaveIdMismatch'));
@@ -667,7 +677,7 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 			/* eslint-enable no-param-reassign */
 		}
 		catch (ex) {
-			UI.alert(`${ex.message.toUpperFirst()}.</p><p>${L10n.get('aborting')}.`);
+			UI.alert(`${(ex as Error).message.toUpperFirst()}.</p><p>${L10n.get('aborting')}.`);
 			return false;
 		}
 
@@ -678,7 +688,7 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 	/*******************************************************************************************************************
 		Module Exports.
 	*******************************************************************************************************************/
-	return Object.freeze(Object.defineProperties({}, {
+	return Object.freeze(objectDefineProperties({}, {
 		/*
 			Save Functions.
 		*/
@@ -691,7 +701,7 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 			Autosave Functions.
 		*/
 		autosave : {
-			value : Object.freeze(Object.defineProperties({}, {
+			value : Object.freeze(objectDefineProperties({}, {
 				ok     : { value : autosaveOk },
 				has    : { value : autosaveHas },
 				get    : { value : autosaveGet },
@@ -705,7 +715,7 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 			Slots Functions.
 		*/
 		slots : {
-			value : Object.freeze(Object.defineProperties({}, {
+			value : Object.freeze(objectDefineProperties({}, {
 				ok      : { value : slotsOk },
 				length  : { get : slotsLength },
 				isEmpty : { value : slotsIsEmpty },
@@ -734,7 +744,7 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 			Event Functions.
 		*/
 		onLoad : {
-			value : Object.freeze(Object.defineProperties({}, {
+			value : Object.freeze(objectDefineProperties({}, {
 				add    : { value : onLoadAdd },
 				clear  : { value : onLoadClear },
 				delete : { value : onLoadDelete },
@@ -742,7 +752,7 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 			}))
 		},
 		onSave : {
-			value : Object.freeze(Object.defineProperties({}, {
+			value : Object.freeze(objectDefineProperties({}, {
 				add    : { value : onSaveAdd },
 				clear  : { value : onSaveClear },
 				delete : { value : onSaveDelete },
