@@ -2,7 +2,7 @@ import { SugarcubeParser } from '../sugarcube-parser';
 import { Selector } from '../test-api/selector';
 
 describe(`History`, () => {
-  fit('can go backward and forward in history', async () => {
+  it('can go backward and forward in history', async () => {
     const passages = [
       {
         title: 'passage title 1',
