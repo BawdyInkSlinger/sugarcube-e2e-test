@@ -32,7 +32,12 @@ class InMemoryStorageAdapterImpl implements Adapter {
     this.inMemoryStore.clear();
     return true;
   }
+
   create(storageId: string, persistent: boolean): Adapter {
+    logger.debug(
+      `InMemoryStorageAdapterImpl/create(${storageId}, ${persistent}})`
+    );
+    this.inMemoryStore.clear();
     return this;
   }
   delete(key: keyof KeyValue): boolean {
@@ -43,7 +48,7 @@ class InMemoryStorageAdapterImpl implements Adapter {
     return true;
   }
   get<Key extends keyof KeyValue>(key: Key): KeyValue[Key] {
-    return this.inMemoryStore.get(key) as KeyValue[Key] ?? null;
+    return (this.inMemoryStore.get(key) as KeyValue[Key]) ?? null;
   }
   has(key: keyof KeyValue): boolean {
     return this.inMemoryStore.has(key);
