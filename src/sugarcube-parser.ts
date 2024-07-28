@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import fs from 'fs/promises';
-import './test-api/internal/monkey-patching/jsdom/strings'
+import './test-api/internal/monkey-patching/jsdom/strings';
 import { DOMWindow, JSDOM, ResourceLoader } from 'jsdom';
 import seedrandom from 'seedrandom';
 import { SimplePassage } from './internal/declarations/unofficial/simple-passage';
@@ -148,7 +148,7 @@ export class SugarcubeParser {
 
     const { Dialog } = await import('./internal/dialog');
     resetGlobal('Dialog', Dialog);
-    
+
     const { UIBar } = await import('./internal/uibar');
     resetGlobal('UIBar', UIBar);
 
@@ -159,18 +159,17 @@ export class SugarcubeParser {
 
     resetGlobal('settings', {});
 
-    
     const {
-        initialize: initializeStory,
-        runStoryInit,
-        Story,
+      initialize: initializeStory,
+      runStoryInit,
+      Story,
     } = await import('./internal/fakes/story');
-    
+
     resetGlobal('Story', Story);
-    
+
     const { Setting } = await import('./internal/setting');
     resetGlobal('Setting', Setting);
-    
+
     resetGlobal('initializeStory', initializeStory);
     resetGlobal('runStoryInit', runStoryInit);
 
@@ -251,9 +250,8 @@ export class SugarcubeParser {
     logger.debug(`resetState(url=\`${url}\`)`);
     globalThis.jsdom.reconfigure({ url });
 
-    // globalThis.UIBar.destroy();
-    // globalThis.UIBar.init();
     globalThis.Engine.restart();
+
     globalThis.runStoryInit();
   }
 

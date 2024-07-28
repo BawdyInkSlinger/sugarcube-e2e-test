@@ -39,7 +39,7 @@ export const Engine = (() => {
   });
 
   // Minimum delay for DOM actions (in milliseconds).
-  const minDomActionDelay = 40;
+  const minDomActionDelay = 0;
 
   // Cache of the debug view(s) for initialization special passage(s).
   const _initDebugViews = [];
@@ -65,6 +65,9 @@ export const Engine = (() => {
     */
   function engineInit() {
     logger.debug(`[Engine/engineInit()] (_state: ${_state})`);
+
+    // BIS Change:
+    _updating = null;
 
     if (_state !== States.Idle) {
       logger.warn(`[Engine/engineInit()] (_state !== States.Idle: ${_state})`);
@@ -117,15 +120,8 @@ export const Engine = (() => {
           .attr('aria-live', 'polite')
           .end();
 
-        // Cache the data passage elements now to prevent recursive processing.
-        const $dataInitPassages = $elems.find('[data-init-passage]');
-        const $dataPassages = $elems.find('[data-passage]');
-
-        // Array of updating passage/element objects.
-        const updating = [];
-
         // Data passage elements updated once during initialization.
-        $dataInitPassages.each((i, el) => {
+        $elems.find('[data-init-passage]').each((i, el) => {
           if (el.id === 'passages') {
             throw new Error(
               `"StoryInterface" element <${el.nodeName.toLowerCase()} id="passages"> must not contain a "data-init-passage" content attribute`
@@ -147,20 +143,14 @@ export const Engine = (() => {
           }
 
           if (Story.has(passage)) {
-            // BIS changed from: jQuery(el).empty().wiki(Story.get(passage).processText().trim());
-            updating.push({
-              passage,
-              element: el,
-              once: true,
-            });
+            jQuery(el).empty().wiki(Story.get(passage).processText().trim());
           }
         });
 
         // Data passage elements updated upon navigation.
-        $dataPassages.each((i, el) => {
-          logger.debug(
-            `[Engine/engineInit()] ($dataPassages.each((${i}, '${el}'))`
-          );
+        const updating = [];
+        $elems.find('[data-passage]').each((i, el) => {
+          logger.debug(`[Engine/engineInit()] ($elems.each((${i}, '${el}'))`);
 
           if (el.id === 'passages') {
             throw new Error(
@@ -176,12 +166,13 @@ export const Engine = (() => {
             );
           }
 
-          const storyHasPassage = Story.has(passage);
-          logger.debug(
-            `[Engine/engineInit()] (Story.has(\`${passage}\`) === ${storyHasPassage})`
-          );
+          if (Story.has(passage)) {
+            logger.debug(
+              `[Engine/engineInit()] (Story.has(\`${passage}\`) === ${Story.has(
+                passage
+              )})`
+            );
 
-          if (storyHasPassage) {
             updating.push({
               passage,
               element: el,
@@ -205,10 +196,6 @@ export const Engine = (() => {
 
       // Insert the core UI elements into the page before the main script.
       $elems.insertBefore('body>script#script-sugarcube');
-
-      if ($('#passages').length === 0) {
-        throw new Error('[Engine/engineInit()] document is missing #passages');
-      }
     })();
 
     /*
@@ -502,7 +489,7 @@ export const Engine = (() => {
         Go to the moment which directly precedes the active moment and show it.
     */
   function engineBackward() {
-    logger.warn(`[Engine/engineBackward()]`);
+    logger.debug(`[Engine/engineBackward()]`);
     return engineGo(-1);
   }
 
@@ -510,7 +497,7 @@ export const Engine = (() => {
         Go to the moment which directly follows the active moment and show it.
     */
   function engineForward() {
-    logger.warn(`[Engine/engineForward()]`);
+    logger.debug(`[Engine/engineForward()]`);
     return engineGo(1);
   }
 
@@ -796,6 +783,11 @@ export const Engine = (() => {
     if (_updating !== null) {
       _updating.forEach((pair) => {
         jQuery(pair.element).empty();
+        // BIS change for error handling
+        const passage = Story.get(pair.passage)
+        if (passage === undefined || passage === null) {
+            throw new Error(`Passage '${pair.passage}' could not be found.`);
+        }
         new Wikifier(
           pair.element,
           Story.get(pair.passage).processText().trim()

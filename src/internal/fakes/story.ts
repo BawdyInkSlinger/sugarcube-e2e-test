@@ -113,7 +113,7 @@ export const Story = {
   },
 };
 
-Story.reset(); // Side effect. Reset at the beginning so the storage/session containers are I initialize to before first use
+Story.reset(); // Side effect. Reset at the beginning so the storage/session containers are initialize before first use
 
 function filter(predicate: (passage: Passage) => boolean, thisArg?: undefined) {
   if (typeof predicate !== 'function') {

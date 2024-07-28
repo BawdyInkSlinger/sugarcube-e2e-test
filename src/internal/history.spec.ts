@@ -4,45 +4,56 @@ import { Selector } from '../test-api/selector';
 describe(`History`, () => {
   async function forwardBackwardTest(sugarcubeParser: SugarcubeParser) {
     await sugarcubeParser.testController
+    //   .log(`Go to the 1st page`)
       .goto('passage title 1')
       .expect(Selector(`.passage`).innerText)
       .contains(`page 1`)
       .expect(Selector(`#history-backward:enabled`).exists)
       .notOk()
       .expect(Selector(`#history-forward:enabled`).exists)
-      .notOk()
-      // Go to the second page:
+      .notOk();
+    // Go to the second page:
+    await sugarcubeParser.testController
+    //   .log(`Go to the 2nd page`)
       .click(Selector(`button`).withText(`passage title 2`))
       .expect(Selector(`.passage`).innerText)
       .contains(`page 2`)
       .expect(Selector(`#history-backward:enabled`).exists)
       .ok()
       .expect(Selector(`#history-forward:enabled`).exists)
-      .notOk()
-      // Go to the third page:
+      .notOk();
+    // Go to the third page:
+    await sugarcubeParser.testController
+    //   .log(`Go to the 3rd page`)
       .click(Selector(`button`).withText(`passage title 3`))
       .expect(Selector(`.passage`).innerText)
       .contains(`page 3`)
       .expect(Selector(`#history-backward:enabled`).exists)
       .ok()
       .expect(Selector(`#history-forward:enabled`).exists)
-      .notOk()
+      .notOk();
+    await sugarcubeParser.testController
+    //   .log(`clicking a history button`)
       .click(Selector('#history-backward'))
       .expect(Selector(`.passage`).innerText)
       .contains(`page 2`)
       .expect(Selector(`#history-backward:enabled`).exists)
       .ok()
       .expect(Selector(`#history-forward:enabled`).exists)
-      .ok()
-      // Go back
+      .ok();
+    // Go back
+    await sugarcubeParser.testController
+    //   .log(`clicking a history button`)
       .click(Selector('#history-backward'))
       .expect(Selector(`.passage`).innerText)
       .contains(`page 1`)
       .expect(Selector(`#history-backward:enabled`).exists)
       .notOk()
       .expect(Selector(`#history-forward:enabled`).exists)
-      .ok()
-      // Go forward
+      .ok();
+    // Go forward
+    await sugarcubeParser.testController
+    //   .log(`clicking a history button`)
       .click(Selector('#history-forward'))
       .expect(Selector(`.passage`).innerText)
       .contains(`page 2`)
@@ -80,7 +91,7 @@ describe(`History`, () => {
     await forwardBackwardTest(sugarcubeParser);
   });
 
-  xit('can go backward and forward with a custom StoryInterface', async () => {
+  it('can go backward and forward with a custom StoryInterface', async () => {
     const passageEndHandler = `
 $(document).on(':passageend', function (ev) {
   $(\`#history-backward\`)
@@ -120,9 +131,17 @@ $(document).on(':passageend', function (ev) {
         title: 'StoryInterface',
         tags: [],
         text: `
+        <!-- data-passage recreates the buttons on every passageend event -->
+        <div data-passage="History Buttons"></div>
+        <div id="passages"></div>
+        `,
+      },
+      {
+        title: 'History Buttons',
+        tags: [],
+        text: `
         <button id="history-backward" class="history__button menu__button">Backward</button>
         <button id="history-forward" class="history__button menu__button">Forward</button>
-        <div id="passages"></div>
         `,
       },
       {
@@ -136,6 +155,9 @@ $(document).on(':passageend', function (ev) {
       passages,
     });
 
+    await forwardBackwardTest(sugarcubeParser);
+
+    sugarcubeParser.resetState();
     await forwardBackwardTest(sugarcubeParser);
   });
 });

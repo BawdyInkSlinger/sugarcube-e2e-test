@@ -70,8 +70,9 @@ export const UIBar = (() => { // eslint-disable-line no-unused-vars, no-var
 
 	function uiBarInit() {
 		logger.debug('[UIBar/uiBarInit()]');
-
+        
 		if (document.getElementById('ui-bar')) {
+            logger.warn('[UIBar/uiBarInit()]: No #ui-bar to initialize. Early return.');
 			return;
 		}
 
