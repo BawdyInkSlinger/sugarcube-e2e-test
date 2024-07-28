@@ -355,8 +355,8 @@ export const Engine = (() => {
             Save.autosave.has()
           ) {
             logger.info(
-                `\tattempting autoload: "${Save.autosave.get().title}"`
-              );
+              `\tattempting autoload: "${Save.autosave.get().title}"`
+            );
             loadStart = false;
             UI.buildAutoload();
             Dialog.open();
@@ -485,11 +485,14 @@ export const Engine = (() => {
         Activate the moment at the given offset from the active moment within the state history
         and show it.
     */
-  function engineGo(offset) {
+  function engineGo(offset: number) {
+    logger.debug(`[Engine/engineGo(offset=${offset})]`);
     const succeded = State.go(offset);
 
     if (succeded) {
       engineShow();
+    } else {
+      logger.warn(`[Engine/engineGo(offset=${offset})]: did not succeed`);
     }
 
     return succeded;
@@ -499,6 +502,7 @@ export const Engine = (() => {
         Go to the moment which directly precedes the active moment and show it.
     */
   function engineBackward() {
+    logger.warn(`[Engine/engineBackward()]`);
     return engineGo(-1);
   }
 
@@ -506,6 +510,7 @@ export const Engine = (() => {
         Go to the moment which directly follows the active moment and show it.
     */
   function engineForward() {
+    logger.warn(`[Engine/engineForward()]`);
     return engineGo(1);
   }
 

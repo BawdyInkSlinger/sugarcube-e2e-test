@@ -22,6 +22,7 @@ import { PRNGWrapper } from './prngwrapper';
 import { objectDefineProperties } from './utils/object-define-properties';
 import { getLogger } from '../logging/logger';
 import { clone } from './helpers';
+import { inspect } from 'util';
 
 const logger = getLogger('DEFAULT');
 
@@ -513,8 +514,12 @@ export const State = (() => {
   /*
 		Activate the moment at the given index within the history.
 	*/
-  function historyGoTo(index) {
-    logger.debug(`[State/historyGoTo(index: ${index})]`);
+  function historyGoTo(index: number) {
+    logger.debug(
+      `[State/historyGoTo(index: ${index}, _activeIndex=${_activeIndex}, history=${inspect(
+        _history
+      )})]`
+    );
 
     if (
       index == null /* lazy equality for null */ ||
@@ -522,6 +527,7 @@ export const State = (() => {
       index >= historySize() ||
       index === _activeIndex
     ) {
+      logger.warn(`[State/historyGoTo(index: ${index})]: returned false`);
       return false;
     }
 
@@ -534,7 +540,7 @@ export const State = (() => {
   /*
 		Activate the moment at the given offset from the active moment within the history.
 	*/
-  function historyGo(offset) {
+  function historyGo(offset?: number) {
     logger.debug(`[State/historyGo(offset: ${offset})]`);
 
     if (offset == null || offset === 0) {

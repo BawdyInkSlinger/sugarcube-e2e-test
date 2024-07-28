@@ -27,7 +27,6 @@ describe(`History`, () => {
       .ok()
       .expect(Selector(`#history-forward:enabled`).exists)
       .notOk()
-      // Go back
       .click(Selector('#history-backward'))
       .expect(Selector(`.passage`).innerText)
       .contains(`page 2`)
@@ -77,7 +76,7 @@ describe(`History`, () => {
     });
     await forwardBackwardTest(sugarcubeParser);
 
-    await sugarcubeParser.assignStateAndReload({});
+    sugarcubeParser.resetState();
     await forwardBackwardTest(sugarcubeParser);
   });
 

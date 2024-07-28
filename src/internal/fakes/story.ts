@@ -15,6 +15,7 @@ import { Dialog } from '../dialog';
 import { Setting } from '../setting';
 import { UIBar } from '../uibar';
 import { Save } from '../save';
+import { inspect } from 'util';
 
 let storyPassages: Passage[] = [];
 const logger = getLogger('DEFAULT');
@@ -300,6 +301,13 @@ function start(moduleScripts: Script[], storyScripts: Script[]) {
   Setting.init();
 
   Macro.init();
+
+  // I moved this outside of runStoryInit() so it wouldn't be called on reset:
+  // Each call adds a new handler to the forward/backward history buttons. e.g.,
+  // If you call UIBar.start(); twice, clicking the back button will behave like
+  // you called it twice.
+  UIBar.start();
+
   // past this point is supposed to be in a Promise then() See sugarcube.js
   runStoryInit();
 }
@@ -324,8 +332,6 @@ export function runStoryInit() {
 
   // Start the engine.
   Engine.start();
-
-  UIBar.start();
 
   // Trigger the `:storyready` global synthetic event.
   jQuery.event.trigger(':storyready');
