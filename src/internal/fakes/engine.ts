@@ -12,6 +12,11 @@ import { triggerTimeout } from '../../trigger-timeout';
 import { Util } from '../util';
 import { getLogger } from '../../logging/logger';
 import { setDisplayTitle } from '../helpers';
+import { UIBar } from '../uibar';
+import { Save } from '../save';
+import { objectDefineProperties } from '../utils/object-define-properties';
+import { Dialog } from '../dialog';
+import { UI } from '../ui';
 
 /* eslint-disable no-var */
 // copied from sugarcube.js
@@ -26,42 +31,43 @@ export const Engine = (() => {
   // added by BIS:
   const logger = getLogger('DEFAULT');
 
-  // Engine state types object.
+  // Engine state types object (pseudo-enumeration).
   const States = Util.toEnum({
-    Init: 'init',
     Idle: 'idle',
     Playing: 'playing',
     Rendering: 'rendering',
   });
 
   // Minimum delay for DOM actions (in milliseconds).
-  const DOM_DELAY = 0; // I want all delays to be as short as possible so tests run faster, but setting this to 0 errors: bad evaluation: anime is not defined
+  const minDomActionDelay = 40;
 
   // Cache of the debug view(s) for initialization special passage(s).
   const _initDebugViews = [];
 
-  // Current state of the engine.
-  let _state = States.Init;
-  logger.debug(`_state = States.Init`);
+  // Current state of the engine (default: `Engine.States.Idle`).
+  let _state = States.Idle;
 
   // Last time `enginePlay()` was called (in milliseconds).
   let _lastPlay = null;
 
+  // BIS: commenting out style code
+  // Cache of the outline patching <style> element (`StyleWrapper`-wrapped).
+  //   let _outlinePatch = null;
+
   // List of objects describing `StoryInterface` elements to update via passages during navigation.
   let _updating = null;
 
-  /*******************************************************************************
+  /*******************************************************************************************************************
         Engine Functions.
-    *******************************************************************************/
-
+    *******************************************************************************************************************/
   /*
         Initialize the core story elements and perform some bookkeeping.
     */
   function engineInit() {
     logger.debug(`[Engine/engineInit()] (_state: ${_state})`);
 
-    if (_state !== States.Init) {
-      logger.warn(`[Engine/engineInit()] (_state !== States.Init: ${_state})`);
+    if (_state !== States.Idle) {
+      logger.warn(`[Engine/engineInit()] (_state !== States.Idle: ${_state})`);
       return;
     }
 
@@ -86,12 +92,13 @@ export const Engine = (() => {
 
       if (markup) {
         // Remove the UI bar, its styles, and events.
-        // UIBar.destroy();
+        UIBar.destroy();
 
         // Remove the core display area styles.
         jQuery(document.head).find('#style-core-display').remove();
 
-        $elems.append(`<div id="story" role="main">${markup}</div>`);
+        // BIS: used to be $elems.append(`<div id="story" role="main">${markup}</div>`);
+        $elems.append(markup);
 
         const $passages = $elems.find('#passages');
 
@@ -140,6 +147,7 @@ export const Engine = (() => {
           }
 
           if (Story.has(passage)) {
+            // BIS changed from: jQuery(el).empty().wiki(Story.get(passage).processText().trim());
             updating.push({
               passage,
               element: el,
@@ -185,7 +193,7 @@ export const Engine = (() => {
           _updating = updating;
         }
 
-        // Config.ui.updateStoryElements = false;
+        (Config.ui as any).updateStoryElements = false;
       } else {
         logger.debug(
           `[Engine/engineInit()] (because markup is false): $elems.append('<div id="story" role="main"><div id="passages" aria-live="polite"></div></div>');`
@@ -202,190 +210,181 @@ export const Engine = (() => {
         throw new Error('[Engine/engineInit()] document is missing #passages');
       }
     })();
+
+    /*
+            Generate and cache the ARIA outlines <style> element (`StyleWrapper`-wrapped)
+            and set up the handler to manipulate the outlines.
+
+            IDEA: http://www.paciellogroup.com/blog/2012/04/how-to-remove-css-outlines-in-an-accessible-manner/
+        */
+    // BIS: commenting out style code
+    // _outlinePatch = new StyleWrapper(
+    //   (() =>
+    //     jQuery(document.createElement('style'))
+    //       .attr({
+    //         id: 'style-aria-outlines',
+    //         type: 'text/css',
+    //       })
+    //       .appendTo(document.head)
+    //       .get(0))() // return the <style> element itself
+    // );
+    // _hideOutlines(); // initially hide outlines
+    // let _lastOutlineEvent;
+    // jQuery(document).on(
+    //   'mousedown.aria-outlines keydown.aria-outlines',
+    //   (ev) => {
+    //     if (ev.type !== _lastOutlineEvent) {
+    //       _lastOutlineEvent = ev.type;
+
+    //       if (ev.type === 'keydown') {
+    //         _showOutlines();
+    //       } else {
+    //         _hideOutlines();
+    //       }
+    //     }
+    //   }
+    // );
   }
 
   /*
         Run user scripts (user stylesheet, JavaScript, and widgets).
     */
-  function engineRunUserScripts() {
-    logger.debug(`[Engine/engineRunUserScripts()] (_state=${_state}`);
-
-    if (_state !== States.Init) {
-      logger.warn(
-        `[Engine/engineRunUserScripts()] (_state !== States.Init: ${_state})`
-      );
-      return;
-    }
-
-    // Load the user styles.
-    // (() => {
-    //     const storyStyle = document.createElement('style');
-
-    //     new StyleWrapper(storyStyle)
-    //         .add(Story.getAllStylesheet().map(style => style.text.trim()).join('\n'));
-
-    //     jQuery(storyStyle)
-    //         .appendTo(document.head)
-    //         .attr({
-    //             id   : 'style-story',
-    //             type : 'text/css'
-    //         });
-    // })();
-
-    // Load the user scripts.
-    // Story.getAllScript().forEach(script => {
-    //     try {
-    //         Scripting.evalJavaScript(script.text);
-    //     }
-    //     catch (ex: any) {
-    //         logger.error(ex);
-    //         Alert.error(script.name, getErrorMessage(ex));
-    //     }
-    // });
-
-    // // Load the user widgets.
-    // Story.getAllWidget().forEach(widget => {
-    //     try {
-    //         Wikifier.wikifyEval(widget.processText());
-    //     }
-    //     catch (ex: any) {
-    //         logger.error(ex);
-    //         Alert.error(widget.name, getErrorMessage(ex));
-    //     }
-    // });
-  }
-
-  /*
-        Run the user init passages.
-    */
-  function engineRunUserInit() {
+  function engineStart() {
     logger.debug(`[Engine/engineRunUserInit()] ($_state=${_state})`);
 
-    if (_state !== States.Init) {
+    if (_state !== States.Idle) {
       logger.warn(
-        `[Engine/engineRunUserInit()] (_state !== States.Init: ${_state})`
+        `[Engine/engineRunUserInit()] (_state !== States.Idle: ${_state})`
       );
       return;
     }
 
-    // /*
-    //     Execute `init`-tagged special passages.
-    // */
-    // Story.getAllInit().forEach(passage => {
-    //     try {
-    //         const debugBuffer = Wikifier.wikifyEval(passage.text);
+    // BIS: commenting out because it's handled in Story.ts
+    /*
+            Execute `init`-tagged special passages.
+        */
+    // Story.getAllInit().forEach((passage) => {
+    //   try {
+    //     const debugBuffer = Wikifier.wikifyEval(passage.text);
 
-    //         if (Config.debug) {
-    //             const debugView = new DebugView(
-    //                 document.createDocumentFragment(),
-    //                 'special',
-    //                 `${passage.name} [init-tagged]`,
-    //                 `${passage.name} [init-tagged]`
-    //             );
-    //             debugView.modes({ hidden : true });
-    //             debugView.append(debugBuffer);
-    //             _initDebugViews.push(debugView.output);
-    //         }
+    //     if (Config.debug) {
+    //       const debugView = new DebugView(
+    //         document.createDocumentFragment(),
+    //         'special',
+    //         `${passage.title} [init-tagged]`,
+    //         `${passage.title} [init-tagged]`
+    //       );
+    //       debugView.modes({ hidden: true });
+    //       debugView.append(debugBuffer);
+    //       _initDebugViews.push(debugView.output);
     //     }
-    //     catch (ex: any) {
-    //         logger.error(ex);
-    //         Alert.error(`${passage.name} [init-tagged]`, getErrorMessage(ex));
-    //     }
+    //   } catch (ex) {
+    //     console.error(ex);
+    //     Alert.error(
+    //       `${passage.title} [init-tagged]`,
+    //       typeof ex === 'object' ? ex.message : ex
+    //     );
+    //   }
     // });
 
-    // /*
-    //     Execute the StoryInit special passage.
-    // */
+    /*
+            Execute the StoryInit special passage.
+        */
     // if (Story.has('StoryInit')) {
-    //     try {
-    //         const debugBuffer = Wikifier.wikifyEval(Story.get('StoryInit').text);
+    //   try {
+    //     const debugBuffer = Wikifier.wikifyEval(Story.get('StoryInit').text);
 
-    //         if (Config.debug) {
-    //             const debugView = new DebugView(
-    //                 document.createDocumentFragment(),
-    //                 'special',
-    //                 'StoryInit',
-    //                 'StoryInit'
-    //             );
-    //             debugView.modes({ hidden : true });
-    //             debugView.append(debugBuffer);
-    //             _initDebugViews.push(debugView.output);
-    //         }
+    //     if (Config.debug) {
+    //       const debugView = new DebugView(
+    //         document.createDocumentFragment(),
+    //         'special',
+    //         'StoryInit',
+    //         'StoryInit'
+    //       );
+    //       debugView.modes({ hidden: true });
+    //       debugView.append(debugBuffer);
+    //       _initDebugViews.push(debugView.output);
     //     }
-    //     catch (ex: any) {
-    //         logger.error(ex);
-    //         Alert.error('StoryInit', getErrorMessage(ex));
-    //     }
+    //   } catch (ex) {
+    //     console.error(ex);
+    //     Alert.error('StoryInit', typeof ex === 'object' ? ex.message : ex);
+    //   }
     // }
-  }
-
-  /*
-        Starts the story.
-    */
-  function engineStart(): void {
-    logger.debug(`[Engine/engineStart()] (_state=${_state})`);
-
-    if (_state !== States.Init) {
-      logger.warn(`[Engine/engineStart()] (_state !== States.Init: ${_state})`);
-      return;
-    }
 
     // Sanity checks.
-    // if (Config.passages.start == null) { // lazy equality for null
-    //     throw new Error('starting passage not selected');
+    // if (Config.passages.start == null) {
+    //   // lazy equality for null
+    //   throw new Error('starting passage not selected');
     // }
     // if (!Story.has(Config.passages.start)) {
-    //     throw new Error(`starting passage ("${Config.passages.start}") not found`);
+    //   throw new Error(
+    //     `starting passage ("${Config.passages.start}") not found`
+    //   );
     // }
-
-    // Update the engine state.
-    _state = States.Idle;
-    logger.debug(`_state = States.Idle`);
 
     // Focus the document element initially.
-    // document.documentElement.focus();
+    // jQuery(document.documentElement).focus();
 
-    // Attempt to restore an active session.  Failing that, attempt to
-    // autoload the autosave, if requested.  Failing that, display the
-    // starting passage.
-    // if (State.restore()) {
-    //     engineShow();
-    // }
-    // else {
-    // const autoloadType = typeof Config.saves.autoload;
+    /*
+            Attempt to restore an active session.  Failing that, attempt to autoload the autosave,
+            if requested.  Failing that, display the starting passage.
+        */
+    if (State.restore()) {
+      engineShow();
+    } else {
+      let loadStart = true;
 
-    // if (autoloadType === 'string') {
-    //     if (Config.saves.autoload === 'prompt') {
-    //         UI.buildAutoload();
-    //         Dialog.open();
-    //     }
-    // }
-    // else {
-    // new Promise((resolve, reject) => {
-    //     if (
-    //         Save.browser.hasContinue()
-    //         && (
-    //             autoloadType === 'boolean' && Config.saves.autoload
-    //             || autoloadType === 'function' && Config.saves.autoload()
-    //         )
-    //     ) {
-    //         return resolve();
-    //     }
+      switch (typeof Config.saves.autoload) {
+        case 'boolean':
+          if (
+            Config.saves.autoload &&
+            Save.autosave.ok() &&
+            Save.autosave.has()
+          ) {
+            logger.info(
+              `\tattempting autoload: "${Save.autosave.get().title}"`
+            );
 
-    //     reject(); // eslint-disable-line prefer-promise-reject-errors
-    // })
-    //     .then(() => {
-    //         logger.debug('\tattempting autoload of browser continue');
+            loadStart = !Save.autosave.load();
+          }
+          break;
+        case 'string':
+          if (
+            Config.saves.autoload === 'prompt' &&
+            Save.autosave.ok() &&
+            Save.autosave.has()
+          ) {
+            logger.info(
+                `\tattempting autoload: "${Save.autosave.get().title}"`
+              );
+            loadStart = false;
+            UI.buildAutoload();
+            Dialog.open();
+          }
+          break;
+        case 'function':
+          if (
+            Save.autosave.ok() &&
+            Save.autosave.has() &&
+            !!Config.saves.autoload()
+          ) {
+            logger.info(
+              `\tattempting autoload: "${Save.autosave.get().title}"`
+            );
 
-    //         return Save.browser.continue();
-    //     })
-    //     .catch(() => {
-    //         logger.debug(`\tstarting passage: "${Config.passages.start}"`);
+            loadStart = !Save.autosave.load();
+          }
+          break;
+      }
 
-    // enginePlay(Config.passages.start);
-    //             });
-    //     }
-    // }
+      // BIS added: &&  Config.passages.start
+      // BIS: this will only load in autoload if Config.passages.start exists
+      if (loadStart && Config.passages.start) {
+        logger.debug(`\tstarting passage: "${Config.passages.start}"`);
+
+        enginePlay(Config.passages.start);
+      }
+    }
   }
 
   /*
@@ -430,8 +429,8 @@ export const Engine = (() => {
     // window.location.reload();
 
     // added by BIS
-    _state = States.Init;
-    logger.debug(`_state = States.Init`);
+    // _state = States.Init;
+    // logger.debug(`_state = States.Init`);
   }
 
   /*
@@ -527,13 +526,6 @@ export const Engine = (() => {
       `[Engine/enginePlay(title: "${title}", noHistory: ${noHistory}, _state: ${_state})] Enter`
     );
 
-    if (_state === States.Init) {
-      logger.warn(
-        `[Engine/enginePlay(title: "${title}", noHistory: ${noHistory}, _state: ${_state})] (_state === States.Init: ${_state})`
-      );
-      return false;
-    }
-
     let passageTitle = title;
 
     // Update the engine state.
@@ -562,12 +554,14 @@ export const Engine = (() => {
     // NOTE: The values of the `title` parameter and `passageTitle` variable
     // may be empty, strings, or numbers (though using a number as reference
     // to a numeric title should be discouraged), so after loading the passage,
-    // always refer to `passage.name` and never to the others.
+    // always refer to `passage.title` and never to the others.
     const passage = Story.get(passageTitle);
 
     logger.debug(
       `[Engine/enginePlay(title: "${title}", noHistory: ${noHistory}, _state: ${_state})] :passageinit Execute the pre-history events and tasks.`
     );
+
+    // Execute the pre-history events and tasks.
     jQuery.event.trigger({
       type: ':passageinit',
       passage,
@@ -580,7 +574,7 @@ export const Engine = (() => {
 
     // Create a new entry in the history.
     if (!noHistory) {
-      State.create(passage.name);
+      State.create(passage.title);
     }
 
     // Clear the document body's classes.
@@ -593,7 +587,8 @@ export const Engine = (() => {
     // NOTE: This is mostly for event, task, and special passage code,
     // though the likelihood of it being needed this early is low.  This
     // will be updated again later at the end.
-    _lastPlay = Date.now();
+    // BIS was: _lastPlay = Date.now();
+    _lastPlay = Util.now();
 
     // Execute pre-display tasks and the `PassageReady` special passage.
     Object.keys(predisplay).forEach((task) => {
@@ -624,11 +619,11 @@ export const Engine = (() => {
     const passageEl = document.createElement('div');
     jQuery(passageEl)
       .attr({
-        id: passage.id,
-        'data-passage': passage.name,
+        id: passage.domId,
+        'data-passage': passage.title,
         'data-tags': dataTags,
       })
-      .addClass(`passage passage-in ${passage.className}`);
+      .addClass(`passage ${passage.className}`);
 
     // Add the passage's classes and tags to the document body.
     jQuery(document.body)
@@ -641,6 +636,8 @@ export const Engine = (() => {
     logger.debug(
       `[Engine/enginePlay(title: "${title}", noHistory: ${noHistory}, _state: ${_state})] :passagestart Execute pre-render events and tasks.`
     );
+
+    // Execute pre-render events and tasks.
     jQuery.event.trigger({
       type: ':passagestart',
       content: passageEl,
@@ -668,6 +665,8 @@ export const Engine = (() => {
     logger.debug(
       `[Engine/enginePlay(title: "${title}", noHistory: ${noHistory}, _state: ${_state})] :passagerender Execute post-render events and tasks.`
     );
+
+    // Execute post-render events and tasks.
     jQuery.event.trigger({
       type: ':passagerender',
       content: passageEl,
@@ -687,14 +686,14 @@ export const Engine = (() => {
     }
 
     // Empty the passage container.
-    if (containerEl && containerEl.hasChildNodes()) {
+    if (containerEl.hasChildNodes()) {
       if (
         typeof Config.passages.transitionOut === 'number' ||
         (typeof Config.passages.transitionOut === 'string' &&
           Config.passages.transitionOut !== '' &&
           Has.transitionEndEvent)
       ) {
-        Array.from(containerEl.childNodes).forEach((outgoing) => {
+        [...containerEl.childNodes].forEach((outgoing) => {
           const $outgoing = jQuery(outgoing);
 
           if (
@@ -708,7 +707,6 @@ export const Engine = (() => {
             $outgoing
               .attr({
                 id: `out-${$outgoing.attr('id')}`,
-                'aria-hidden': 'true',
                 'aria-live': 'off',
               })
               .addClass('passage-out');
@@ -725,7 +723,7 @@ export const Engine = (() => {
               triggerTimeout(
                 `engine passage-out: ${$outgoing.html()}`,
                 () => $outgoing.remove(),
-                Math.max(DOM_DELAY, Config.passages.transitionOut)
+                Math.max(minDomActionDelay, Config.passages.transitionOut)
               );
             }
           } else {
@@ -737,13 +735,12 @@ export const Engine = (() => {
       }
     }
 
-    // Append the passage element to the passage container and initiate
-    // its transition animation.
-    jQuery(passageEl).appendTo(containerEl);
+    // Append the passage element to the passage container and set up its transition.
+    jQuery(passageEl).addClass('passage-in').appendTo(containerEl);
     triggerTimeout(
       `engine transition animation: ${containerEl.textContent}`,
       () => jQuery(passageEl).removeClass('passage-in'),
-      DOM_DELAY / 2
+      minDomActionDelay
     );
 
     // Update the story display title, if necessary.
@@ -754,9 +751,9 @@ export const Engine = (() => {
       }
     } else if (
       Config.passages.displayTitles &&
-      passage.name !== Config.passages.start
+      passage.title !== Config.passages.start
     ) {
-      document.title = `${passage.name} | ${Story.name}`;
+      document.title = `${passage.title} | ${Story.title}`;
     }
 
     // Scroll the window to the top.
@@ -792,21 +789,16 @@ export const Engine = (() => {
 
     // Update the other interface elements, if necessary.
     if (_updating !== null) {
-      for (let i = 0; i < _updating.length /* empty */; ) {
-        const { element, passage, once } = _updating[i];
-
-        jQuery(element).empty().wiki(Story.get(passage).processText().trim());
-
-        if (once) {
-          _updating.deleteAt(i);
-        } else {
-          ++i;
-        }
-      }
+      _updating.forEach((pair) => {
+        jQuery(pair.element).empty();
+        new Wikifier(
+          pair.element,
+          Story.get(pair.passage).processText().trim()
+        );
+      });
+    } else if (Config.ui.updateStoryElements) {
+      UIBar.update();
     }
-    // else if (Config.ui.updateStoryElements) {
-    //     UIBar.update();
-    // }
 
     // Add the completed debug views for `StoryInit`, `PassageReady`, and `PassageDone`
     // to the incoming passage element.
@@ -849,19 +841,39 @@ export const Engine = (() => {
 
     // Last second post-processing for accessibility and other things.
     jQuery('#story')
-      // Add `tabindex=0` to all interactive elements that don't have it.
+      // Add `link-external` to all `href` bearing `<a>` elements which don't have it.
+      .find('a[href]:not(.link-external)')
+      .addClass('link-external')
+      .end()
+      // Add `tabindex=0` to all interactive elements which don't have it.
       .find('a,link,button,input,select,textarea')
       .not('[tabindex]')
       .attr('tabindex', 0);
 
     // Handle autosaves.
-    // if (State.turns > 1 && Save.browser.auto.isEnabled()) {
-    //     Save.browser.auto.save();
-    // }
+    switch (typeof Config.saves.autosave) {
+      case 'boolean':
+        if (Config.saves.autosave) {
+          Save.autosave.save();
+        }
+        break;
+      case 'object':
+        if (passage.tags.some((tag) => Config.saves.autosave.includes(tag))) {
+          Save.autosave.save();
+        }
+        break;
+      case 'function':
+        if (Config.saves.autosave()) {
+          Save.autosave.save();
+        }
+        break;
+    }
 
     logger.debug(
       `[Engine/enginePlay(title: "${title}", noHistory: ${noHistory}, _state: ${_state})] :passageend Execute post-play events.`
     );
+
+    // Execute post-play events.
     jQuery.event.trigger({
       type: ':passageend',
       content: passageEl,
@@ -873,15 +885,15 @@ export const Engine = (() => {
     logger.debug(`_state = States.Idle`);
 
     // Update the last play time.
-    _lastPlay = Date.now();
+    // BIS was: _lastPlay = Date.now();
+    _lastPlay = Util.now();
 
     return passageEl;
   }
 
-  /*******************************************************************************
+  /*******************************************************************************************************************
         Legacy Functions.
-    *******************************************************************************/
-
+    *******************************************************************************************************************/
   /*
         [DEPRECATED] Play the given passage, optionally without altering the history.
     */
@@ -910,43 +922,54 @@ export const Engine = (() => {
     enginePlay(title, noHistory);
   }
 
-  /*******************************************************************************
-        Object Exports.
-    *******************************************************************************/
+  /*******************************************************************************************************************
+        Utility Functions.
+    *******************************************************************************************************************/
+  // BIS: commenting out style code
+  //   function _hideOutlines() {
+  //     _outlinePatch.set('*:focus{outline:none;}');
+  //   }
 
-  return Object.preventExtensions(
-    objectCreateNull(null, {
-      /*
+  //   function _showOutlines() {
+  //     _outlinePatch.clear();
+  //   }
+
+  /*******************************************************************************************************************
+        Module Exports.
+    *******************************************************************************************************************/
+  return Object.freeze(
+    objectDefineProperties(
+      {},
+      {
+        /*
             Constants.
         */
-      States: { value: States },
-      DOM_DELAY: { get: () => DOM_DELAY },
+        States: { value: States },
+        minDomActionDelay: { value: minDomActionDelay },
 
-      /*
+        /*
             Core Functions.
         */
-      init: { value: engineInit },
-      runUserScripts: { value: engineRunUserScripts },
-      runUserInit: { value: engineRunUserInit },
-      start: { value: engineStart },
-      restart: { value: engineRestart },
-      state: { get: engineState },
-      isIdle: { value: engineIsIdle },
-      isPlaying: { value: engineIsPlaying },
-      isRendering: { value: engineIsRendering },
-      lastPlay: { get: engineLastPlay },
-      goTo: { value: engineGoTo },
-      go: { value: engineGo },
-      backward: { value: engineBackward },
-      forward: { value: engineForward },
-      show: { value: engineShow },
-      play: { value: enginePlay },
+        init: { value: engineInit },
+        start: { value: engineStart },
+        restart: { value: engineRestart },
+        state: { get: engineState },
+        isIdle: { value: engineIsIdle },
+        isPlaying: { value: engineIsPlaying },
+        isRendering: { value: engineIsRendering },
+        lastPlay: { get: engineLastPlay },
+        goTo: { value: engineGoTo },
+        go: { value: engineGo },
+        backward: { value: engineBackward },
+        forward: { value: engineForward },
+        show: { value: engineShow },
+        play: { value: enginePlay },
 
-      /*
+        /*
             Legacy Functions.
         */
-      display: { value: engineDisplay },
-      minDomActionDelay: { value: DOM_DELAY },
-    })
+        display: { value: engineDisplay },
+      }
+    )
   );
 })();

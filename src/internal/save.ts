@@ -193,7 +193,7 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 		return _unmarshal(saves.autosave);
 	}
 
-	function autosaveSave(title, metadata) {
+	function autosaveSave(title?, metadata?) {
 		if (typeof Config.saves.isAllowed === 'function' && !Config.saves.isAllowed()) {
 			return false;
 		}

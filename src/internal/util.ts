@@ -129,7 +129,7 @@ export const Util = (() => {
   /*
 		Returns a pseudo-enumeration created from the given Array, Map, Set, or generic object.
 	*/
-  function utilToEnum(obj) {
+  function utilToEnum<T>(obj: T): { [Key in keyof T]: boolean } {
     const pEnum = Object.create(null);
 
     if (obj instanceof Array) {

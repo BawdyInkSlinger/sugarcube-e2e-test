@@ -465,7 +465,7 @@ export const State = (() => {
   /*
 		Creates a new moment and pushes it onto the history, discarding future moments if necessary.
 	*/
-  function historyCreate(title) {
+  function historyCreate(title: string) {
     logger.debug(`[State/historyCreate(title: "${title}")]`);
 
     /*
