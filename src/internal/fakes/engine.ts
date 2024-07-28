@@ -51,12 +51,12 @@ export const Engine = (() => {
   let _updating = null;
 
   /*******************************************************************************
-		Engine Functions.
-	*******************************************************************************/
+        Engine Functions.
+    *******************************************************************************/
 
   /*
-		Initialize the core story elements and perform some bookkeeping.
-	*/
+        Initialize the core story elements and perform some bookkeeping.
+    */
   function engineInit() {
     logger.debug(`[Engine/engineInit()] (_state: ${_state})`);
 
@@ -70,13 +70,13 @@ export const Engine = (() => {
     }
 
     /*
-			Remove #init-no-js & #init-lacking from #init-screen.
-		*/
+            Remove #init-no-js & #init-lacking from #init-screen.
+        */
     jQuery('#init-no-js,#init-lacking').remove();
 
     /*
-			Generate the core story elements and insert them into the page before the store area.
-		*/
+            Generate the core story elements and insert them into the page before the store area.
+        */
     (() => {
       const $elems = jQuery(document.createDocumentFragment());
       const markup =
@@ -205,8 +205,8 @@ export const Engine = (() => {
   }
 
   /*
-		Run user scripts (user stylesheet, JavaScript, and widgets).
-	*/
+        Run user scripts (user stylesheet, JavaScript, and widgets).
+    */
   function engineRunUserScripts() {
     logger.debug(`[Engine/engineRunUserScripts()] (_state=${_state}`);
 
@@ -219,45 +219,45 @@ export const Engine = (() => {
 
     // Load the user styles.
     // (() => {
-    // 	const storyStyle = document.createElement('style');
+    //     const storyStyle = document.createElement('style');
 
-    // 	new StyleWrapper(storyStyle)
-    // 		.add(Story.getAllStylesheet().map(style => style.text.trim()).join('\n'));
+    //     new StyleWrapper(storyStyle)
+    //         .add(Story.getAllStylesheet().map(style => style.text.trim()).join('\n'));
 
-    // 	jQuery(storyStyle)
-    // 		.appendTo(document.head)
-    // 		.attr({
-    // 			id   : 'style-story',
-    // 			type : 'text/css'
-    // 		});
+    //     jQuery(storyStyle)
+    //         .appendTo(document.head)
+    //         .attr({
+    //             id   : 'style-story',
+    //             type : 'text/css'
+    //         });
     // })();
 
     // Load the user scripts.
     // Story.getAllScript().forEach(script => {
-    // 	try {
-    // 		Scripting.evalJavaScript(script.text);
-    // 	}
-    // 	catch (ex: any) {
-    // 		logger.error(ex);
-    // 		Alert.error(script.name, getErrorMessage(ex));
-    // 	}
+    //     try {
+    //         Scripting.evalJavaScript(script.text);
+    //     }
+    //     catch (ex: any) {
+    //         logger.error(ex);
+    //         Alert.error(script.name, getErrorMessage(ex));
+    //     }
     // });
 
     // // Load the user widgets.
     // Story.getAllWidget().forEach(widget => {
-    // 	try {
-    // 		Wikifier.wikifyEval(widget.processText());
-    // 	}
-    // 	catch (ex: any) {
-    // 		logger.error(ex);
-    // 		Alert.error(widget.name, getErrorMessage(ex));
-    // 	}
+    //     try {
+    //         Wikifier.wikifyEval(widget.processText());
+    //     }
+    //     catch (ex: any) {
+    //         logger.error(ex);
+    //         Alert.error(widget.name, getErrorMessage(ex));
+    //     }
     // });
   }
 
   /*
-		Run the user init passages.
-	*/
+        Run the user init passages.
+    */
   function engineRunUserInit() {
     logger.debug(`[Engine/engineRunUserInit()] ($_state=${_state})`);
 
@@ -269,59 +269,59 @@ export const Engine = (() => {
     }
 
     // /*
-    // 	Execute `init`-tagged special passages.
+    //     Execute `init`-tagged special passages.
     // */
     // Story.getAllInit().forEach(passage => {
-    // 	try {
-    // 		const debugBuffer = Wikifier.wikifyEval(passage.text);
+    //     try {
+    //         const debugBuffer = Wikifier.wikifyEval(passage.text);
 
-    // 		if (Config.debug) {
-    // 			const debugView = new DebugView(
-    // 				document.createDocumentFragment(),
-    // 				'special',
-    // 				`${passage.name} [init-tagged]`,
-    // 				`${passage.name} [init-tagged]`
-    // 			);
-    // 			debugView.modes({ hidden : true });
-    // 			debugView.append(debugBuffer);
-    // 			_initDebugViews.push(debugView.output);
-    // 		}
-    // 	}
-    // 	catch (ex: any) {
-    // 		logger.error(ex);
-    // 		Alert.error(`${passage.name} [init-tagged]`, getErrorMessage(ex));
-    // 	}
+    //         if (Config.debug) {
+    //             const debugView = new DebugView(
+    //                 document.createDocumentFragment(),
+    //                 'special',
+    //                 `${passage.name} [init-tagged]`,
+    //                 `${passage.name} [init-tagged]`
+    //             );
+    //             debugView.modes({ hidden : true });
+    //             debugView.append(debugBuffer);
+    //             _initDebugViews.push(debugView.output);
+    //         }
+    //     }
+    //     catch (ex: any) {
+    //         logger.error(ex);
+    //         Alert.error(`${passage.name} [init-tagged]`, getErrorMessage(ex));
+    //     }
     // });
 
     // /*
-    // 	Execute the StoryInit special passage.
+    //     Execute the StoryInit special passage.
     // */
     // if (Story.has('StoryInit')) {
-    // 	try {
-    // 		const debugBuffer = Wikifier.wikifyEval(Story.get('StoryInit').text);
+    //     try {
+    //         const debugBuffer = Wikifier.wikifyEval(Story.get('StoryInit').text);
 
-    // 		if (Config.debug) {
-    // 			const debugView = new DebugView(
-    // 				document.createDocumentFragment(),
-    // 				'special',
-    // 				'StoryInit',
-    // 				'StoryInit'
-    // 			);
-    // 			debugView.modes({ hidden : true });
-    // 			debugView.append(debugBuffer);
-    // 			_initDebugViews.push(debugView.output);
-    // 		}
-    // 	}
-    // 	catch (ex: any) {
-    // 		logger.error(ex);
-    // 		Alert.error('StoryInit', getErrorMessage(ex));
-    // 	}
+    //         if (Config.debug) {
+    //             const debugView = new DebugView(
+    //                 document.createDocumentFragment(),
+    //                 'special',
+    //                 'StoryInit',
+    //                 'StoryInit'
+    //             );
+    //             debugView.modes({ hidden : true });
+    //             debugView.append(debugBuffer);
+    //             _initDebugViews.push(debugView.output);
+    //         }
+    //     }
+    //     catch (ex: any) {
+    //         logger.error(ex);
+    //         Alert.error('StoryInit', getErrorMessage(ex));
+    //     }
     // }
   }
 
   /*
-		Starts the story.
-	*/
+        Starts the story.
+    */
   function engineStart(): void {
     logger.debug(`[Engine/engineStart()] (_state=${_state})`);
 
@@ -332,10 +332,10 @@ export const Engine = (() => {
 
     // Sanity checks.
     // if (Config.passages.start == null) { // lazy equality for null
-    // 	throw new Error('starting passage not selected');
+    //     throw new Error('starting passage not selected');
     // }
     // if (!Story.has(Config.passages.start)) {
-    // 	throw new Error(`starting passage ("${Config.passages.start}") not found`);
+    //     throw new Error(`starting passage ("${Config.passages.start}") not found`);
     // }
 
     // Update the engine state.
@@ -349,84 +349,84 @@ export const Engine = (() => {
     // autoload the autosave, if requested.  Failing that, display the
     // starting passage.
     // if (State.restore()) {
-    // 	engineShow();
+    //     engineShow();
     // }
     // else {
     // const autoloadType = typeof Config.saves.autoload;
 
     // if (autoloadType === 'string') {
-    // 	if (Config.saves.autoload === 'prompt') {
-    // 		UI.buildAutoload();
-    // 		Dialog.open();
-    // 	}
+    //     if (Config.saves.autoload === 'prompt') {
+    //         UI.buildAutoload();
+    //         Dialog.open();
+    //     }
     // }
     // else {
     // new Promise((resolve, reject) => {
-    // 	if (
-    // 		Save.browser.hasContinue()
-    // 		&& (
-    // 			autoloadType === 'boolean' && Config.saves.autoload
-    // 			|| autoloadType === 'function' && Config.saves.autoload()
-    // 		)
-    // 	) {
-    // 		return resolve();
-    // 	}
+    //     if (
+    //         Save.browser.hasContinue()
+    //         && (
+    //             autoloadType === 'boolean' && Config.saves.autoload
+    //             || autoloadType === 'function' && Config.saves.autoload()
+    //         )
+    //     ) {
+    //         return resolve();
+    //     }
 
-    // 	reject(); // eslint-disable-line prefer-promise-reject-errors
+    //     reject(); // eslint-disable-line prefer-promise-reject-errors
     // })
-    // 	.then(() => {
-    // 		logger.debug('\tattempting autoload of browser continue');
+    //     .then(() => {
+    //         logger.debug('\tattempting autoload of browser continue');
 
-    // 		return Save.browser.continue();
-    // 	})
-    // 	.catch(() => {
-    // 		logger.debug(`\tstarting passage: "${Config.passages.start}"`);
+    //         return Save.browser.continue();
+    //     })
+    //     .catch(() => {
+    //         logger.debug(`\tstarting passage: "${Config.passages.start}"`);
 
     // enginePlay(Config.passages.start);
-    // 			});
-    // 	}
+    //             });
+    //     }
     // }
   }
 
   /*
-		Restarts the story.
-	*/
+        Restarts the story.
+    */
   function engineRestart() {
     logger.debug('[Engine/engineRestart()]');
 
     /*
-			Show the loading screen to hide any unsightly rendering shenanigans during the
-			page reload.
-		*/
+            Show the loading screen to hide any unsightly rendering shenanigans during the
+            page reload.
+        */
     // LoadScreen.show();
 
     /*
-			Scroll the window to the top.
+            Scroll the window to the top.
 
-			This is required by most browsers for the starting passage or it will remain at
-			whatever its current scroll position is after the page reload.  We do it generally,
-			rather than only for the currently set starting passage, since the starting passage
-			may be dynamically manipulated.
-		*/
+            This is required by most browsers for the starting passage or it will remain at
+            whatever its current scroll position is after the page reload.  We do it generally,
+            rather than only for the currently set starting passage, since the starting passage
+            may be dynamically manipulated.
+        */
     // window.scroll(0, 0);
 
     /*
-			Delete the active session.
-		*/
+            Delete the active session.
+        */
     State.reset();
     State.clearTemporary();
 
     /*
-			Trigger an ':enginerestart' event.
-		*/
+            Trigger an ':enginerestart' event.
+        */
     logger.debug(
       `[Engine/engineRestart()] :passageinit Trigger an ':enginerestart' event.`
     );
     jQuery.event.trigger(':enginerestart');
 
     /*
-			Reload the page.
-		*/
+            Reload the page.
+        */
     // window.location.reload();
 
     // added by BIS
@@ -435,43 +435,43 @@ export const Engine = (() => {
   }
 
   /*
-		Returns the current state of the engine.
-	*/
+        Returns the current state of the engine.
+    */
   function engineState() {
     return _state;
   }
 
   /*
-		Returns whether the engine is idle.
-	*/
+        Returns whether the engine is idle.
+    */
   function engineIsIdle() {
     return _state === States.Idle;
   }
 
   /*
-		Returns whether the engine is playing.
-	*/
+        Returns whether the engine is playing.
+    */
   function engineIsPlaying() {
     return _state !== States.Idle;
   }
 
   /*
-		Returns whether the engine is rendering.
-	*/
+        Returns whether the engine is rendering.
+    */
   function engineIsRendering() {
     return _state === States.Rendering;
   }
 
   /*
-		Returns a timestamp representing the last time `Engine.play()` was called.
-	*/
+        Returns a timestamp representing the last time `Engine.play()` was called.
+    */
   function engineLastPlay() {
     return _lastPlay;
   }
 
   /*
-		Activate the moment at the given index within the state history and show it.
-	*/
+        Activate the moment at the given index within the state history and show it.
+    */
   function engineGoTo(idx) {
     const succeded = State.goTo(idx);
 
@@ -483,9 +483,9 @@ export const Engine = (() => {
   }
 
   /*
-		Activate the moment at the given offset from the active moment within the state history
-		and show it.
-	*/
+        Activate the moment at the given offset from the active moment within the state history
+        and show it.
+    */
   function engineGo(offset) {
     const succeded = State.go(offset);
 
@@ -497,31 +497,31 @@ export const Engine = (() => {
   }
 
   /*
-		Go to the moment which directly precedes the active moment and show it.
-	*/
+        Go to the moment which directly precedes the active moment and show it.
+    */
   function engineBackward() {
     return engineGo(-1);
   }
 
   /*
-		Go to the moment which directly follows the active moment and show it.
-	*/
+        Go to the moment which directly follows the active moment and show it.
+    */
   function engineForward() {
     return engineGo(1);
   }
 
   /*
-		Renders and displays the active (present) moment's associated passage without adding
-		a new moment to the history.
-	*/
+        Renders and displays the active (present) moment's associated passage without adding
+        a new moment to the history.
+    */
   function engineShow() {
     return enginePlay(State.passage, true);
   }
 
   /*
-		Renders and displays the passage referenced by the given title, optionally without
-		adding a new moment to the history.
-	*/
+        Renders and displays the passage referenced by the given title, optionally without
+        adding a new moment to the history.
+    */
   function enginePlay(title: string, noHistory?: boolean) {
     logger.debug(
       `[Engine/enginePlay(title: "${title}", noHistory: ${noHistory}, _state: ${_state})] Enter`
@@ -805,7 +805,7 @@ export const Engine = (() => {
       }
     }
     // else if (Config.ui.updateStoryElements) {
-    // 	UIBar.update();
+    //     UIBar.update();
     // }
 
     // Add the completed debug views for `StoryInit`, `PassageReady`, and `PassageDone`
@@ -856,7 +856,7 @@ export const Engine = (() => {
 
     // Handle autosaves.
     // if (State.turns > 1 && Save.browser.auto.isEnabled()) {
-    // 	Save.browser.auto.save();
+    //     Save.browser.auto.save();
     // }
 
     logger.debug(
@@ -879,12 +879,12 @@ export const Engine = (() => {
   }
 
   /*******************************************************************************
-		Legacy Functions.
-	*******************************************************************************/
+        Legacy Functions.
+    *******************************************************************************/
 
   /*
-		[DEPRECATED] Play the given passage, optionally without altering the history.
-	*/
+        [DEPRECATED] Play the given passage, optionally without altering the history.
+    */
   function engineDisplay(title, link, option) {
     logger.debug('[Engine/engineDisplay()]');
 
@@ -911,20 +911,20 @@ export const Engine = (() => {
   }
 
   /*******************************************************************************
-		Object Exports.
-	*******************************************************************************/
+        Object Exports.
+    *******************************************************************************/
 
   return Object.preventExtensions(
     objectCreateNull(null, {
       /*
-			Constants.
-		*/
+            Constants.
+        */
       States: { value: States },
       DOM_DELAY: { get: () => DOM_DELAY },
 
       /*
-			Core Functions.
-		*/
+            Core Functions.
+        */
       init: { value: engineInit },
       runUserScripts: { value: engineRunUserScripts },
       runUserInit: { value: engineRunUserInit },
@@ -943,8 +943,8 @@ export const Engine = (() => {
       play: { value: enginePlay },
 
       /*
-			Legacy Functions.
-		*/
+            Legacy Functions.
+        */
       display: { value: engineDisplay },
       minDomActionDelay: { value: DOM_DELAY },
     })
