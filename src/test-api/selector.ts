@@ -65,7 +65,7 @@ interface SelectorAPI {
   // value: Promise<string | undefined>;
   // visible: Promise<boolean>;
   // hasClass(className: string): Promise<boolean>;
-  // getStyleProperty(propertyName: string): Promise<string>;
+  getStyleProperty(propertyName: string): Promise<string>;
   getAttribute(attributeName: string): Promise<string | null>;
   // getBoundingClientRectProperty(propertyName: string): Promise<number>;
   hasAttribute(attributeName: string): Promise<boolean>;
@@ -298,6 +298,20 @@ const internalSelector = (
         selectorExecute(executionSteps).attr(attributeName)
       );
     },
+
+    getStyleProperty(attributeName: string): Promise<string> {
+      return ReExecutablePromise.fromFn(() => {
+        const $nodes = selectorExecute(executionSteps);
+        if ($nodes.length === 0) {
+            throw new Error(
+              `${selectorToStringBuilder(executionSteps)()} does not exist`
+            );
+          }
+        const element = $nodes[0];
+        return globalThis.window.getComputedStyle(element)[attributeName];
+      });
+    },
+
     toString: selectorToStringBuilder(executionSteps),
   };
   return selectorImpl;

@@ -20,7 +20,7 @@ describe(`jsdom`, () => {
     });
   });
 
-  fdescribe(`getStyleProperty`, () => {
+  describe(`getStyleProperty`, () => {
     it(`can compute default property values`, async () => {
       const { window } = new JSDOM('<p>Hello!</p>', {
         pretendToBeVisual: true,
@@ -30,7 +30,7 @@ describe(`jsdom`, () => {
         window.getComputedStyle(window.document.querySelector(`p`)!)['display']
       ).toEqual('block');
     });
-    
+
     it(`can compute inline property styles`, async () => {
       const { window } = new JSDOM('<p style="display: none">Hello!</p>', {
         pretendToBeVisual: true,
@@ -40,9 +40,10 @@ describe(`jsdom`, () => {
         window.getComputedStyle(window.document.querySelector(`p`)!)['display']
       ).toEqual('none');
     });
-    
+
     it(`can compute head element styles`, async () => {
-      const { window } = new JSDOM(`
+      const { window } = new JSDOM(
+        `
 <!DOCTYPE html>
 <html>
 <head>
@@ -57,17 +58,20 @@ describe(`jsdom`, () => {
     <p>Hello!</p>
 </body>
 </html>
-        `, {
-        pretendToBeVisual: true,
-      });
+        `,
+        {
+          pretendToBeVisual: true,
+        }
+      );
 
       expect(
         window.getComputedStyle(window.document.querySelector(`p`)!)['display']
       ).toEqual('none');
     });
-    
+
     it(`can compute styles from CSS class`, async () => {
-      const { window } = new JSDOM(`
+      const { window } = new JSDOM(
+        `
 <!DOCTYPE html>
 <html>
 <head>
@@ -82,9 +86,11 @@ describe(`jsdom`, () => {
     <p class="my-prop">Hello!</p>
 </body>
 </html>
-        `, {
-        pretendToBeVisual: true,
-      });
+        `,
+        {
+          pretendToBeVisual: true,
+        }
+      );
 
       expect(
         window.getComputedStyle(window.document.querySelector(`p`)!)['display']
