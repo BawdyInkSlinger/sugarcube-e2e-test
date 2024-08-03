@@ -36,7 +36,7 @@ describe(`Save`, () => {
       .expect(Selector(`#ui-dialog.open`).exists)
       .ok()
       // Click the save button
-      .click(Selector(`#saves-save-0`), { waitFor: 'click end' })
+      .click(Selector(`#saves-save-0:enabled`), { waitFor: 'click end' })
       // The Dialog should close
       .expect(Selector(`#ui-dialog.open`).exists)
       .notOk()
@@ -48,12 +48,12 @@ describe(`Save`, () => {
       .click(Selector(`#menu-item-saves a`), { waitFor: 'click end' })
       .expect(Selector(`#saves-load-0`).exists)
       .ok()
-      .expect(Selector(`#saves-delete-0`).hasAttribute('disabled'))
+      .expect(Selector(`#saves-delete-0:enabled`).hasAttribute('disabled'))
       .notOk()
       .expect(Selector(`#saves-save-0`).exists)
       .notOk()
       // Save on the second page
-      .click(Selector(`#saves-save-1`), { waitFor: 'click end' })
+      .click(Selector(`#saves-save-1:enabled`), { waitFor: 'click end' })
       .expect(Selector(`.passage`).innerText)
       .contains(`page 2`)
       // Go to the third page:
@@ -67,13 +67,13 @@ describe(`Save`, () => {
       .expect(Selector(`#saves-load-1`).exists)
       .ok()
       // Load the first save
-      .click(Selector(`#saves-load-0`))
+      .click(Selector(`#saves-load-0:enabled`))
       // We should be on page 1
       .expect(Selector(`.passage`).innerText)
       .contains(`page 1`)
       // Load the second save
       .click(Selector(`#menu-item-saves a`), { waitFor: 'click end' })
-      .click(Selector(`#saves-load-1`))
+      .click(Selector(`#saves-load-1:enabled`))
       // We should be on page 2
       .expect(Selector(`.passage`).innerText)
       .contains(`page 2`);
