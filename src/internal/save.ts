@@ -293,7 +293,7 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 		return _unmarshal(saves.slots[slot]);
 	}
 
-	function slotsSave(slot, title, metadata) {
+	function slotsSave(slot: number, title: string, metadata): boolean {
 		if (typeof Config.saves.isAllowed === 'function' && !Config.saves.isAllowed()) {
 			if (Dialog.isOpen()) {
 				$(document).one(':dialogclosed', () => UI.alert(L10n.get('savesDisallowed')));

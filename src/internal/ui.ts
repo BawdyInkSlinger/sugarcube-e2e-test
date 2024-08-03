@@ -247,7 +247,9 @@ export const UI = (() => { // eslint-disable-line no-unused-vars, no-var
 		}
 
 		function createSaveList() {
-			function createButton(bId, bClass, bText, bSlot, bAction?) {
+			function createButton(bId: string, bClass: string, bText: string, bSlot: 'auto', bAction?: () => unknown): JQuery<HTMLButtonElement>;
+			function createButton(bId: string, bClass: string, bText: string, bSlot: number, bAction?: (slot: number, title?: string, metaadata?: unknown) => unknown): JQuery<HTMLButtonElement>;
+			function createButton(bId: string, bClass: string, bText: string, bSlot: number | 'auto', bAction?: (slot?: number, title?: string, metaadata?: unknown) => unknown): JQuery<HTMLButtonElement> {
 				const $btn = jQuery(document.createElement('button'))
 					.attr('id', `saves-${bId}-${bSlot}`)
 					.addClass(bId)
