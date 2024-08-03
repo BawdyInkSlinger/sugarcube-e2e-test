@@ -1,5 +1,6 @@
 import { SugarcubeParser } from '../sugarcube-parser';
 import { Selector } from '../test-api/selector';
+import { TestController } from '../test-api/test-controller';
 
 describe(`Save`, () => {
   it('can save and load', async () => {
@@ -25,7 +26,11 @@ describe(`Save`, () => {
       passages,
     });
 
-    await sugarcubeParser.testController
+    await testSaveAndLoad(sugarcubeParser.testController);
+  });
+
+  async function testSaveAndLoad(t: TestController) {
+    await t
       .goto('passage title 1')
       .click(Selector(`#menu-item-saves a`), { waitFor: 'click end' })
       .expect(Selector(`#ui-dialog.open`).exists)
@@ -71,7 +76,6 @@ describe(`Save`, () => {
       .click(Selector(`#saves-load-1`))
       // We should be on page 2
       .expect(Selector(`.passage`).innerText)
-      .contains(`page 2`)
-
-  });
+      .contains(`page 2`);
+  }
 });
