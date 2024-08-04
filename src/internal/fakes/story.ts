@@ -100,6 +100,7 @@ export const Story = {
   },
 
   reset() {
+    // console.trace(`Reset Story`);
     logger.debug(`Reset Story`);
     SimpleStore.adapters.length = 0;
     SimpleStore.adapters.push(InMemoryStorageAdapter);
@@ -305,8 +306,8 @@ function start(moduleScripts: Script[], storyScripts: Script[]) {
 
   // I moved this outside of runStoryInit() so it wouldn't be called on reset:
   // Each call adds a new handler to the forward/backward history buttons. e.g.,
-  // If you call UIBar.start(); twice, clicking the back button will behave like
-  // you called it twice.
+  // If you call UIBar.start(); twice, clicking the back button once fire the "back"
+  // action twice.
   UIBar.start();
 
   // past this point is supposed to be in a Promise then() See sugarcube.js

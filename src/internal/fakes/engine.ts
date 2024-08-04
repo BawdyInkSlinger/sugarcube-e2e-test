@@ -414,10 +414,6 @@ export const Engine = (() => {
             Reload the page.
         */
     // window.location.reload();
-
-    // added by BIS
-    // _state = States.Init;
-    // logger.debug(`_state = States.Init`);
   }
 
   /*

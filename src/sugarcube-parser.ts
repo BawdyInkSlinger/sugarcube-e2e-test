@@ -253,6 +253,7 @@ export class SugarcubeParser {
     logger.debug(`resetState(url=\`${url}\`)`);
     globalThis.jsdom.reconfigure({ url });
 
+    globalThis.Story.reset();
     globalThis.Engine.restart();
 
     globalThis.runStoryInit();

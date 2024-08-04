@@ -3,7 +3,7 @@ import { Selector } from '../test-api/selector';
 import { TestController } from '../test-api/test-controller';
 import { SimplePassage } from './declarations/unofficial/simple-passage';
 
-fdescribe(`Save`, () => {
+describe(`Save`, () => {
   let passages: SimplePassage[];
   let sugarcubeParser: SugarcubeParser;
   let t: TestController;
@@ -38,11 +38,16 @@ fdescribe(`Save`, () => {
     await sugarcubeParser.assignStateAndReload<unknown>({});
   });
 
-  it('can save and load', async () => {
-    sugarcubeParser = await SugarcubeParser.create({
-        passages,
-      });
-      
+  it('can reuse an isolated sugarcubeParser while saving and loading 1', async () => {
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages,
+    });
+
+    await testSaveAndLoad(sugarcubeParser.testController);
+
+    sugarcubeParser.resetState();
+    await sugarcubeParser.assignStateAndReload<unknown>({});
+
     await testSaveAndLoad(sugarcubeParser.testController);
   });
 
