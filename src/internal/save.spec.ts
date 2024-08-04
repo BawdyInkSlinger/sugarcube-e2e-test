@@ -1,10 +1,15 @@
 import { SugarcubeParser } from '../sugarcube-parser';
 import { Selector } from '../test-api/selector';
 import { TestController } from '../test-api/test-controller';
+import { SimplePassage } from './declarations/unofficial/simple-passage';
 
-describe(`Save`, () => {
-  it('can save and load', async () => {
-    const passages = [
+fdescribe(`Save`, () => {
+  let passages: SimplePassage[];
+  let sugarcubeParser: SugarcubeParser;
+  let t: TestController;
+
+  beforeAll(async () => {
+    passages = [
       {
         title: 'passage title 1',
         tags: ['passage tag 1'],
@@ -22,10 +27,30 @@ describe(`Save`, () => {
       },
     ];
 
-    const sugarcubeParser = await SugarcubeParser.create({
+    sugarcubeParser = await SugarcubeParser.create({
       passages,
     });
+    t = sugarcubeParser.testController;
+  });
 
+  beforeEach(async () => {
+    sugarcubeParser.resetState();
+    await sugarcubeParser.assignStateAndReload<unknown>({});
+  });
+
+  it('can save and load', async () => {
+    sugarcubeParser = await SugarcubeParser.create({
+        passages,
+      });
+      
+    await testSaveAndLoad(sugarcubeParser.testController);
+  });
+
+  it('can reuse a shared sugarcubeParser while saving and loading 1', async () => {
+    await testSaveAndLoad(sugarcubeParser.testController);
+  });
+
+  it('can reuse a shared sugarcubeParser while saving and loading 2', async () => {
     await testSaveAndLoad(sugarcubeParser.testController);
   });
 
