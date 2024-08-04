@@ -51,7 +51,7 @@ describe(`Save`, () => {
     await testSaveAndLoad(sugarcubeParser.testController);
   });
 
-  fit('can reuse a shared sugarcubeParser while saving and loading 1', async () => {
+  it('can reuse a shared sugarcubeParser while saving and loading 1', async () => {
     await testSaveAndLoad(sugarcubeParser.testController);
   });
 
@@ -84,10 +84,9 @@ describe(`Save`, () => {
       .notOk()
       // The save description is correct
       .expect(
-        Selector('#saves-list div[data-added-by-bis-description-0]')
-          .getAttribute(`data-added-by-bis-description-0`)
+        Selector('#saves-list div[data-added-by-bis-description-0]').innerText
       )
-      .eql("passage title 1")
+      .eql('page 1 passage title 2…')
       // Save on the second page
       .click(Selector(`#saves-save-1:enabled`), { waitFor: 'click end' })
       .expect(Selector(`.passage`).innerText)

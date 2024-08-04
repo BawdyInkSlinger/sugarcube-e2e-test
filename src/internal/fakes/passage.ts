@@ -8,9 +8,11 @@
 ***********************************************************************************************************************/
 /* global Config, L10n, Util, Wikifier */
 
+import { title } from 'process';
 import { TWINE1 } from '../../constants';
 import { getLogger } from '../../logging/logger';
 import { Config } from '../config';
+import { SimplePassage } from '../declarations/unofficial/simple-passage';
 import { L10n } from '../l10n';
 import { Util } from '../util';
 import { Wikifier } from '../wikifier';
@@ -82,63 +84,57 @@ export const PassageClass = (() => {
     // declare text: string;
     declare tags: string[];
     declare classes: string[];
-    declare element: Element | null;
     declare _excerpt: string | null;
 
-    constructor(title: string, el?: Element) {
+    constructor({ title, text, tags }: SimplePassage) {
+      const sortedAndUniqueTags = [...new Set<string>(tags)].sort((a, b) =>
+        a.localeCompare(b)
+      );
+
+      const id = `passage-${Util.slugify(title)}`;
+      this.#construct(id, Util.entityDecode(title), text, sortedAndUniqueTags);
+    }
+
+    // I extracted this private method to rename sortedAndUniqueTags -> tags and prevent the possibility of unsorted tag being used accidentally
+    #construct(id: string, title: string, text: string, tags: string[]) {
       Object.defineProperties(this, {
-        // Passage title/ID.
+        // Passage title.
         title: {
-          value: Util.unescape(title),
+          value: title,
         },
 
-        // Passage data element (within the story data element; i.e. T1: '[tiddler]', T2: 'tw-passagedata').
-        element: {
-          value: el || null,
+        text: {
+          value: text,
         },
 
         // Passage tags array (unique).
         tags: {
-          value: Object.freeze(
-            el && el.hasAttribute('tags')
-              ? Array.from(
-                  new Set(el.getAttribute('tags').trim().splitOrEmpty(/\s+/))
-                )
-              : []
-          ),
+          value: tags,
         },
 
-        // Passage excerpt.  Used by the `description()` method.
-        _excerpt: {
-          writable: true,
-          value: null,
-        },
-      });
-
-      // Properties dependant upon the above set.
-      Object.defineProperties(this, {
         // Passage DOM-compatible ID.
-        domId: {
-          value: `passage-${Util.slugify(this.title)}`,
+        id: {
+          value: id,
         },
 
         // Passage classes array (sorted and unique).
         classes: {
           value: Object.freeze(
-            this.tags.length === 0
+            tags.length === 0
               ? []
               : (() =>
-                  /*
-							Return the sorted list of unique classes.
-
-							NOTE: The `this.tags` array is already sorted and unique,
-							so we only need to filter and map here.
-						*/
-                  this.tags
+                  // Return the sorted list of unique classes.
+                  tags
                     .filter((tag) => !_tagsToSkip.test(tag))
                     .map((tag) => Util.slugify(tag)))()
           ),
         },
+
+        /* legacy */
+        domId: {
+          value: id,
+        },
+        /* /legacy */
       });
     }
 
@@ -149,25 +145,7 @@ export const PassageClass = (() => {
 
     // TODO: (v3) This should be → `get source`.
     get text() {
-      if (this.element == null) {
-        // lazy equality for null
-        const passage = Util.escapeMarkup(this.title);
-        const mesg = `${L10n.get('errorTitle')}: ${L10n.get(
-          'errorNonexistentPassage',
-          { passage }
-        )}`;
-        return `<div class="error-view"><span class="error">${mesg}</span></div>`;
-      }
-
-      // For Twine 1
-      if (TWINE1) {
-        return _twine1Unescape(this.element.textContent);
-      }
-      // For Twine 2
-      else {
-        // eslint-disable-line no-else-return
-        return this.element.textContent.replace(/\r/g, '');
-      }
+      return this.text;
     }
 
     description() {
@@ -207,10 +185,11 @@ export const PassageClass = (() => {
 
     // TODO: (v3) This should be → `get text`.
     processText() {
-      if (this.element == null) {
-        // lazy equality for null
-        return this.text;
-      }
+        // Commented by BIS
+    //   if (this.element == null) {
+    //     // lazy equality for null
+    //     return this.text;
+    //   }
 
       // Handle image passage transclusion.
       if (this.tags.includes('Twine.image')) {
@@ -238,7 +217,7 @@ export const PassageClass = (() => {
       return processed;
     }
 
-    render(options) {
+    render(options?) {
       // Wikify the passage into a document fragment.
       const frag = document.createDocumentFragment();
       new Wikifier(frag, this.processText(), options);
