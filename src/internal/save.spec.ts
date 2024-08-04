@@ -23,7 +23,17 @@ describe(`Save`, () => {
       {
         title: 'passage title 3',
         tags: ['passage tag 3'],
-        text: 'page 3',
+        text: 'page 3 <<button "Create autosave" `passage()`>><<run Save.autosave.save(`my autosave`)>><</button>>',
+      },
+      {
+        title: 'Script',
+        tags: ['script'],
+        text: `
+        Config.saves.autosave  = () => false; // this makes in autosave slot available, but you have to use \`Save.autosave.save()\` 
+        Config.saves.isAllowed = () => {
+            return !tags().includes("no_saving");
+        }
+        `,
       },
     ];
 
@@ -65,6 +75,9 @@ describe(`Save`, () => {
       .click(Selector(`#menu-item-saves a`), { waitFor: 'click end' })
       .expect(Selector(`#ui-dialog.open`).exists)
       .ok()
+      // Autosave should be disabled
+      .expect(Selector('#saves-load-auto:disabled').exists)
+      .ok()
       // Click the save button
       .click(Selector(`#saves-save-0:enabled`), { waitFor: 'click end' })
       // The Dialog should close
@@ -95,11 +108,15 @@ describe(`Save`, () => {
       .click(Selector(`button`).withText(`passage title 3`))
       .expect(Selector(`.passage`).innerText)
       .contains(`page 3`)
-      // If we open the Save Dialog, there are two saves
+      // Create an autosave
+      .click(Selector(`button`).withText(`Create autosave`))
+      // If we open the Save Dialog, there are two saves and an autosave
       .click(Selector(`#menu-item-saves a`), { waitFor: 'click end' })
       .expect(Selector(`#saves-load-0`).exists)
       .ok()
       .expect(Selector(`#saves-load-1`).exists)
+      .ok()
+      .expect(Selector('#saves-load-auto:enabled').exists)
       .ok()
       // Load the first save
       .click(Selector(`#saves-load-0:enabled`))
@@ -111,6 +128,12 @@ describe(`Save`, () => {
       .click(Selector(`#saves-load-1:enabled`))
       // We should be on page 2
       .expect(Selector(`.passage`).innerText)
-      .contains(`page 2`);
+      .contains(`page 2`)
+      // Load the autosave
+      .click(Selector(`#menu-item-saves a`), { waitFor: 'click end' })
+      .click(Selector(`#saves-load-auto:enabled`))
+      // We should be on page 3
+      .expect(Selector(`.passage`).innerText)
+      .contains(`page 3`)
   }
 });

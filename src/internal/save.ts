@@ -192,8 +192,11 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 		return _unmarshal(saves.autosave);
 	}
 
-	function autosaveSave(title?, metadata?) {
+	function autosaveSave(title?: string, metadata?) {
+        const isSavesAllowAFunction = typeof Config.saves.isAllowed === 'function';
+		logger.debug(`[Save/autosaveSave(typeof Config.saves.isAllowed=${typeof Config.saves.isAllowed}, Config.saves.isAllowed=${isSavesAllowAFunction ? Config.saves.isAllowed() : Config.saves.isAllowed})]`); 
 		if (typeof Config.saves.isAllowed === 'function' && !Config.saves.isAllowed()) {
+            logger.debug(`[Save/autosaveSave(Failed to autosave due to Config.saves.isAllowed)]`); 
 			return false;
 		}
 
