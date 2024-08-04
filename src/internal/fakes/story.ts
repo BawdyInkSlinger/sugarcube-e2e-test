@@ -17,7 +17,6 @@ import { UIBar } from '../uibar';
 import { Save } from '../save';
 import { inspect } from 'util';
 
-let storyPassages: Passage[] = [];
 const logger = getLogger('DEFAULT');
 const passageLogger = getLogger('DEBUG_PASSAGES');
 const evalLogger = getLogger('DEBUG_EVAL');
@@ -27,6 +26,8 @@ const _widgets: Passage[] = [];
 const _passages: Passage[] = [];
 const _styles: Passage[] = [];
 const _scripts: Passage[] = [];
+
+let storyPassages: Passage[] = [];
 
 export const Story = {
   id: 'fakeStoryId',
