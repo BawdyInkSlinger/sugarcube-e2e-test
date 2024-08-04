@@ -369,6 +369,8 @@ export const UI = (() => { // eslint-disable-line no-unused-vars, no-var
 
 					// Add the description (title and datestamp).
 					jQuery(document.createElement('div'))
+                        // BIS added data attr
+                        .attr(`data-added-by-bis-description-${i}`, saves.slots[i].title)
 						.text(saves.slots[i].title)
 						.appendTo($tdDesc);
 					jQuery(document.createElement('div'))
