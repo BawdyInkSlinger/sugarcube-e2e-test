@@ -73,6 +73,10 @@ export class SugarcubeParser {
 
     const { jsdom, document, window } =
       await SugarcubeParser.load(resourceLoader);
+
+    const { setupHTMLDialogElement } = await import('./internal/setup-dialog-element');
+    setupHTMLDialogElement(window);
+
     const jQuery = jQueryFactory(window);
 
     resetGlobal('window', window);
