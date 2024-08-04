@@ -112,67 +112,71 @@ export interface SaveAPI {
    */
   onSave: SaveEventAPI<SaveHandler>;
 
-  slots: {
-    /**
-     * Returns the total number of available slots.
-     * @since 2.0.0
-     */
-    length: number;
+  /* Changed by BIS: */
+  slots: SaveObject[];
+  
+  /* BIS: above changed was incorrect. Original: */
+//   slots: {
+//     /**
+//      * Returns the total number of available slots.
+//      * @since 2.0.0
+//      */
+//     length: number;
 
-    /**
-     * Returns the total number of filled slots.
-     * @since 2.0.0
-     */
-    count(): number;
+//     /**
+//      * Returns the total number of filled slots.
+//      * @since 2.0.0
+//      */
+//     count(): number;
 
-    /**
-     * Deletes a save from the given slot.
-     * @param slot Save slot index (0-based).
-     * @since 2.0.0
-     */
-    delete(slot: number): void;
+//     /**
+//      * Deletes a save from the given slot.
+//      * @param slot Save slot index (0-based).
+//      * @since 2.0.0
+//      */
+//     delete(slot: number): void;
 
-    /**
-     * Returns a save object from the given slot or null, if there was no save in the given slot.
-     * @param slot Save slot index (0-based).
-     * @since 2.0.0
-     */
-    get(slot: number): SaveObject;
+//     /**
+//      * Returns a save object from the given slot or null, if there was no save in the given slot.
+//      * @param slot Save slot index (0-based).
+//      * @since 2.0.0
+//      */
+//     get(slot: number): SaveObject;
 
-    /**
-     * Returns whether the given slot is filled.
-     * @param slot Save slot index (0-based).
-     * @since 2.0.0
-     */
-    has(slot: number): boolean;
+//     /**
+//      * Returns whether the given slot is filled.
+//      * @param slot Save slot index (0-based).
+//      * @since 2.0.0
+//      */
+//     has(slot: number): boolean;
 
-    /**
-     * Returns whether there are any filled slots.
-     * @since 2.0.0
-     */
-    isEmpty(): boolean;
+//     /**
+//      * Returns whether there are any filled slots.
+//      * @since 2.0.0
+//      */
+//     isEmpty(): boolean;
 
-    /**
-     * Loads a save from the given slot.
-     * @param slot
-     */
-    load(slot: number): void;
+//     /**
+//      * Loads a save from the given slot.
+//      * @param slot
+//      */
+//     load(slot: number): void;
 
-    /**
-     * Returns whether the slot saves are available and ready.
-     * @since 2.0.0
-     */
-    ok(): boolean;
+//     /**
+//      * Returns whether the slot saves are available and ready.
+//      * @since 2.0.0
+//      */
+//     ok(): boolean;
 
-    /**
-     * Saves to the given slot.
-     * @param slot Save slot index (0-based).
-     * @param title The title of the save. If omitted or null, defaults to the passage's description.
-     * @param metadata The data to be stored in the save object's metadata property. Must be JSON-serializable.
-     * @since 2.0.0
-     */
-    save(slot: number, title?: string, metadata?: any): void;
-  };
+//     /**
+//      * Saves to the given slot.
+//      * @param slot Save slot index (0-based).
+//      * @param title The title of the save. If omitted or null, defaults to the passage's description.
+//      * @param metadata The data to be stored in the save object's metadata property. Must be JSON-serializable.
+//      * @since 2.0.0
+//      */
+//     save(slot: number, title?: string, metadata?: any): void;
+//   };
 
   autosave: {
     // Added by BIS:

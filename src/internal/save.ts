@@ -1,6 +1,5 @@
 import {
   SaveAPI,
-  SaveDetails,
   SaveObject,
 } from './declarations/twine-sugarcube-copy/save';
 import { getLogger } from '../logging/logger';
