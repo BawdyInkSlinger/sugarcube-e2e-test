@@ -11,20 +11,21 @@ type KeyValue = {
   remember: StoreValue;
   metadata: StoreValue;
 };
+type Keys = keyof KeyValue;
 
 export interface Adapter {
   name: string;
-  delete(value: keyof KeyValue): boolean;
-  set<Key extends keyof KeyValue>(key: Key, value: KeyValue[Key]): boolean;
-  get<Key extends keyof KeyValue>(key: Key): KeyValue[Key] | null;
-  has(key: keyof KeyValue): boolean;
   init: (storageId: string, persistent: boolean) => boolean;
   create: (storageId: string, persistent: boolean) => Adapter;
+  delete(value: Keys): boolean;
+  set<Key extends Keys>(key: Key, value: KeyValue[Key]): boolean;
+  get<Key extends Keys>(key: Key): KeyValue[Key] | null;
+  has(key: Keys): boolean;
 }
 
 class InMemoryStorageAdapterImpl implements Adapter {
   name: 'InMemoryStorageAdapterImpl';
-  inMemoryStore = new Map<keyof KeyValue, KeyValue[keyof KeyValue]>();
+  inMemoryStore = new Map<Keys, KeyValue[Keys]>();
   init(storageId: string, persistent: boolean): boolean {
     logger.debug(
       `InMemoryStorageAdapterImpl/init(${storageId}, ${persistent}})`
@@ -40,17 +41,17 @@ class InMemoryStorageAdapterImpl implements Adapter {
     this.inMemoryStore.clear();
     return this;
   }
-  delete(key: keyof KeyValue): boolean {
+  delete(key: Keys): boolean {
     return this.inMemoryStore.delete(key);
   }
-  set<Key extends keyof KeyValue>(key: Key, value: object): boolean {
+  set<Key extends Keys>(key: Key, value: object): boolean {
     this.inMemoryStore.set(key, value);
     return true;
   }
-  get<Key extends keyof KeyValue>(key: Key): KeyValue[Key] {
+  get<Key extends Keys>(key: Key): KeyValue[Key] {
     return (this.inMemoryStore.get(key) as KeyValue[Key]) ?? null;
   }
-  has(key: keyof KeyValue): boolean {
+  has(key: Keys): boolean {
     return this.inMemoryStore.has(key);
   }
   toString() {
