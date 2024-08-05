@@ -11,7 +11,6 @@ const logger = getLogger('DEBUG_TRIGGER_TIMEOUT');
 
 type LastTimeoutEvent = 'created' | 'completed' | 'cleared';
 type TimeoutID = Branded<string, 'TimeoutID'>;
-
 declare function setTimeout<TArgs extends unknown[]>(
   callback: (...args: TArgs) => void,
   ms?: number,
@@ -21,7 +20,6 @@ declare function setTimeout(
   callback: (args: void) => void,
   ms?: number
 ): TimeoutID;
-
 type ClearTimeoutFunction = () => void;
 export type TimeoutData = {
   cancelTimeout: ClearTimeoutFunction;
@@ -94,14 +92,4 @@ export function triggerTimeout<Params extends unknown[]>(
 export function clearTimeouts() {
   [...timers.keys()].forEach((timerData) => timerData.cancelTimeout());
   timers.clear();
-}
-
-export function findLastTimeoutEvent(
-  cb: (timeoutData: TimeoutData) => boolean
-): LastTimeoutEvent | null {
-  const timeoutData = [...timers.keys()].find(cb);
-  if (timeoutData) {
-    return timers.get(timeoutData);
-  }
-  return null;
 }
