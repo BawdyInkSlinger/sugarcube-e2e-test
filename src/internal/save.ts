@@ -52,11 +52,12 @@ export const Save = (() => { // eslint-disable-line no-unused-vars, no-var
 		Saves Functions.
 	*******************************************************************************************************************/
 	function savesInit() {
-		logger.debug('[Save/savesInit()]'); 
+		logger.debug('[Save/savesInit()]');
 
 		// Disable save slots and the autosave when Web Storage is unavailable.
 		if (StorageContainer.storage.name === 'cookie') {
-			savesObjClear();
+            logger.debug('[Save/savesInit(Disable save slots and the autosave when Web Storage is unavailable.)]');
+            savesObjClear();
             // @ts-ignore
 			Config.saves.autoload = undefined;
             // @ts-ignore

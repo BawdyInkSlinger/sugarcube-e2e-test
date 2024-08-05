@@ -23,7 +23,12 @@ describe(`Save`, () => {
       {
         title: 'passage title 3',
         tags: ['passage tag 3'],
-        text: 'page 3 <<button "Create autosave" `passage()`>><<run Save.autosave.save(`my autosave`)>><</button>>',
+        text: 'page 3 <<button "Create autosave" `passage()`>><<run Save.autosave.save(`my autosave`)>><</button>> <<button "passage title 4" "passage title 4">><</button>>',
+      },
+      {
+        title: 'passage title 4',
+        tags: ['passage tag 4', 'no_saving'],
+        text: 'page 4',
       },
       {
         title: 'Script',
@@ -75,7 +80,7 @@ describe(`Save`, () => {
       .click(Selector(`#menu-item-saves a`), { waitFor: 'click end' })
       .expect(Selector(`#ui-dialog.open`).exists)
       .ok()
-      // Autosave should be disabled
+      // Autosave should exist but be disabled
       .expect(Selector('#saves-load-auto:disabled').exists)
       .ok()
       // Click the save button
@@ -135,5 +140,9 @@ describe(`Save`, () => {
       // We should be on page 3
       .expect(Selector(`.passage`).innerText)
       .contains(`page 3`)
+      // Go to a page where you are not allowed to save
+      .click(Selector(`button`).withText(`passage title 4`))
+      .expect(Selector(`.passage`).innerText)
+      .contains(`page 4`)
   }
 });

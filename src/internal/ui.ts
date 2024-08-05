@@ -281,6 +281,7 @@ export const UI = (() => { // eslint-disable-line no-unused-vars, no-var
 			const saves  = Save.get();
 			const $tbody = jQuery(document.createElement('tbody'));
 
+            logger.debug(`UI/uiBuildSaves(Save.autosave.ok()=${Save.autosave.ok()}, saves.autosave=${saves.autosave})`);
 			if (Save.autosave.ok()) {
 				const $tdSlot = jQuery(document.createElement('td'));
 				const $tdLoad = jQuery(document.createElement('td'));
