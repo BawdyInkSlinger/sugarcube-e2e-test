@@ -28,20 +28,15 @@ fdescribe(`Done Macro`, () => {
         title: 'PassageDone',
         tags: [],
         text: `
-        <<script>>
-        console.log('PassageDone: ' + passage());
-        <</script>>
         <<if $("#visited-passages").length === 0>>
             <<done>>
                 <<script>>
-                    console.log('push');
                     State.variables.visitedPassages.push(passage());
                 <</script>>
             <</done>>
         <<else>>
             <<done>>
                 <<script>>
-                    console.log('append:', State.variables.visitedPassages);
                     $("#visited-passages").text(State.variables.visitedPassages.toString())
                 <</script>>
             <</done>>
