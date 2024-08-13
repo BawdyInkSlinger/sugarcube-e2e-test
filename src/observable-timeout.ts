@@ -19,7 +19,7 @@ declare function setTimeout(
   callback: (args: void) => void,
   ms?: number
 ): TimeoutID;
-type ClearTimeoutFunction = () => void;
+type ClearTimeoutFunction = () => Promise<TimeoutID>;
 export type TimeoutData = {
   cancelTimeout: ClearTimeoutFunction;
   timeoutIdentifier: TimeoutID;
@@ -47,20 +47,28 @@ export function observeTimeout<Params extends unknown[]>(
     timeoutId = setTimeout(setTimeoutWithTrigger, delay);
     result = {
       cancelTimeout: () => {
-        clearTimeout(timeoutId);
-        logger.debug(
-          `observeTimeout: trigger cancelTimeout for '${context.replaceAll(
-            /\r/g,
-            ''
-          )}' delay='${delay}'`
-        );
+        if (result.status !== 'pending') {
+          logger.warn(
+            buildLogMessage(
+              `trigger cancelTimeout on a timer that's already ${result.status}:`
+            )
+          );
+          console.trace();
+          return Promise.resolve(timeoutId);
+        }
+
         timers.delete(timeoutId);
+        clearTimeout(timeoutId);
+        result.status = `canceled`;
+        logger.debug(buildLogMessage(`trigger cancelTimeout for`));
         resolve(result);
+        return Promise.resolve(timeoutId);
       },
       timeoutIdentifier: timeoutId,
       context,
       status: `pending`,
     };
+    logger.debug(buildLogMessage(`trigger createtimeout for`));
 
     function setTimeoutWithTrigger() {
       try {
@@ -75,26 +83,21 @@ export function observeTimeout<Params extends unknown[]>(
         }
         reject(source);
       } finally {
-        logger.debug(
-          `observeTimeout: trigger completetimeout for '${context.replaceAll(
-            /\r/g,
-            ''
-          )}' delay='${delay}'`
-        );
         timers.delete(timeoutId);
-        if (result.status !== 'rejected') {
+        if (result.status === 'pending') {
           result.status = 'completed';
         }
+        logger.debug(buildLogMessage(`trigger completetimeout for`));
         resolve(result);
       }
     }
 
-    logger.debug(
-      `observeTimeout: trigger createtimeout for '${context.replaceAll(
+    function buildLogMessage(prefix: string): string {
+      return `observeTimeout: ${prefix} '${context.replaceAll(
         /\r/g,
         ''
-      )}' delay='${delay}'`
-    );
+      )}' delay='${delay}' timeoutID='${timeoutId}' status='${result.status}'`;
+    }
   });
 
   timers.set(timeoutId, p);
@@ -103,8 +106,11 @@ export function observeTimeout<Params extends unknown[]>(
 }
 
 export async function clearTimeouts() {
-  void [...timers.values()].map(async (timerData: Promise<TimeoutData>) =>
-    (await timerData).cancelTimeout()
+  await Promise.all(
+    [...timers.values()].map(
+      async (promiseData: Promise<TimeoutData>) =>
+        await (await promiseData).cancelTimeout()
+    )
   );
   timers.clear();
 }
