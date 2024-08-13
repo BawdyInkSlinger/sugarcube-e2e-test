@@ -7,7 +7,7 @@
 import { Branded } from './internal/utils/branded';
 import { getLogger } from './logging/logger';
 
-const logger = getLogger('DEBUG_TRIGGER_TIMEOUT');
+const logger = getLogger('DEBUG_TRIGGER_TIMEOUT'); // TODO: Rename
 
 type TimeoutID = Branded<string, 'TimeoutID'>;
 declare function setTimeout<TArgs extends unknown[]>(
@@ -27,6 +27,11 @@ export type TimeoutData = {
 };
 
 const timers: TimeoutData[] = [];
+
+export function getObservableTimeouts(): Promise<TimeoutData>[] {
+  return timers.map((td) => Promise.resolve(td));
+}
+
 export function observeTimeout<Params extends unknown[]>(
   context: string,
   functionRef: (...params: Params) => void,
@@ -39,13 +44,12 @@ export function observeTimeout<Params extends unknown[]>(
     cancelTimeout: () => {
       clearTimeout(timeoutId);
       logger.debug(
-        `observeTimeout: trigger :cleartimeout for '${context.replaceAll(
+        `observeTimeout: trigger cancelTimeout for '${context.replaceAll(
           /\r/g,
           ''
         )}' delay='${delay}'`
       );
       timers.push(result);
-      jQuery.event.trigger(':cleartimeout', result);
     },
     timeoutIdentifier: timeoutId,
     context,
@@ -65,25 +69,23 @@ export function observeTimeout<Params extends unknown[]>(
       }
     } finally {
       logger.debug(
-        `observeTimeout: trigger :completetimeout for '${context.replaceAll(
+        `observeTimeout: trigger completetimeout for '${context.replaceAll(
           /\r/g,
           ''
         )}' delay='${delay}'`
       );
       timers.push(result);
-      jQuery.event.trigger(':completetimeout', result);
     }
   }
 
   logger.debug(
-    `observeTimeout: trigger :createtimeout for '${context.replaceAll(
+    `observeTimeout: trigger createtimeout for '${context.replaceAll(
       /\r/g,
       ''
     )}' delay='${delay}'`
   );
 
   timers.push(result);
-  jQuery.event.trigger(':createtimeout', result);
 
   return result;
 }

@@ -1,5 +1,5 @@
-import './test-api/internal/monkey-patching/jsdom/strings'
-import { Selector, SugarcubeParser } from '.';
+import './test-api/internal/monkey-patching/jsdom/strings';
+import { getObservableTimeouts, observeTimeout } from './observable-timeout';
 import {
   ResourceLoaderConstructorOptions,
   ResourceLoader,
@@ -8,22 +8,13 @@ import {
 } from 'jsdom';
 
 describe('Observable Timeout', () => {
-  it('can group timers and tell you how many are running', async () => {
-    // const sugarcubeParser = await SugarcubeParser.create({
-    //   passages: [
-    //     {
-    //       title: 'SugarcubeParser title',
-    //       tags: ['SugarcubeParser tag'],
-    //       text: 'SugarcubeParser text',
-    //     },
-    //   ],
-    // });
+  it('Promise.all waits for all timeouts to complete', async () => {
+    observeTimeout('a', () => {}, 1);
+    observeTimeout('b', () => {}, 2);
+    observeTimeout('c', () => {}, 3);
 
-    // await sugarcubeParser.testController
-    //   .goto('SugarcubeParser title')
-    //   .expect(Selector(`.passage`).innerText)
-    //   .contains(`SugarcubeParser text`)
-    //   .expect(Selector(`.passage`).innerText)
-    //   .notContains(`SugarcubeParser t3xt`);
+    await Promise.all(getObservableTimeouts());
+
+    expect(getObservableTimeouts()).toEqual([]);
   });
 });
