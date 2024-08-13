@@ -730,7 +730,7 @@ Macro.add('type', {
 
         // Kick off typing the node.
         if (start) {
-          triggerTimeout(`<<type>> macro: ${contents}`, typeNode, start);
+          setTimeout(typeNode, start);
         } else {
           typeNode();
         }
@@ -1926,11 +1926,7 @@ Macro.add(['numberbox', 'textbox'], {
       // Set up a single-use post-display task to autofocus the element.
       postdisplay[`#autofocus:${el.id}`] = (task) => {
         delete postdisplay[task]; // single-use task
-        triggerTimeout(
-          `<<${this.name}>> macro: ${el.value}`,
-          () => el.focus(),
-          Engine.minDomActionDelay
-        );
+        setTimeout(() => el.focus(), Engine.minDomActionDelay);
       };
     }
   },
@@ -2103,11 +2099,7 @@ Macro.add('textarea', {
       // Set up a single-use post-display task to autofocus the element.
       postdisplay[`#autofocus:${el.id}`] = (task) => {
         delete postdisplay[task]; // single-use task
-        triggerTimeout(
-          `<<textarea>> macro: ${el.textContent}`,
-          () => el.focus(),
-          Engine.minDomActionDelay
-        );
+        setTimeout(() => el.focus(), Engine.minDomActionDelay);
       };
     }
   },
@@ -3742,11 +3734,8 @@ Macro.add('repeat', {
         $output.append(frag);
 
         if (transition) {
-          triggerTimeout(
-            `<<repeat>> macro transition: ${this.args}`,
-            () => $output.removeClass('macro-repeat-in'),
-            Engine.minDomActionDelay
-          );
+          // BIS: Maybe this timeout should be observed until stopped? Punting for now
+          setTimeout(() => $output.removeClass('macro-repeat-in'), Engine.minDomActionDelay);
         }
       }),
       delay

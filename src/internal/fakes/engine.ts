@@ -8,7 +8,6 @@ import { State } from '../state';
 import { Wikifier } from '../wikifier';
 import { objectCreateNull } from '../utils/object-create-null';
 import { TempStateContainer } from './tempstate';
-import { triggerTimeout } from '../../trigger-timeout';
 import { Util } from '../util';
 import { getLogger } from '../../logging/logger';
 import { setDisplayTitle } from '../helpers';
@@ -708,10 +707,9 @@ export const Engine = (() => {
                 }
               });
             } else {
-              triggerTimeout(
-                `engine passage-out: ${$outgoing.html()}`,
+              setTimeout(
                 () => $outgoing.remove(),
-                Math.max(minDomActionDelay, Config.passages.transitionOut)
+                  Math.max(minDomActionDelay, Config.passages.transitionOut)
               );
             }
           } else {
@@ -725,11 +723,7 @@ export const Engine = (() => {
 
     // Append the passage element to the passage container and set up its transition.
     jQuery(passageEl).addClass('passage-in').appendTo(containerEl);
-    triggerTimeout(
-      `engine transition animation: ${containerEl.textContent}`,
-      () => jQuery(passageEl).removeClass('passage-in'),
-      minDomActionDelay
-    );
+    setTimeout(() => jQuery(passageEl).removeClass('passage-in'), minDomActionDelay);
 
     // Update the story display title, if necessary.
     if (Story.has('StoryDisplayTitle')) {
