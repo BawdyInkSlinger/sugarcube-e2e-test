@@ -99,7 +99,7 @@ fdescribe('Observable Timeout', () => {
     expect(getObservableTimeouts().length).not.toEqual(0);
   });
 
-  it('lets you clear timeouts', async () => {
+  it('returns no observable timeouts after you clear all timeouts', async () => {
     observeTimeout('12', () => {}, 1);
     observeTimeout('13', () => {}, 2);
     observeTimeout('14', () => {}, 3);
