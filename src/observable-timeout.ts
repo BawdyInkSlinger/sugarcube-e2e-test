@@ -24,6 +24,7 @@ export type TimeoutData = {
   cancelTimeout: ClearTimeoutFunction;
   timeoutIdentifier: TimeoutID;
   context: string;
+  status: `completed` | `canceled` | `rejected` | `pending`;
 };
 
 const timers = new Map<TimeoutID, Promise<TimeoutData>>();
@@ -38,7 +39,7 @@ export function observeTimeout<Params extends unknown[]>(
   delay: number,
   ...params: Params
 ): TimeoutData {
-  const cause = new Error();
+  const source = new Error();
 
   let timeoutId: TimeoutID | undefined = undefined;
   let result: TimeoutData | undefined = undefined;
@@ -58,22 +59,21 @@ export function observeTimeout<Params extends unknown[]>(
       },
       timeoutIdentifier: timeoutId,
       context,
+      status: `pending`,
     };
 
     function setTimeoutWithTrigger() {
       try {
         functionRef(...params);
       } catch (ex: unknown) {
+        result.status = 'rejected';
         if (ex instanceof Error) {
-          if (cause) {
-            ex.cause = cause;
-          }
-          reject(ex);
-          throw ex;
+          source.cause = ex;
         } else {
-            reject(new Error(ex + ''));
-          throw new Error(ex + '');
+          const cause = new Error(ex + '');
+          source.cause = cause;
         }
+        reject(source);
       } finally {
         logger.debug(
           `observeTimeout: trigger completetimeout for '${context.replaceAll(
@@ -82,6 +82,9 @@ export function observeTimeout<Params extends unknown[]>(
           )}' delay='${delay}'`
         );
         timers.delete(timeoutId);
+        if (result.status !== 'rejected') {
+          result.status = 'completed';
+        }
         resolve(result);
       }
     }
