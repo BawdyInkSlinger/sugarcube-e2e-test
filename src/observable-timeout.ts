@@ -26,10 +26,10 @@ export type TimeoutData = {
   context: string;
 };
 
-const timers: TimeoutData[] = [];
+const timers = new Map<TimeoutID, Promise<TimeoutData>>();
 
 export function getObservableTimeouts(): Promise<TimeoutData>[] {
-  return timers.map((td) => Promise.resolve(td));
+  return [...timers.values()].map((td) => Promise.resolve(td));
 }
 
 export function observeTimeout<Params extends unknown[]>(
@@ -39,58 +39,69 @@ export function observeTimeout<Params extends unknown[]>(
   ...params: Params
 ): TimeoutData {
   const cause = new Error();
-  const timeoutId = setTimeout(setTimeoutWithTrigger, delay);
-  const result = {
-    cancelTimeout: () => {
-      clearTimeout(timeoutId);
-      logger.debug(
-        `observeTimeout: trigger cancelTimeout for '${context.replaceAll(
-          /\r/g,
-          ''
-        )}' delay='${delay}'`
-      );
-      timers.push(result);
-    },
-    timeoutIdentifier: timeoutId,
-    context,
-  };
 
-  function setTimeoutWithTrigger() {
-    try {
-      functionRef(...params);
-    } catch (ex: unknown) {
-      if (ex instanceof Error) {
-        if (cause) {
-          ex.cause = cause;
+  let timeoutId: TimeoutID | undefined = undefined;
+  let result: TimeoutData | undefined = undefined;
+  const p = new Promise<TimeoutData>((resolve, reject) => {
+    timeoutId = setTimeout(setTimeoutWithTrigger, delay);
+    result = {
+      cancelTimeout: () => {
+        clearTimeout(timeoutId);
+        logger.debug(
+          `observeTimeout: trigger cancelTimeout for '${context.replaceAll(
+            /\r/g,
+            ''
+          )}' delay='${delay}'`
+        );
+        timers.delete(timeoutId);
+        resolve(result);
+      },
+      timeoutIdentifier: timeoutId,
+      context,
+    };
+
+    function setTimeoutWithTrigger() {
+      try {
+        functionRef(...params);
+      } catch (ex: unknown) {
+        if (ex instanceof Error) {
+          if (cause) {
+            ex.cause = cause;
+          }
+          reject(ex);
+          throw ex;
+        } else {
+            reject(new Error(ex + ''));
+          throw new Error(ex + '');
         }
-        throw ex;
-      } else {
-        throw new Error(ex + '');
+      } finally {
+        logger.debug(
+          `observeTimeout: trigger completetimeout for '${context.replaceAll(
+            /\r/g,
+            ''
+          )}' delay='${delay}'`
+        );
+        timers.delete(timeoutId);
+        resolve(result);
       }
-    } finally {
-      logger.debug(
-        `observeTimeout: trigger completetimeout for '${context.replaceAll(
-          /\r/g,
-          ''
-        )}' delay='${delay}'`
-      );
-      timers.push(result);
     }
-  }
 
-  logger.debug(
-    `observeTimeout: trigger createtimeout for '${context.replaceAll(
-      /\r/g,
-      ''
-    )}' delay='${delay}'`
-  );
+    logger.debug(
+      `observeTimeout: trigger createtimeout for '${context.replaceAll(
+        /\r/g,
+        ''
+      )}' delay='${delay}'`
+    );
+  });
 
-  timers.push(result);
+  timers.set(timeoutId, p);
 
   return result;
 }
 
-export function clearTimeouts() {
-  [...timers].forEach((timerData) => timerData.cancelTimeout());
-  timers.length = 0;
+export async function clearTimeouts() {
+  void [...timers.values()].map(async (timerData: Promise<TimeoutData>) =>
+    (await timerData).cancelTimeout()
+  );
+  timers.clear();
 }
