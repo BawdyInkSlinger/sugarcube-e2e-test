@@ -11,7 +11,7 @@ import { SugarCubeTemporaryVariables } from './internal/declarations/twine-sugar
 import { TestController, testController } from './test-api/test-controller';
 import { getLogger } from './logging/logger';
 import { addToPrettyString } from './add-to-pretty-string';
-import { clearTimeouts } from './trigger-timeout';
+import { clearTimeouts } from './observable-timeout';
 import jQueryFactory from 'jquery';
 import {} from 'node:path';
 import type { State } from './internal/state';

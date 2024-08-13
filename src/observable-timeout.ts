@@ -28,7 +28,7 @@ export type TimeoutData = {
 };
 
 const timers = new Map<TimeoutData, LastTimeoutEvent>();
-export function triggerTimeout<Params extends unknown[]>(
+export function observeTimeout<Params extends unknown[]>(
   context: string,
   functionRef: (...params: Params) => void,
   delay: number,
@@ -40,7 +40,7 @@ export function triggerTimeout<Params extends unknown[]>(
     cancelTimeout: () => {
       clearTimeout(timeoutId);
       logger.debug(
-        `triggerTimeout: trigger :cleartimeout for '${context.replaceAll(
+        `observeTimeout: trigger :cleartimeout for '${context.replaceAll(
           /\r/g,
           ''
         )}' delay='${delay}'`
@@ -66,7 +66,7 @@ export function triggerTimeout<Params extends unknown[]>(
       }
     } finally {
       logger.debug(
-        `triggerTimeout: trigger :completetimeout for '${context.replaceAll(
+        `observeTimeout: trigger :completetimeout for '${context.replaceAll(
           /\r/g,
           ''
         )}' delay='${delay}'`
@@ -77,7 +77,7 @@ export function triggerTimeout<Params extends unknown[]>(
   }
 
   logger.debug(
-    `triggerTimeout: trigger :createtimeout for '${context.replaceAll(
+    `observeTimeout: trigger :createtimeout for '${context.replaceAll(
       /\r/g,
       ''
     )}' delay='${delay}'`

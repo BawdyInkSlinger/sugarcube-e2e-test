@@ -11,7 +11,7 @@
            Story, TempState, Util, Wikifier, postdisplay, prehistory, storage, stringFrom
 */
 
-import { triggerTimeout } from '../../trigger-timeout';
+import { observeTimeout } from '../../observable-timeout';
 import { Config } from '../config';
 import { DebugView } from '../debugview';
 import { Engine, postdisplay, prehistory } from '../fakes/engine';
@@ -1784,7 +1784,7 @@ Macro.add(['linkappend', 'linkprepend', 'linkreplace'], {
           }
 
           if (transition) {
-            triggerTimeout(
+            observeTimeout(
               `<<${this.name}>> macro transition: ${this.payload[0].contents}`,
               () => $insert.removeClass(`macro-${this.name}-in`),
               Engine.minDomActionDelay
@@ -2562,7 +2562,7 @@ Macro.add(['append', 'prepend', 'replace'], {
       if (transition) {
         $insert = jQuery(document.createElement('span'));
         $insert.addClass(`macro-${this.name}-insert macro-${this.name}-in`);
-        triggerTimeout(
+        observeTimeout(
           `<<${this.name}>> macro transition: ${this.payload[0].contents}`,
           () => $insert.removeClass(`macro-${this.name}-in`),
           Engine.minDomActionDelay
@@ -3633,7 +3633,7 @@ Macro.add('done', {
       return;
     }
 
-    triggerTimeout(
+    observeTimeout(
       `<<done>> macro: ${contents}`,
       this.createShadowWrapper(() => $.wiki(contents)),
       Engine.minDomActionDelay
@@ -3673,7 +3673,7 @@ Macro.add('goto', {
             unwanted by users, who are used to the current behavior from
             similar macros and constructs.
         */
-    triggerTimeout(
+    observeTimeout(
       `<<goto>> macro: ${this.args[0]}`,
       () => Engine.play(passage),
       Engine.minDomActionDelay
@@ -3919,7 +3919,7 @@ Macro.add('timed', {
         $output.append(frag);
 
         if (transition) {
-          triggerTimeout(
+          observeTimeout(
             '<<timed>> macro: transition',
             () => $output.removeClass('macro-timed-in'),
             Engine.minDomActionDelay
@@ -3958,7 +3958,7 @@ Macro.add('timed', {
 
       if ((nextItem = items.shift()) != null) {
         // lazy equality for null
-        timerId = triggerTimeout(
+        timerId = observeTimeout(
           `<<timed>> macro: ${nextItem.content}`,
           worker,
           nextItem.delay
@@ -3971,7 +3971,7 @@ Macro.add('timed', {
     };
 
     // Setup the timeout.
-    timerId = triggerTimeout(
+    timerId = observeTimeout(
       `<<timed>> macro: ${nextItem.content}`,
       worker,
       nextItem.delay

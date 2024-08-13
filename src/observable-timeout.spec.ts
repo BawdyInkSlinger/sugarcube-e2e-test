@@ -7,7 +7,7 @@ import {
   FetchOptions,
 } from 'jsdom';
 
-describe('Trigger Timeout', () => {
+describe('Observable Timeout', () => {
   it('can group timers and tell you how many are running', async () => {
     // const sugarcubeParser = await SugarcubeParser.create({
     //   passages: [
