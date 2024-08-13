@@ -9,7 +9,6 @@ import { getLogger } from './logging/logger';
 
 const logger = getLogger('DEBUG_TRIGGER_TIMEOUT');
 
-type LastTimeoutEvent = 'created' | 'completed' | 'cleared';
 type TimeoutID = Branded<string, 'TimeoutID'>;
 declare function setTimeout<TArgs extends unknown[]>(
   callback: (...args: TArgs) => void,
@@ -27,7 +26,7 @@ export type TimeoutData = {
   context: string;
 };
 
-const timers = new Map<TimeoutData, LastTimeoutEvent>();
+const timers: TimeoutData[] = [];
 export function observeTimeout<Params extends unknown[]>(
   context: string,
   functionRef: (...params: Params) => void,
@@ -45,7 +44,7 @@ export function observeTimeout<Params extends unknown[]>(
           ''
         )}' delay='${delay}'`
       );
-      timers.set(result, 'cleared');
+      timers.push(result);
       jQuery.event.trigger(':cleartimeout', result);
     },
     timeoutIdentifier: timeoutId,
@@ -71,7 +70,7 @@ export function observeTimeout<Params extends unknown[]>(
           ''
         )}' delay='${delay}'`
       );
-      timers.set(result, 'completed');
+      timers.push(result);
       jQuery.event.trigger(':completetimeout', result);
     }
   }
@@ -83,13 +82,13 @@ export function observeTimeout<Params extends unknown[]>(
     )}' delay='${delay}'`
   );
 
-  timers.set(result, 'created');
+  timers.push(result);
   jQuery.event.trigger(':createtimeout', result);
 
   return result;
 }
 
 export function clearTimeouts() {
-  [...timers.keys()].forEach((timerData) => timerData.cancelTimeout());
-  timers.clear();
+  [...timers].forEach((timerData) => timerData.cancelTimeout());
+  timers.length = 0;
 }
