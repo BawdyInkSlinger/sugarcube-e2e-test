@@ -41,45 +41,6 @@ fdescribe('Observable Timeout', () => {
     }
     expect(data.status).toEqual(`rejected`);
   });
-  
-  it('has status of rejected when timeout throws an error then it is cleared', async () => {
-    let data: any;
-    try {
-      data = observeTimeout(
-        '3',
-        () => {
-          throw new Error(`intentional`);
-        },
-        1
-      );
-
-      await Promise.all(getObservableTimeouts());
-    } catch (ex) {
-      expect(ex.cause.message).toEqual(`intentional`);
-    }
-
-    await data.cancelTimeout();
-    
-    expect(data.status).toEqual(`rejected`);
-  });
-
-  it('has status of canceled when timeout cleared', async () => {
-    const data = observeTimeout('4', () => {}, 1);
-
-    await data.cancelTimeout();
-    await Promise.all(getObservableTimeouts());
-
-    expect(data.status).toEqual(`canceled`);
-  });
-
-  it('has status of completed when timeout is cleared after it finishes', async () => {
-    const data = observeTimeout('5', () => {}, 1);
-
-    await Promise.all(getObservableTimeouts());
-    await data.cancelTimeout();
-
-    expect(data.status).toEqual(`completed`);
-  });
 
   it('Promise.all waits for all timeouts to complete', async () => {
     observeTimeout('6', () => {}, 1);
@@ -107,5 +68,46 @@ fdescribe('Observable Timeout', () => {
     await clearTimeouts();
 
     expect(getObservableTimeouts()).toEqual([]);
+  });
+
+  describe(`cancelTimeout`, () => {
+    it('has a canceled status when called', async () => {
+      const data = observeTimeout('4', () => {}, 1);
+
+      await data.cancelTimeout();
+      await Promise.all(getObservableTimeouts());
+
+      expect(data.status).toEqual(`canceled`);
+    });
+
+    it('throws an error when already rejected', async () => {
+      let data: any;
+      try {
+        data = observeTimeout(
+          '3',
+          () => {
+            throw new Error(`intentional`);
+          },
+          1
+        );
+
+        await Promise.all(getObservableTimeouts());
+      } catch (ex) {
+        expect(ex.cause.message).toEqual(`intentional`);
+      }
+
+      await data.cancelTimeout();
+
+      expect(data.status).toEqual(`rejected`);
+    });
+
+    it('throws an error when already completed', async () => {
+      const data = observeTimeout('5', () => {}, 1);
+
+      await Promise.all(getObservableTimeouts());
+      await data.cancelTimeout();
+
+      expect(data.status).toEqual(`completed`);
+    });
   });
 });
