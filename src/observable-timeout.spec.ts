@@ -8,6 +8,7 @@ import {
 describe('Observable Timeout', () => {
   beforeEach(async () => {
     await clearTimeouts();
+    expect(getObservableTimeouts()).toEqual([]);
   });
 
   it('has status of pending when timeout is created', async () => {
