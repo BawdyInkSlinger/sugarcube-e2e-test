@@ -1,7 +1,7 @@
 import { SugarcubeParser } from '../../sugarcube-parser';
 import { Selector } from '../../test-api/selector';
 
-fdescribe(`Done Macro`, () => {
+describe(`Done Macro`, () => {
   it('runs on the current page', async () => {
     const passages = [
       {
@@ -37,6 +37,10 @@ fdescribe(`Done Macro`, () => {
         <<else>>
             <<done>>
                 <<script>>
+                    /* 
+                      Since this is in a done macro, it proves waitForPassageEnd() only resolves
+                      after the timers on the NEXT page resolve.
+                    */
                     $("#visited-passages").text(State.variables.visitedPassages.toString())
                 <</script>>
             <</done>>
@@ -47,9 +51,6 @@ fdescribe(`Done Macro`, () => {
         title: 'StoryInit',
         tags: [],
         text: `
-    <<script>>
-        console.log('StoryInit');
-    <</script>>
     <<set $visitedPassages = []>>
           `,
       },
