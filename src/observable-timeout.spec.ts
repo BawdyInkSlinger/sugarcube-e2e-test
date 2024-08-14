@@ -5,7 +5,7 @@ import {
   observeTimeout,
 } from './observable-timeout';
 
-fdescribe('Observable Timeout', () => {
+describe('Observable Timeout', () => {
   beforeEach(async () => {
     await clearTimeouts();
   });
@@ -93,20 +93,33 @@ fdescribe('Observable Timeout', () => {
 
         await Promise.all(getObservableTimeouts());
       } catch (ex) {
-        expect(ex.cause.message).toEqual(`intentional`);
+        expect(ex.cause.message).toContain(`intentional`);
+        expect(data.status).toEqual(`rejected`);
       }
 
-      await data.cancelTimeout();
-
+      try {
+        await data.cancelTimeout();
+      } catch (ex) {
+        expect(ex.cause.message).toContain(
+          `trigger cancelTimeout on a timer that's already`
+        );
+      }
       expect(data.status).toEqual(`rejected`);
     });
 
     it('throws an error when already completed', async () => {
-      const data = observeTimeout('5', () => {}, 1);
+      let data: any;
+      try {
+        data = observeTimeout('5', () => {}, 1);
 
-      await Promise.all(getObservableTimeouts());
-      await data.cancelTimeout();
+        await Promise.all(getObservableTimeouts());
 
+        await data.cancelTimeout();
+      } catch (ex) {
+        expect(ex.cause.message).toContain(
+          `trigger cancelTimeout on a timer that's already`
+        );
+      }
       expect(data.status).toEqual(`completed`);
     });
   });

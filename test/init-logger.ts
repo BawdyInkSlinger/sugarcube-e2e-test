@@ -2,7 +2,7 @@ import { Category } from '../src/logging/logger'
 
 const logLevels = new Map<Category, 'debug' | 'info' | 'warn' | 'error'>([
   ['DEFAULT', 'warn'],
-  ['DEBUG_TRIGGER_TIMEOUT', 'debug'],
+  ['DEBUG_TRIGGER_TIMEOUT', 'warn'],
   ['DEBUG_EVAL', 'warn'],
   ['DEBUG_PASSAGES', 'warn'],
   ['DEBUG_TEST_CONTROLLER_ENTER_LOG_MESSAGES', 'warn'],

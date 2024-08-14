@@ -26,11 +26,13 @@ export type TimeoutData = {
   context: string;
   status: `completed` | `canceled` | `rejected` | `pending`;
 };
+export type CancelablePromise = Promise<TimeoutData> &
+  Pick<TimeoutData, 'cancelTimeout'>;
 
-const timers = new Map<TimeoutID, Promise<TimeoutData>>();
+const timers = new Map<TimeoutID, CancelablePromise>();
 
-export function getObservableTimeouts(): Promise<TimeoutData>[] {
-  return [...timers.values()].map((td) => Promise.resolve(td));
+export function getObservableTimeouts(): CancelablePromise[] {
+  return [...timers.values()];
 }
 
 export function observeTimeout<Params extends unknown[]>(
@@ -43,18 +45,17 @@ export function observeTimeout<Params extends unknown[]>(
 
   let timeoutId: TimeoutID | undefined = undefined;
   let result: TimeoutData | undefined = undefined;
-  const p = new Promise<TimeoutData>((resolve, reject) => {
+  const p: CancelablePromise = new Promise<TimeoutData>((resolve, reject) => {
     timeoutId = setTimeout(setTimeoutWithTrigger, delay);
     result = {
       cancelTimeout: () => {
         if (result.status !== 'pending') {
-          logger.warn(
+          source.cause = new Error(
             buildLogMessage(
               `trigger cancelTimeout on a timer that's already ${result.status}:`
             )
           );
-          console.trace();
-          return Promise.resolve(timeoutId);
+          throw source;
         }
 
         timers.delete(timeoutId);
@@ -98,7 +99,8 @@ export function observeTimeout<Params extends unknown[]>(
         ''
       )}' delay='${delay}' timeoutID='${timeoutId}' status='${result.status}'`;
     }
-  });
+  }) as CancelablePromise;
+  p.cancelTimeout = result.cancelTimeout;
 
   timers.set(timeoutId, p);
 
@@ -106,11 +108,11 @@ export function observeTimeout<Params extends unknown[]>(
 }
 
 export async function clearTimeouts() {
-  await Promise.all(
-    [...timers.values()].map(
-      async (promiseData: Promise<TimeoutData>) =>
-        await (await promiseData).cancelTimeout()
-    )
+  await Promise.allSettled(
+    [...timers.values()].map((cancelablePromise) => {
+      return cancelablePromise.cancelTimeout();
+    })
   );
+
   timers.clear();
 }
