@@ -9,6 +9,9 @@ export const setupHTMLDialogElement = (window) => {
   prototype.close = function (this: HTMLDialogElement) {
     this.removeAttribute(`open`);
     this.style.display = 'none';
+
+    const event = new globalThis.window.Event(`close`);
+    this.dispatchEvent(event);
   };
 
   prototype['isSetupDialogElement'] = true;
