@@ -174,12 +174,33 @@ describe('SugarcubeParser', () => {
         { 'temporary': '456' }
       );
 
-      // resetState
       sugarcubeParser.resetState();
 
       // $variable not set, _temporary not set
       expect(sugarcubeParser.State.variables[`variable`]).not.toBeDefined();
       expect(sugarcubeParser.State.temporary[`temporary`]).not.toBeDefined();
+    });
+    
+    it(`does NOT clear passages`, async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'passage title',
+            tags: ['passage tag'],
+            text: 'passage text',
+          },
+        ],
+      });
+
+      function getPassageCount() {
+        return globalThis.Story.lookupWith(() => true).map((p) => p.title).length;
+      }
+
+      expect(getPassageCount()).toEqual(1);
+      
+      sugarcubeParser.resetState();
+      
+      expect(getPassageCount()).toEqual(1);
     });
   });
 });
