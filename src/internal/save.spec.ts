@@ -4,54 +4,38 @@ import { TestController } from '../test-api/test-controller';
 import { SimplePassage } from './declarations/unofficial/simple-passage';
 
 describe(`Save`, () => {
-  let passages: SimplePassage[];
-  let sugarcubeParser: SugarcubeParser;
-  let t: TestController;
-
-  beforeAll(async () => {
-    passages = [
-      {
-        title: 'passage title 1',
-        tags: ['passage tag 1'],
-        text: 'page 1 <<button "passage title 2" "passage title 2">><</button>>',
-      },
-      {
-        title: 'passage title 2',
-        tags: ['passage tag 2'],
-        text: 'page 2 <<button "passage title 3" "passage title 3">><</button>>',
-      },
-      {
-        title: 'passage title 3',
-        tags: ['passage tag 3'],
-        text: 'page 3 <<button "Create autosave" `passage()`>><<run Save.autosave.save(`my autosave`)>><</button>> <<button "passage title 4" "passage title 4">><</button>>',
-      },
-      {
-        title: 'passage title 4',
-        tags: ['passage tag 4', 'no_saving'],
-        text: 'page 4',
-      },
-      {
-        title: 'Script',
-        tags: ['script'],
-        text: `
-        Config.saves.autosave  = () => false; // this makes in autosave slot available, but you have to use \`Save.autosave.save()\` 
-        Config.saves.isAllowed = () => {
-            return !tags().includes("no_saving");
-        }
-        `,
-      },
-    ];
-
-    sugarcubeParser = await SugarcubeParser.create({
-      passages,
-    });
-    t = sugarcubeParser.testController;
-  });
-
-  beforeEach(async () => {
-    sugarcubeParser.resetState();
-    await sugarcubeParser.assignStateAndReload<unknown>({});
-  });
+  const passages: SimplePassage[] = [
+    {
+      title: 'passage title 1',
+      tags: ['passage tag 1'],
+      text: 'page 1 <<button "passage title 2" "passage title 2">><</button>>',
+    },
+    {
+      title: 'passage title 2',
+      tags: ['passage tag 2'],
+      text: 'page 2 <<button "passage title 3" "passage title 3">><</button>>',
+    },
+    {
+      title: 'passage title 3',
+      tags: ['passage tag 3'],
+      text: 'page 3 <<button "Create autosave" `passage()`>><<run Save.autosave.save(`my autosave`)>><</button>> <<button "passage title 4" "passage title 4">><</button>>',
+    },
+    {
+      title: 'passage title 4',
+      tags: ['passage tag 4', 'no_saving'],
+      text: 'page 4',
+    },
+    {
+      title: 'Script',
+      tags: ['script'],
+      text: `
+      Config.saves.autosave  = () => false; // this makes in autosave slot available, but you have to use \`Save.autosave.save()\` 
+      Config.saves.isAllowed = () => {
+          return !tags().includes("no_saving");
+      }
+      `,
+    },
+  ];
 
   it('can reuse an isolated sugarcubeParser while saving and loading 1', async () => {
     const sugarcubeParser = await SugarcubeParser.create({
@@ -66,12 +50,22 @@ describe(`Save`, () => {
     await testSaveAndLoad(sugarcubeParser.testController);
   });
 
-  it('can reuse a shared sugarcubeParser while saving and loading 1', async () => {
-    await testSaveAndLoad(sugarcubeParser.testController);
-  });
+  it('can NOT reuse a shared sugarcubeParser while saving and loading', async () => {
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages,
+    });
 
-  it('can reuse a shared sugarcubeParser while saving and loading 2', async () => {
-    await testSaveAndLoad(sugarcubeParser.testController);
+    try {
+      await Promise.all([
+        testSaveAndLoad(sugarcubeParser.testController),
+        testSaveAndLoad(sugarcubeParser.testController),
+      ]);
+      fail(
+        `Reused a sugarcubeParser in a test that required isolated save states. This should fail.`
+      );
+    } catch (ex: unknown) {
+      expect(ex).toBeInstanceOf(Error);
+    }
   });
 
   async function testSaveAndLoad(t: TestController) {
@@ -143,6 +137,6 @@ describe(`Save`, () => {
       // Go to a page where you are not allowed to save
       .click(Selector(`button`).withText(`passage title 4`))
       .expect(Selector(`.passage`).innerText)
-      .contains(`page 4`)
+      .contains(`page 4`);
   }
 });
