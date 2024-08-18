@@ -68,7 +68,7 @@ export class SugarcubeParser {
     moduleScripts = [],
     sugarcubeScripts = [],
   }: SugarcubeParserOptions): Promise<SugarcubeParser> {
-    clearTimeouts(); // This could prevent parallel test runs?
+    await clearTimeouts(); // This could prevent parallel test runs?
     // setPassageLoadedHandler(customPassageLoadedHandler); TODO: turn TestController into a class so this (and timeoutMillis, for eg) can be passed into it?
 
     const { jsdom, document, window } =
