@@ -35,6 +35,7 @@ export function click(
         source1.cause = new Error(
           `Attempted to click on selector that could not be found: ${selector.toString()}`
         );
+        document.printError();
         throw source1;
       }
 

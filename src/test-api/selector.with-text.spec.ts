@@ -1,5 +1,6 @@
 import { SugarcubeParser } from '../sugarcube-parser';
 import { Selector } from './selector';
+import { SinonSandbox, SinonStub } from 'sinon';
 
 describe(`selector withText`, () => {
   it('can click a button withText', async () => {

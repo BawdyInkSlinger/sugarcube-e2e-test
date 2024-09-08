@@ -34,6 +34,7 @@ export type SugarcubeParserOptions = {
   //   customPassageLoadedHandler?: (debugNote: string) => Promise<void>;  TODO: turn TestController into a class so this (and timeoutMillis, for eg) can be passed into it?
   moduleScripts?: string[];
   sugarcubeScripts?: string[];
+  printOnError?: PrettyStringOptions
 };
 
 export class SugarcubeParser {
@@ -67,12 +68,13 @@ export class SugarcubeParser {
     resourceLoader = 'usable',
     moduleScripts = [],
     sugarcubeScripts = [],
+    printOnError
   }: SugarcubeParserOptions): Promise<SugarcubeParser> {
     await clearTimeouts(); // This could prevent parallel test runs?
     // setPassageLoadedHandler(customPassageLoadedHandler); TODO: turn TestController into a class so this (and timeoutMillis, for eg) can be passed into it?
 
     const { jsdom, document, window } =
-      await SugarcubeParser.load(resourceLoader);
+      await SugarcubeParser.load(resourceLoader, printOnError);
 
     const { setupHTMLDialogElement } = await import('./internal/setup-dialog-element');
     setupHTMLDialogElement(window);
@@ -207,7 +209,7 @@ export class SugarcubeParser {
     return new SugarcubeParser();
   }
 
-  private static async load(resources: ResourceLoader | 'usable'): Promise<{
+  private static async load(resources: ResourceLoader | 'usable', printOnError?: PrettyStringOptions): Promise<{
     window: DOMWindow;
     document: Document;
     jsdom: JSDOM;
@@ -227,7 +229,7 @@ export class SugarcubeParser {
         const { window: jsdomWindow } = jsdom;
         const { document: jsdomDocument } = jsdomWindow;
 
-        addToPrettyString(jsdomDocument);
+        addToPrettyString(jsdomDocument, printOnError);
 
         resolve({
           jsdom,
