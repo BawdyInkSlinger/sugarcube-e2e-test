@@ -9,7 +9,7 @@ describe(`Print On Error`, () => {
       {
         title: 'passage title',
         tags: ['passage tag'],
-        text: `<h1>Passage 1</h1><<button "Button" "passage 2">><</button>>`,
+        text: `<h1>Passage 1</h1><<button "Button" "passage 2">><</button>><<button "Noop">><</button>>`,
       },
       {
         title: 'passage 2',
@@ -43,6 +43,28 @@ describe(`Print On Error`, () => {
     try {
       await sugarcubeParser.testController.click(
         Selector('.passage button').withText('foobar')
+      );
+      fail(`Error expected`);
+    } catch (parentError) {
+      expect(printError.calledOnce).toBeTrue();
+    }
+  });
+  
+  it('prints the document when a passage end does not occur', async () => {
+    const sugarcubeParser = await SugarcubeParser.create({
+      ...passages,
+      printOnError: {
+        includeHeadElement: false,
+        includeSvgBody: true,
+        selectorsToRemove: ['body'],
+      },
+    });
+
+    await sugarcubeParser.testController.goto('passage title');
+
+    try {
+      await sugarcubeParser.testController.click(
+        Selector('.passage button').withText('Noop')
       );
       fail(`Error expected`);
     } catch (parentError) {

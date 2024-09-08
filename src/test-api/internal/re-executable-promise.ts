@@ -32,6 +32,7 @@ export default class ReExecutablePromise<T> extends Promise<T> {
           if (err instanceof Error) {
             err.cause = this.cause;
           }
+          document.printError();
           throw err;
         }
       });

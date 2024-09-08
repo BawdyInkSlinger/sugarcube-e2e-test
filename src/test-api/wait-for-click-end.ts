@@ -25,6 +25,7 @@ export function waitForClickEnd(debugNote = '', timeoutMillis = 2000) {
     },
     (reason) => {
       source.cause = reason;
+      document.printError();
       throw source;
     }
   );

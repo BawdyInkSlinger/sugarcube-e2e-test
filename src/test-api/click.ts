@@ -59,6 +59,7 @@ go to a new passage? If not, click with a different wait strategy.`.replace(
           } else {
             source2.cause = err;
           }
+          document.printError();
           throw source2;
         });
       }

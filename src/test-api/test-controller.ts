@@ -336,12 +336,14 @@ export const testController: TestController = {
     const gotoPromise = thisAsPromise(this).then(() => {
       if (!globalThis.Story.has(passageTitle)) {
         source.cause = new Error(`Passage '${passageTitle}' does not exist`);
+        document.printError();
         throw source;
       }
 
       const pageLoadPromise = waitForPassageEnd(`goto '${passageTitle}'`)
         .catch((reason) => {
           source.cause = reason;
+          document.printError();
           throw source;
         })
         .finally(() => {

@@ -167,6 +167,7 @@ const internalSelector = (
       );
       const $nodes = selectorExecute(executionSteps);
       if ($nodes.length === 0) {
+        document.printError();
         throw new Error(
           `${selectorToStringBuilder(executionSteps)()} does not exist`
         );
@@ -179,6 +180,7 @@ const internalSelector = (
       );
       const $nodes = selectorExecute(executionSteps);
       if ($nodes.length === 0) {
+        document.printError();
         throw new Error(
           `${selectorToStringBuilder(executionSteps)()} does not exist`
         );
@@ -191,6 +193,7 @@ const internalSelector = (
       );
       const $nodes = selectorExecute(executionSteps);
       if ($nodes.length === 0) {
+        document.printError();
         throw new Error(
           `${selectorToStringBuilder(executionSteps)()} does not exist`
         );
@@ -303,6 +306,7 @@ const internalSelector = (
       return ReExecutablePromise.fromFn(() => {
         const $nodes = selectorExecute(executionSteps);
         if ($nodes.length === 0) {
+            document.printError();
             throw new Error(
               `${selectorToStringBuilder(executionSteps)()} does not exist`
             );
