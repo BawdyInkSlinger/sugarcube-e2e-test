@@ -49,7 +49,29 @@ describe(`Print On Error`, () => {
       expect(printError.calledOnce).toBeTrue();
     }
   });
-  
+
+  it('prints the document when an assertion fails', async () => {
+    const sugarcubeParser = await SugarcubeParser.create({
+      ...passages,
+      printOnError: {
+        includeHeadElement: false,
+        includeSvgBody: true,
+        selectorsToRemove: ['body'],
+      },
+    });
+
+    await sugarcubeParser.testController.goto('passage title');
+
+    try {
+      await sugarcubeParser.testController
+        .expect(Selector('.passage button').withText('Does not exist').exists)
+        .ok();
+      fail(`Error expected`);
+    } catch (parentError) {
+      expect(printError.calledOnce).toBeTrue();
+    }
+  });
+
   it('prints the document when a passage end does not occur', async () => {
     const sugarcubeParser = await SugarcubeParser.create({
       ...passages,

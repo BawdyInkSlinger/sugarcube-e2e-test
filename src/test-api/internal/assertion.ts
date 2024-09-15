@@ -216,6 +216,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
               chalk.bgRed
             )}\n  To Match:\n${re}`;
 
+            document.printError();
             return Promise.reject(source);
           } else {
             return Promise.resolve();
@@ -266,6 +267,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
             // console.log(document.toPrettyString({includeHeadElement: false,
             //     includeSvgBody: false,
             //     selectorsToRemove: [`#before-passage-container`, `#after-passage-container`]}));
+            document.printError();
             return Promise.reject(source);
           } else {
             return Promise.resolve();
@@ -342,6 +344,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
           const customErrorMessage =
             typeof messageOrOptions === 'string' ? '\n' + messageOrOptions : '';
           source.message = `${customErrorMessage}\n  Expected:\n${actualValue}\n  To Contain:\n${needle}`;
+          document.printError();
           return Promise.reject(source);
         })
         .finally(() => {
@@ -415,6 +418,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
           const customErrorMessage =
             typeof messageOrOptions === 'string' ? '\n' + messageOrOptions : '';
           source.message = `${customErrorMessage}\n  Expected:\n${actualValue}\n  To NOT Contain:\n${needle}`;
+          document.printError();
           return Promise.reject(source);
         })
         .finally(() => {
@@ -476,16 +480,19 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
             )} > ${JSON.stringify(expected)}\n  Actual: ${JSON.stringify(
               actualValue
             )} is not a number`;
+            document.printError();
             return Promise.reject(source);
           } else if (actualNumber === expected) {
             source.message = `${customErrorMessage}\n  Expected:\n${actualNumber} > ${JSON.stringify(
               expected
             )}\n  Actual:\n${actualNumber} == ${JSON.stringify(expected)}`;
+            document.printError();
             return Promise.reject(source);
           } else if (actualNumber < expected) {
             source.message = `${customErrorMessage}\n  Expected:\n${actualNumber} > ${JSON.stringify(
               expected
             )}`;
+            document.printError();
             return Promise.reject(source);
           } else {
             return Promise.resolve();
@@ -550,11 +557,13 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
             )} >= ${JSON.stringify(expected)}\n  Actual: ${JSON.stringify(
               actualValue
             )} is not a number`;
+            document.printError();
             return Promise.reject(source);
           } else if (actualNumber < expected) {
             source.message = `${customErrorMessage}\n  Expected:\n${actualNumber} >= ${JSON.stringify(
               expected
             )}`;
+            document.printError();
             return Promise.reject(source);
           } else {
             return Promise.resolve();
@@ -632,6 +641,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
             source.message = `${
               typeof messageOrOptions === 'string' ? messageOrOptions : ''
             }\n  Expected:\n${expected}\n  Actual:\n${actualValue}\n  Diff:\n${diff}`;
+            document.printError();
             return Promise.reject(source);
           } else {
             return Promise.resolve();
@@ -709,6 +719,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
             source.message = `${
               typeof messageOrOptions === 'string' ? messageOrOptions : ''
             }\n  Expected:\n${expected}\n  To NOT Equal:\n${actualValue}\n  Diff:\n${diff}`;
+            document.printError();
             return Promise.reject(source);
           } else {
             return Promise.resolve();
@@ -764,6 +775,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
                 ? '\n' + messageOrOptions
                 : '';
             source.message = `${customErrorMessage}\n  Expected:\nTruthy\n  Actual:\n${actualValue}`;
+            document.printError();
             return Promise.reject(source);
           } else {
             return Promise.resolve();
@@ -811,6 +823,7 @@ export class PromiseAssertions<A> implements AssertionApi<A> {
                 ? '\n' + messageOrOptions
                 : '';
             source.message = `${customErrorMessage}\n  Expected:\nFalsy\n  Actual:\n${actualValue}`;
+            document.printError();
             return Promise.reject(source);
           } else {
             return Promise.resolve();
