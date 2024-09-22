@@ -70,7 +70,7 @@ interface SelectorAPI {
   // getBoundingClientRectProperty(propertyName: string): Promise<number>;
   hasAttribute(attributeName: string): Promise<boolean>;
   // shadowRoot(): Selector;
-  nth(index: number): Selector;
+  nth(zeroBasedIndex: number): Selector;
   withText(text: string): Selector;
   // withText(re: RegExp): Selector;
   withExactText(text: string): Selector;
@@ -283,14 +283,14 @@ const internalSelector = (
       });
     },
 
-    nth(index: number): Selector {
+    nth(zeroBasedIndex: number): Selector {
       const clonedExecutionSteps = _.clone(executionSteps);
       clonedExecutionSteps.push({
         action: 'function',
         implementation: (lastLink) => {
-          return jQuery(lastLink[index]);
+          return jQuery(lastLink[zeroBasedIndex]);
         },
-        toString: () => `:nth(${index})`,
+        toString: () => `:nth(${zeroBasedIndex})`,
       });
 
       return internalSelector(clonedExecutionSteps);
