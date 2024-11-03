@@ -8,6 +8,7 @@ import {
   execute as selectorExecute,
 } from './internal/selector/execute';
 import { selectorToStringBuilder } from './internal/selector/selector-to-string-builder';
+import { htmlElementToNodeSnapshot } from './html-element-to-node-snapshot';
 
 const enterLogger = getLogger('DEBUG_SELECTOR_ENTER_LOG_MESSAGES');
 const executionLogger = getLogger('DEBUG_SELECTOR_EXECUTION_LOG_MESSAGES');
@@ -159,10 +160,22 @@ const internalSelector = (
     executionSteps = init;
   }
 
-  const selectorImpl: Selector & { toString: () => string } = (
+  // export interface SelectorPromise extends SelectorAPI, Promise<NodeSnapshot> {}
+
+  const selectorImpl: Selector & { toString: () => string } = function (
+    this: Selector & { toString: () => string },
     ...args: any[]
-  ): SelectorPromise => {
-    return null as SelectorPromise;
+  ): SelectorPromise {
+    const htmlElement = selectorImpl.execute().get(0);
+
+    const result = Object.assign(
+      Promise.resolve(htmlElementToNodeSnapshot(htmlElement)),
+      this
+    );
+
+    return result;
+
+    // return selectorImpl.execute().get(0);
   };
 
   selectorImpl.execute = () => selectorExecute(executionSteps);
