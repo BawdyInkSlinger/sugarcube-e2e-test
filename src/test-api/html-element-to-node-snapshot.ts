@@ -1,3 +1,4 @@
+import { innerText } from './internal/inner-text/inner-text';
 import { NodeSnapshot } from './internal/node-snapshot';
 
 export const htmlElementToNodeSnapshot = function (
@@ -12,6 +13,9 @@ export const htmlElementToNodeSnapshot = function (
     },
     get hasChildNodes(): boolean {
       return el.childElementCount > 0;
+    },
+    get innerText(): string {
+      return innerText(el);
     },
     get attributes(): { [name: string]: string } | undefined {
       if (!el.hasAttributes()) {

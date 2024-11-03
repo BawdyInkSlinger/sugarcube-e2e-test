@@ -174,8 +174,6 @@ const internalSelector = (
     );
 
     return result;
-
-    // return selectorImpl.execute().get(0);
   };
 
   selectorImpl.execute = () => selectorExecute(executionSteps);
