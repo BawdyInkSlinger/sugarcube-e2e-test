@@ -369,7 +369,7 @@ describe(`selector`, () => {
       .expect(findFirstDiv.innerText)
       .eql(`div1`);
   });
-  
+
   it(`returns a new selector for parent()`, async () => {
     const sugarcubeParser = await SugarcubeParser.create({
       passages: [
@@ -396,10 +396,17 @@ describe(`selector`, () => {
       ],
     });
 
-    const findSecondP = Selector(`.passage > div > div`).find(`p`).withExactText(`p2`);
+    const findSecondP = Selector(`.passage > div > div`)
+      .find(`p`)
+      .withExactText(`p2`);
     const findSecondDiv = findSecondP.parent().find(`div`).withText(`v2`);
-    const findThirdDiv = findSecondP.parent().parent().parent().find(`div`).withText(`v3`);
-    
+    const findThirdDiv = findSecondP
+      .parent()
+      .parent()
+      .parent()
+      .find(`div`)
+      .withText(`v3`);
+
     await sugarcubeParser.testController
       .goto('passage title')
       .expect(findSecondP.innerText)
@@ -407,7 +414,7 @@ describe(`selector`, () => {
       .expect(findSecondDiv.innerText)
       .eql(`div2`)
       .expect(findThirdDiv.innerText)
-      .eql(`div3`)
+      .eql(`div3`);
   });
 
   it('has innerHTML', async () => {
@@ -427,5 +434,41 @@ describe(`selector`, () => {
       .goto('passage title')
       .expect(reExecutablePromise)
       .eql(` <p> Words words words <span> nest </span> </p> `);
+  });
+
+  it('returns a SelectorPromise when called as `Selector(...)()`', async () => {
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag', 'nobr'],
+          text: `
+<p class="with-content">p0</p>
+<div>
+    <div>
+        <p class="with-content">p1</p>
+        <div class="with-content">div1</div>
+    </div>
+</div>
+<div>
+    <div>
+        <p class="with-content">p2</p>
+        <div class="with-content">div2</div>
+    </div>
+</div>
+<div class="with-content">div3</div>
+`,
+        },
+      ],
+    });
+
+    const firstWithContentElement: NodeSnapshot =
+      await Selector(`.passage`).find(`.with-content`)();
+    expect(firstWithContentElement.innerText).toEqual(`p0`);
+
+    const secondWithContentElement: NodeSnapshot = await Selector(
+      `.passage .with-content`
+    ).nth(1)();
+    expect(secondWithContentElement.innerText).toEqual(`p1`);
   });
 });

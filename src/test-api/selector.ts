@@ -25,7 +25,7 @@ interface SelectorFactory {
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Selector extends SelectorAPI {
-  // (...args: any[]): SelectorPromise;
+  (...args: any[]): SelectorPromise;
   execute: () => JQuery<HTMLElement>;
 }
 
@@ -159,165 +159,339 @@ const internalSelector = (
     executionSteps = init;
   }
 
-  const selectorImpl: Selector & { toString: () => string } = {
-    execute: () => selectorExecute(executionSteps),
-    innerText: ReExecutablePromise.fromFn(() => {
-      executionLogger.debug(
-        `selector: innerText on '${selectorToStringBuilder(executionSteps)()}'`
-      );
-      const $nodes = selectorExecute(executionSteps);
-      if ($nodes.length === 0) {
-        document.printError();
-        throw new Error(
-          `${selectorToStringBuilder(executionSteps)()} does not exist`
-        );
-      }
-      return innerText($nodes[0]);
-    }),
-    innerHTML: ReExecutablePromise.fromFn(() => {
-      executionLogger.debug(
-        `selector: innerHTML on '${selectorToStringBuilder(executionSteps)()}'`
-      );
-      const $nodes = selectorExecute(executionSteps);
-      if ($nodes.length === 0) {
-        document.printError();
-        throw new Error(
-          `${selectorToStringBuilder(executionSteps)()} does not exist`
-        );
-      }
-      return $nodes[0].innerHTML;
-    }),
-    outerHTML: ReExecutablePromise.fromFn(() => {
-      executionLogger.debug(
-        `selector: outerHTML on '${selectorToStringBuilder(executionSteps)()}'`
-      );
-      const $nodes = selectorExecute(executionSteps);
-      if ($nodes.length === 0) {
-        document.printError();
-        throw new Error(
-          `${selectorToStringBuilder(executionSteps)()} does not exist`
-        );
-      }
-      return $nodes[0].outerHTML;
-    }),
-    exists: ReExecutablePromise.fromFn(
-      () => selectorExecute(executionSteps).length > 0
-    ),
-    count: ReExecutablePromise.fromFn(
-      () => selectorExecute(executionSteps).length
-    ),
-    withText: function (text: string): Selector {
-      enterLogger.debug(
-        `selector: entering withText init='${init}' text='${text}'`
-      );
-      const clonedExecutionSteps = _.clone(executionSteps);
-      clonedExecutionSteps.push({
-        action: 'filter',
-        value: function (
-          this: HTMLElement,
-          index: number,
-          element: HTMLElement
-        ): boolean {
-          return innerText(element).indexOf(text) !== -1;
-        },
-        toString: () => `:contains(${text})`,
-      });
-      return internalSelector(clonedExecutionSteps);
-    },
-    withExactText: function (text: string): Selector {
-      enterLogger.debug(
-        `selector: entering withExactText init='${init}' text='${text}'`
-      );
-      const clonedExecutionSteps = _.clone(executionSteps);
-      clonedExecutionSteps.push({
-        action: 'filter',
-        value: function (
-          this: HTMLElement,
-          index: number,
-          element: HTMLElement
-        ): boolean {
-          return innerText(element) === text;
-        },
-        toString: () => `:containsExact(${text})`,
-      });
-      return internalSelector(clonedExecutionSteps);
-    },
-
-    parent: function (): Selector {
-      enterLogger.debug(`selector: entering parent init='${init}'`);
-      const clonedExecutionSteps = _.clone(executionSteps);
-      clonedExecutionSteps.push({
-        action: 'function',
-        implementation: (lastLink) => {
-          return lastLink.parent();
-        },
-        toString: () => `:parent()`,
-      });
-      return internalSelector(clonedExecutionSteps);
-    },
-
-    find: function (cssSelector: string): Selector {
-      enterLogger.debug(`selector: entering find init='${init}'`);
-      const clonedExecutionSteps = _.clone(executionSteps);
-      clonedExecutionSteps.push({
-        action: 'function',
-        implementation: (lastLink) => {
-          return lastLink.find(cssSelector);
-        },
-        toString: () => `:find(${cssSelector})`,
-      });
-
-      return internalSelector(clonedExecutionSteps);
-    },
-
-    hasAttribute: function (attributeName: string): Promise<boolean> {
-      return ReExecutablePromise.fromFn(() => {
-        enterLogger.debug(
-          `selector: entering hasAttribute init='${init}' attributeName='${attributeName}'`
-        );
-        return selectorExecute(executionSteps)
-          .toArray()
-          .every((el) => {
-            return el.hasAttribute(attributeName);
-          });
-      });
-    },
-
-    nth(zeroBasedIndex: number): Selector {
-      const clonedExecutionSteps = _.clone(executionSteps);
-      clonedExecutionSteps.push({
-        action: 'function',
-        implementation: (lastLink) => {
-          return jQuery(lastLink[zeroBasedIndex]);
-        },
-        toString: () => `:nth(${zeroBasedIndex})`,
-      });
-
-      return internalSelector(clonedExecutionSteps);
-    },
-
-    getAttribute(attributeName: string): Promise<string | null> {
-      return ReExecutablePromise.fromFn(() =>
-        selectorExecute(executionSteps).attr(attributeName)
-      );
-    },
-
-    getStyleProperty(attributeName: string): Promise<string> {
-      return ReExecutablePromise.fromFn(() => {
-        const $nodes = selectorExecute(executionSteps);
-        if ($nodes.length === 0) {
-            document.printError();
-            throw new Error(
-              `${selectorToStringBuilder(executionSteps)()} does not exist`
-            );
-          }
-        const element = $nodes[0];
-        return globalThis.window.getComputedStyle(element)[attributeName];
-      });
-    },
-
-    toString: selectorToStringBuilder(executionSteps),
+  const selectorImpl: Selector & { toString: () => string } = (
+    ...args: any[]
+  ): SelectorPromise => {
+    return null as SelectorPromise;
   };
+
+  selectorImpl.execute = () => selectorExecute(executionSteps);
+
+  selectorImpl.innerText = ReExecutablePromise.fromFn(() => {
+    executionLogger.debug(
+      `selector: innerText on '${selectorToStringBuilder(executionSteps)()}'`
+    );
+    const $nodes = selectorExecute(executionSteps);
+    if ($nodes.length === 0) {
+      document.printError();
+      throw new Error(
+        `${selectorToStringBuilder(executionSteps)()} does not exist`
+      );
+    }
+    return innerText($nodes[0]);
+  });
+
+  selectorImpl.innerHTML = ReExecutablePromise.fromFn(() => {
+    executionLogger.debug(
+      `selector: innerHTML on '${selectorToStringBuilder(executionSteps)()}'`
+    );
+    const $nodes = selectorExecute(executionSteps);
+    if ($nodes.length === 0) {
+      document.printError();
+      throw new Error(
+        `${selectorToStringBuilder(executionSteps)()} does not exist`
+      );
+    }
+    return $nodes[0].innerHTML;
+  });
+
+  selectorImpl.outerHTML = ReExecutablePromise.fromFn(() => {
+    executionLogger.debug(
+      `selector: outerHTML on '${selectorToStringBuilder(executionSteps)()}'`
+    );
+    const $nodes = selectorExecute(executionSteps);
+    if ($nodes.length === 0) {
+      document.printError();
+      throw new Error(
+        `${selectorToStringBuilder(executionSteps)()} does not exist`
+      );
+    }
+    return $nodes[0].outerHTML;
+  });
+
+  selectorImpl.exists = ReExecutablePromise.fromFn(
+    () => selectorExecute(executionSteps).length > 0
+  );
+
+  selectorImpl.count = ReExecutablePromise.fromFn(
+    () => selectorExecute(executionSteps).length
+  );
+
+  selectorImpl.withText = function (text: string): Selector {
+    enterLogger.debug(
+      `selector: entering withText init='${init}' text='${text}'`
+    );
+    const clonedExecutionSteps = _.clone(executionSteps);
+    clonedExecutionSteps.push({
+      action: 'filter',
+      value: function (
+        this: HTMLElement,
+        index: number,
+        element: HTMLElement
+      ): boolean {
+        return innerText(element).indexOf(text) !== -1;
+      },
+      toString: () => `:contains(${text})`,
+    });
+    return internalSelector(clonedExecutionSteps);
+  };
+
+  selectorImpl.withExactText = function (text: string): Selector {
+    enterLogger.debug(
+      `selector: entering withExactText init='${init}' text='${text}'`
+    );
+    const clonedExecutionSteps = _.clone(executionSteps);
+    clonedExecutionSteps.push({
+      action: 'filter',
+      value: function (
+        this: HTMLElement,
+        index: number,
+        element: HTMLElement
+      ): boolean {
+        return innerText(element) === text;
+      },
+      toString: () => `:containsExact(${text})`,
+    });
+    return internalSelector(clonedExecutionSteps);
+  };
+
+  selectorImpl.parent = function (): Selector {
+    enterLogger.debug(`selector: entering parent init='${init}'`);
+    const clonedExecutionSteps = _.clone(executionSteps);
+    clonedExecutionSteps.push({
+      action: 'function',
+      implementation: (lastLink) => {
+        return lastLink.parent();
+      },
+      toString: () => `:parent()`,
+    });
+    return internalSelector(clonedExecutionSteps);
+  };
+
+  selectorImpl.find = function (cssSelector: string): Selector {
+    enterLogger.debug(`selector: entering find init='${init}'`);
+    const clonedExecutionSteps = _.clone(executionSteps);
+    clonedExecutionSteps.push({
+      action: 'function',
+      implementation: (lastLink) => {
+        return lastLink.find(cssSelector);
+      },
+      toString: () => `:find(${cssSelector})`,
+    });
+
+    return internalSelector(clonedExecutionSteps);
+  };
+
+  selectorImpl.hasAttribute = function (
+    attributeName: string
+  ): Promise<boolean> {
+    return ReExecutablePromise.fromFn(() => {
+      enterLogger.debug(
+        `selector: entering hasAttribute init='${init}' attributeName='${attributeName}'`
+      );
+      return selectorExecute(executionSteps)
+        .toArray()
+        .every((el) => {
+          return el.hasAttribute(attributeName);
+        });
+    });
+  };
+
+  selectorImpl.nth = (zeroBasedIndex: number): Selector => {
+    const clonedExecutionSteps = _.clone(executionSteps);
+    clonedExecutionSteps.push({
+      action: 'function',
+      implementation: (lastLink) => {
+        return jQuery(lastLink[zeroBasedIndex]);
+      },
+      toString: () => `:nth(${zeroBasedIndex})`,
+    });
+
+    return internalSelector(clonedExecutionSteps);
+  };
+
+  selectorImpl.getAttribute = (
+    attributeName: string
+  ): Promise<string | null> => {
+    return ReExecutablePromise.fromFn(() =>
+      selectorExecute(executionSteps).attr(attributeName)
+    );
+  };
+
+  selectorImpl.getStyleProperty = (attributeName: string): Promise<string> => {
+    return ReExecutablePromise.fromFn(() => {
+      const $nodes = selectorExecute(executionSteps);
+      if ($nodes.length === 0) {
+        document.printError();
+        throw new Error(
+          `${selectorToStringBuilder(executionSteps)()} does not exist`
+        );
+      }
+      const element = $nodes[0];
+      return globalThis.window.getComputedStyle(element)[attributeName];
+    });
+  };
+
+  selectorImpl.toString = selectorToStringBuilder(executionSteps);
+  //   const selectorImpl: Selector & { toString: () => string } = {
+  //     execute: () => selectorExecute(executionSteps),
+  //     innerText: ReExecutablePromise.fromFn(() => {
+  //       executionLogger.debug(
+  //         `selector: innerText on '${selectorToStringBuilder(executionSteps)()}'`
+  //       );
+  //       const $nodes = selectorExecute(executionSteps);
+  //       if ($nodes.length === 0) {
+  //         document.printError();
+  //         throw new Error(
+  //           `${selectorToStringBuilder(executionSteps)()} does not exist`
+  //         );
+  //       }
+  //       return innerText($nodes[0]);
+  //     }),
+  //     innerHTML: ReExecutablePromise.fromFn(() => {
+  //       executionLogger.debug(
+  //         `selector: innerHTML on '${selectorToStringBuilder(executionSteps)()}'`
+  //       );
+  //       const $nodes = selectorExecute(executionSteps);
+  //       if ($nodes.length === 0) {
+  //         document.printError();
+  //         throw new Error(
+  //           `${selectorToStringBuilder(executionSteps)()} does not exist`
+  //         );
+  //       }
+  //       return $nodes[0].innerHTML;
+  //     }),
+  //     outerHTML: ReExecutablePromise.fromFn(() => {
+  //       executionLogger.debug(
+  //         `selector: outerHTML on '${selectorToStringBuilder(executionSteps)()}'`
+  //       );
+  //       const $nodes = selectorExecute(executionSteps);
+  //       if ($nodes.length === 0) {
+  //         document.printError();
+  //         throw new Error(
+  //           `${selectorToStringBuilder(executionSteps)()} does not exist`
+  //         );
+  //       }
+  //       return $nodes[0].outerHTML;
+  //     }),
+  //     exists: ReExecutablePromise.fromFn(
+  //       () => selectorExecute(executionSteps).length > 0
+  //     ),
+  //     count: ReExecutablePromise.fromFn(
+  //       () => selectorExecute(executionSteps).length
+  //     ),
+  //     withText: function (text: string): Selector {
+  //       enterLogger.debug(
+  //         `selector: entering withText init='${init}' text='${text}'`
+  //       );
+  //       const clonedExecutionSteps = _.clone(executionSteps);
+  //       clonedExecutionSteps.push({
+  //         action: 'filter',
+  //         value: function (
+  //           this: HTMLElement,
+  //           index: number,
+  //           element: HTMLElement
+  //         ): boolean {
+  //           return innerText(element).indexOf(text) !== -1;
+  //         },
+  //         toString: () => `:contains(${text})`,
+  //       });
+  //       return internalSelector(clonedExecutionSteps);
+  //     },
+  //     withExactText: function (text: string): Selector {
+  //       enterLogger.debug(
+  //         `selector: entering withExactText init='${init}' text='${text}'`
+  //       );
+  //       const clonedExecutionSteps = _.clone(executionSteps);
+  //       clonedExecutionSteps.push({
+  //         action: 'filter',
+  //         value: function (
+  //           this: HTMLElement,
+  //           index: number,
+  //           element: HTMLElement
+  //         ): boolean {
+  //           return innerText(element) === text;
+  //         },
+  //         toString: () => `:containsExact(${text})`,
+  //       });
+  //       return internalSelector(clonedExecutionSteps);
+  //     },
+
+  //     parent: function (): Selector {
+  //       enterLogger.debug(`selector: entering parent init='${init}'`);
+  //       const clonedExecutionSteps = _.clone(executionSteps);
+  //       clonedExecutionSteps.push({
+  //         action: 'function',
+  //         implementation: (lastLink) => {
+  //           return lastLink.parent();
+  //         },
+  //         toString: () => `:parent()`,
+  //       });
+  //       return internalSelector(clonedExecutionSteps);
+  //     },
+
+  //     find: function (cssSelector: string): Selector {
+  //       enterLogger.debug(`selector: entering find init='${init}'`);
+  //       const clonedExecutionSteps = _.clone(executionSteps);
+  //       clonedExecutionSteps.push({
+  //         action: 'function',
+  //         implementation: (lastLink) => {
+  //           return lastLink.find(cssSelector);
+  //         },
+  //         toString: () => `:find(${cssSelector})`,
+  //       });
+
+  //       return internalSelector(clonedExecutionSteps);
+  //     },
+
+  //     hasAttribute: function (attributeName: string): Promise<boolean> {
+  //       return ReExecutablePromise.fromFn(() => {
+  //         enterLogger.debug(
+  //           `selector: entering hasAttribute init='${init}' attributeName='${attributeName}'`
+  //         );
+  //         return selectorExecute(executionSteps)
+  //           .toArray()
+  //           .every((el) => {
+  //             return el.hasAttribute(attributeName);
+  //           });
+  //       });
+  //     },
+
+  //     nth(zeroBasedIndex: number): Selector {
+  //       const clonedExecutionSteps = _.clone(executionSteps);
+  //       clonedExecutionSteps.push({
+  //         action: 'function',
+  //         implementation: (lastLink) => {
+  //           return jQuery(lastLink[zeroBasedIndex]);
+  //         },
+  //         toString: () => `:nth(${zeroBasedIndex})`,
+  //       });
+
+  //       return internalSelector(clonedExecutionSteps);
+  //     },
+
+  //     getAttribute(attributeName: string): Promise<string | null> {
+  //       return ReExecutablePromise.fromFn(() =>
+  //         selectorExecute(executionSteps).attr(attributeName)
+  //       );
+  //     },
+
+  //     getStyleProperty(attributeName: string): Promise<string> {
+  //       return ReExecutablePromise.fromFn(() => {
+  //         const $nodes = selectorExecute(executionSteps);
+  //         if ($nodes.length === 0) {
+  //             document.printError();
+  //             throw new Error(
+  //               `${selectorToStringBuilder(executionSteps)()} does not exist`
+  //             );
+  //           }
+  //         const element = $nodes[0];
+  //         return globalThis.window.getComputedStyle(element)[attributeName];
+  //       });
+  //     },
+
+  //     toString: selectorToStringBuilder(executionSteps),
+  //   };
   return selectorImpl;
 };
 
