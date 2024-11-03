@@ -1,21 +1,41 @@
 import { NodeSnapshot } from './internal/node-snapshot';
 
-export const htmlElementToNodeSnapshot = (el: HTMLElement): NodeSnapshot => {
-  const result: NodeSnapshot= Object.assign({}, el, {
+export const htmlElementToNodeSnapshot = function (
+  el: HTMLElement
+): NodeSnapshot {
+  const result: NodeSnapshot = Object.assign({}, el, {
     get childNodeCount(): number {
-      throw new Error(`Not Implemented`);
+      return el.childElementCount;
     },
     get hasChildElements(): boolean {
-      throw new Error(`Not Implemented`);
+      return el.childElementCount > 0;
     },
     get hasChildNodes(): boolean {
-      throw new Error(`Not Implemented`);
+      return el.childElementCount > 0;
     },
     get attributes(): { [name: string]: string } | undefined {
-      throw new Error(`Not Implemented`);
+      if (!el.hasAttributes()) {
+        return undefined;
+      }
+
+      return [...el.attributes].reduce((prev, { name, value }: Attr) => {
+        prev[name] = value;
+        return prev;
+      }, {});
     },
     get style(): { [prop: string]: string } | undefined {
-      throw new Error(`Not Implemented`);
+      const styleDeclaration = globalThis.window.getComputedStyle(el);
+
+      const result: { [prop: string]: string } = {};
+
+      for (let i = styleDeclaration.length; i--; ) {
+        const key = styleDeclaration[i];
+        const value = styleDeclaration.getPropertyValue(key);
+
+        result[key] = value;
+      }
+
+      return result;
     },
   });
 

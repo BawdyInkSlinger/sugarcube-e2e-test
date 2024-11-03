@@ -436,7 +436,7 @@ describe(`selector`, () => {
       .eql(` <p> Words words words <span> nest </span> </p> `);
   });
 
-  it('returns a SelectorPromise when called as `Selector(...)()`', async () => {
+  fit('returns a SelectorPromise when called as `Selector(...)()`', async () => {
     const sugarcubeParser = await SugarcubeParser.create({
       passages: [
         {
@@ -462,8 +462,13 @@ describe(`selector`, () => {
       ],
     });
 
+    await sugarcubeParser.testController
+      .goto('passage title')
+      .logDocument({ includeHeadElement: false });
+
     const firstWithContentElement: NodeSnapshot =
       await Selector(`.passage`).find(`.with-content`)();
+    expect(firstWithContentElement).toBeDefined();
     expect(firstWithContentElement.innerText).toEqual(`p0`);
 
     const secondWithContentElement: NodeSnapshot = await Selector(
