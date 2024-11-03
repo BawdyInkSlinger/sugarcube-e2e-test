@@ -462,8 +462,7 @@ describe(`selector`, () => {
       ],
     });
 
-    await sugarcubeParser.testController
-      .goto('passage title')
+    await sugarcubeParser.testController.goto('passage title');
 
     const firstWithContentElement: NodeSnapshot =
       await Selector(`.passage`).find(`.with-content`)();
@@ -474,5 +473,52 @@ describe(`selector`, () => {
       `.passage .with-content`
     ).nth(1)();
     expect(secondWithContentElement.innerText).toEqual(`p1`);
+  });
+
+  it('can reuse the selector after `Selector(...)()` is called', async () => {
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag', 'nobr'],
+          text: `
+<p class="with-content">p0</p>
+<div>
+    <div>
+        <p class="with-content">p1</p>
+        <div class="with-content">div1</div>
+    </div>
+</div>
+<div>
+    <div>
+        <p class="with-content">p2</p>
+        <div class="with-content">div2</div>
+    </div>
+</div>
+<div class="with-content">div3</div>
+`,
+        },
+      ],
+    });
+
+    await sugarcubeParser.testController.goto('passage title');
+
+    const secondWithContentSelector: Selector = Selector(
+      `.passage .with-content`
+    ).nth(1);
+    const secondWithContent: NodeSnapshot = await secondWithContentSelector();
+    expect(secondWithContent.innerText).toEqual(`p1`);
+
+    await sugarcubeParser.testController
+      .expect(
+        secondWithContentSelector
+          // navigate to .passage
+          .parent()
+          .parent()
+          .parent()
+          .find(`.with-content`)
+          .nth(2).innerText
+      )
+      .eql(`div1`);
   });
 });
