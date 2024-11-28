@@ -44,11 +44,11 @@ setup.cleanStateAt = function (name) {
       .eql('2')
       .click(Selector(`button`).withText(`Increment`))
       // reset
-      .click(Selector(`button`).withText(`Reset`))
+      .click(Selector(`button`).withText(`Reset`)) // this will only work if called within StoryInit
       .expect(Selector(`.foo`).innerText)
-      .eql('0')
+      .eql('3')
       .click(Selector(`button`).withText(`Increment`))
       .expect(Selector(`.foo`).innerText)
-      .eql('1');
+      .eql('4');
   });
 });

@@ -47,20 +47,6 @@ class InMemoryStorageAdapterImpl implements Adapter {
   delete(key: Keys): boolean {
     const keyExisted = this.inMemoryStore.delete(key);
 
-    
-    // If attempting to delete session state, this won't work
-    // like in real life: e.g., deleting a cookie store clears all variables
-    // This is why deleting state here needs to clear state explicitly
-    if (
-      key === 'state' &&
-      keyExisted // prevents infinite recursion
-    ) {
-      globalThis.Save.clear();
-      globalThis.Engine.restart();
-
-      globalThis.runStoryInit();
-    }
-
     return keyExisted;
   }
   set<Key extends Keys>(key: Key, value: object): boolean {
