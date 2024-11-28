@@ -60,7 +60,7 @@ export const State = (() => {
 
     // Delete the active session.
     // BIS change. Original: session.delete('state');
-    'delete' in SessionContainer.session &&
+    SessionContainer.session !== null && 'delete' in SessionContainer.session &&
       SessionContainer.session.delete('state');
 
     /*

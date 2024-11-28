@@ -15,7 +15,6 @@ import { Dialog } from '../dialog';
 import { Setting } from '../setting';
 import { UIBar } from '../uibar';
 import { Save } from '../save';
-import { inspect } from 'util';
 
 const logger = getLogger('DEFAULT');
 const passageLogger = getLogger('DEBUG_PASSAGES');

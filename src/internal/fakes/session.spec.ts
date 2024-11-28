@@ -2,7 +2,7 @@ import { SugarcubeParser } from '../../sugarcube-parser';
 import { Selector } from '../../test-api/selector';
 
 describe(`Session`, () => {
-  xit('can be used in passages', async () => {
+  it('can be used in passages', async () => {
     const passages = [
       {
         title: 'StoryInit',
@@ -14,8 +14,7 @@ describe(`Session`, () => {
         tags: ['passage tag'],
         text:
           '<<button "Increment" `passage()`>><<set $foo = $foo + 1>><</button>>\n$$foo = <span class="foo">$foo</span>' +
-          '<<button "Reset" `passage()`>><<script>>setup.cleanStateAt("passage title");<</script>><</button>>' +
-          '<<run console.log(`***************`, session);>>',
+          '<<button "Reset" `passage()`>><<script>>setup.cleanStateAt("passage title");<</script>><</button>>',
       },
       {
         title: 'Script',

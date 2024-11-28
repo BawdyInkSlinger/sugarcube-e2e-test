@@ -1,5 +1,7 @@
 import { getLogger } from '../../logging/logger';
 import { SaveAPI } from '../declarations/twine-sugarcube-copy/save';
+import { State } from '../state';
+import { Story } from './story';
 
 const logger = getLogger('DEFAULT');
 
@@ -43,7 +45,22 @@ class InMemoryStorageAdapterImpl implements Adapter {
     return this;
   }
   delete(key: Keys): boolean {
-    return this.inMemoryStore.delete(key);
+    const keyExisted = this.inMemoryStore.delete(key);
+    
+    // If attempting to delete session state, this won't work
+    // like in real life: e.g., deleting a cookie store clears all variables
+    // This is why deleting state here needs to clear state explicitly
+    if (
+      key === 'state' &&
+      keyExisted // prevents infinite recursion
+    ) {
+      globalThis.Save.clear();
+      globalThis.Engine.restart();
+
+      globalThis.runStoryInit();
+    }
+
+    return keyExisted;
   }
   set<Key extends Keys>(key: Key, value: object): boolean {
     this.inMemoryStore.set(key, value);
