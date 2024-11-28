@@ -6,6 +6,7 @@ const logger = getLogger('DEFAULT');
 export type StoreValue = object;
 type KeyValue = {
   saves: SaveAPI;
+  state: StoreValue;
   options: StoreValue;
   settings: StoreValue;
   remember: StoreValue;

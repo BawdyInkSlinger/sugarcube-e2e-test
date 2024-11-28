@@ -2,10 +2,9 @@
 
 import { Adapter } from './adapter';
 
-// eslint-disable-next-line prefer-const, @typescript-eslint/no-explicit-any
 let _session: Adapter = null;
 
-globalThis.session = {
+const attributes = {
   get(): Adapter {
     return _session;
   },
@@ -14,7 +13,11 @@ globalThis.session = {
   },
 };
 
-// sugarcube reassigns session in some places. You can't reassign to imports. Importing the container is the workaround.
-export const SessionContainer = {
-  session: globalThis.session,
-};
+Object.defineProperty(globalThis, 'session', attributes);
+
+// sugarcube reassigns session in some places. You can't reassign to imports. Importing the container is the workaround and better than using `globalThis.session`.
+export const SessionContainer = Object.defineProperty<{ session: Adapter }>(
+  { session: undefined },
+  'session',
+  attributes
+);
