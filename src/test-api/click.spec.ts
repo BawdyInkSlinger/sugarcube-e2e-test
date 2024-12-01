@@ -50,6 +50,32 @@ describe(`click`, () => {
       .eql(`clicked`);
   });
 
+  it('can click a link bracket syntax link', async () => {
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title 1',
+          tags: ['passage tag'],
+          text: `passage title 1
+
+[[passage title 2]]`,
+        },
+        {
+          title: 'passage title 2',
+          tags: ['passage tag'],
+          text: `passage title 2`,
+        },
+      ],
+    });
+
+    await sugarcubeParser.testController
+      .goto('passage title 1')
+      .logDocument({ includeHeadElement: false })
+      .click(Selector('.passage a').withText('passage title 2'))
+      .expect(Selector(`.passage`).innerText)
+      .eql(`passage title 2`);
+  });
+
   it('gives a useful error if you wait for passage end (default click strategy) but the click does not render a new passage', async () => {
     const sugarcubeParser = await SugarcubeParser.create({
       passages: [
@@ -103,9 +129,9 @@ describe(`click`, () => {
       .eql(`Passage 1`);
 
     try {
-        await sugarcubeParser.testController.click(
-          Selector('.passage button').withText('foobar')
-        );
+      await sugarcubeParser.testController.click(
+        Selector('.passage button').withText('foobar')
+      );
       fail(`Error expected`);
     } catch (parentError) {
       expect(parentError.message).toEqual('Click error');
@@ -114,7 +140,7 @@ describe(`click`, () => {
       expect(childError.message).toEqual(
         'Attempted to click on selector that could not be found: Selector(`.passage button:contains(foobar)`)'
       );
-      
+
       const grandchildError = childError.cause;
       expect(grandchildError).toBeUndefined();
     }
