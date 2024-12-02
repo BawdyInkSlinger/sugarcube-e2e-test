@@ -46,9 +46,9 @@ export interface MacroContextObject {
   contents: string;
 }
 
-type ShadowWrapperCallback<T extends any[]> = (
-  this: MacroContext,
-  ...args: T
+type ShadowWrapperCallback<T, P extends any[]> = (
+  this: T,
+  ...args: P
 ) => void;
 export interface MacroContext {
   /**
@@ -129,11 +129,11 @@ export interface MacroContext {
    * @param startCallback Executed before the main callback is invoked. Does not have access.
    * @since 2.14.0
    */
-  createShadowWrapper<T extends any[]>(
-    callback: ShadowWrapperCallback<T>,
-    doneCallback?: ShadowWrapperCallback<T>,
-    startCallback?: ShadowWrapperCallback<T>
-  ): (...args: T) => void;
+  createShadowWrapper<T, P extends any[]>(
+    callback: ShadowWrapperCallback<T, P>,
+    doneCallback?: ShadowWrapperCallback<T, P>,
+    startCallback?: ShadowWrapperCallback<T, P>
+  ): (this: MacroContext, ...args: P) => void;
 
   /**
    * Renders the message prefixed with the name of the macro and returns false.

@@ -65,10 +65,25 @@ go to a new passage? If not, click with a different wait strategy.`.replace(
       }
 
       // Perform the click
-      clickableElements.trigger('click');
-      logger.debug(
-        `Post $(${selector.toString()}).trigger('click'); Waiting for ${waitStrategy}`
-      );
+      for (let index = 0; index < clickableElements.length; index++) {
+        const clickableElement = clickableElements[index];
+
+        if (isOptionElement(clickableElement)) {
+          // "click"ing on an <optional> does nothing. You must trigger a "change" on the <select> to fire events
+          const $select = $(clickableElement).parents(`select`);
+          $select.val(clickableElement.value);
+
+          $select.trigger('change');
+          logger.debug(
+            `Post $(${selector.toString()}).trigger('change'); Waiting for ${waitStrategy}`
+          );
+        } else {
+          clickableElements.trigger('click');
+          logger.debug(
+            `Post $(${selector.toString()}).trigger('click'); Waiting for ${waitStrategy}`
+          );
+        }
+      }
 
       return (
         waitForPassageEndPromise ??
@@ -86,3 +101,9 @@ go to a new passage? If not, click with a different wait strategy.`.replace(
     });
   return Object.assign(asyncClick, testController);
 }
+
+const isOptionElement = (
+  element: HTMLElement
+): element is HTMLOptionElement => {
+  return element.tagName.toLowerCase() === 'option';
+};

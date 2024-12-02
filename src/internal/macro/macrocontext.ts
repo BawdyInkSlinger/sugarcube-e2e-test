@@ -13,6 +13,7 @@ import { DebugView } from '../debugview';
 import { throwError } from '../helpers';
 import { Patterns } from '../patterns';
 import { State } from '../state';
+import { objectDefineProperties } from '../utils/object-define-properties';
 import { Wikifier } from '../wikifier';
 
 export const MacroContext = (() => {
@@ -64,7 +65,7 @@ export const MacroContext = (() => {
         throw new TypeError('context object missing required properties');
       }
 
-      Object.defineProperties(this, {
+      objectDefineProperties(this, {
         self: {
           value: context.macro,
         },
@@ -209,10 +210,11 @@ export const MacroContext = (() => {
       });
     }
 
-    createShadowWrapper<Param>(
-      callback: (...params: Param[]) => void,
-      doneCallback?: (...params: Param[]) => void,
-      startCallback?: (...params: Param[]) => void
+    createShadowWrapper<Param extends any[]>(
+      this: MacroContext,
+      callback: (...params: Param) => void,
+      doneCallback?: (...params: Param) => void,
+      startCallback?: (...params: Param) => void
     ): (...params: Param[]) => void {
       // eslint-disable-next-line @typescript-eslint/no-this-alias
       const shadowContext = this;

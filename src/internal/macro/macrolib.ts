@@ -14,6 +14,7 @@
 import { observeTimeout } from '../../observable-timeout';
 import { Config } from '../config';
 import { DebugView } from '../debugview';
+import { MacroContext } from '../declarations/twine-sugarcube-copy/macro';
 import { Engine, postdisplay, prehistory } from '../fakes/engine';
 import { StorageContainer } from '../fakes/storage';
 import { Story } from '../fakes/story';
@@ -1482,8 +1483,7 @@ Macro.add(['cycle', 'listbox'], {
   isAsync: true,
   skipArgs: ['optionsfrom'],
   tags: ['option', 'optionsfrom'],
-
-  handler() {
+  handler(this: MacroContext) {
     if (this.args.length === 0) {
       return this.error('no variable name specified');
     }
@@ -1729,8 +1729,9 @@ Macro.add(['cycle', 'listbox'], {
         .addClass(`macro-${this.name}`)
         .val(selectedIdx)
         .on(
+          // @ts-ignore
           'change.macros',
-          this.createShadowWrapper(function () {
+          this.createShadowWrapper<HTMLSelectElement, [JQuery.Event]>(function (this: HTMLSelectElement, event: JQuery.Event) {
             State.setVar(varName, options[Number(this.value)].value);
           })
         )

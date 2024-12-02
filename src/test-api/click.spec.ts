@@ -70,10 +70,46 @@ describe(`click`, () => {
 
     await sugarcubeParser.testController
       .goto('passage title 1')
-      .logDocument({ includeHeadElement: false })
       .click(Selector('.passage a').withText('passage title 2'))
       .expect(Selector(`.passage`).innerText)
       .eql(`passage title 2`);
+  });
+
+  it('can click a select and option element', async () => {
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [
+        {
+          title: 'passage title',
+          tags: ['passage tag'],
+          text: `
+Preferred pronouns: <<listbox "$mc_gender" autoselect>>
+<<option "He/Him/His" "male">>
+<<option "She/Her/Hers" "female">>
+<<option "They/Them/Theirs" "enby">>
+<</listbox>><br><br>
+[[passage title 2]]
+          `,
+        },
+        {
+          title: 'passage title 2',
+          tags: ['passage tag'],
+          text: `mc_gender: $mc_gender`,
+        },
+      ],
+    });
+
+    await sugarcubeParser.testController
+      .goto('passage title')
+      .click(Selector('#listbox-mc-gender'), { waitFor: 'click end' })
+      .click(
+          Selector('#listbox-mc-gender')
+          .find(`option`)
+          .withText('They/Them/Theirs'),
+          { waitFor: 'click end' }
+        )
+        .click(Selector('.passage a').withText('passage title 2'))
+        .expect(Selector(`.passage`).innerText)
+        .eql(`mc_gender: enby`)
   });
 
   it('gives a useful error if you wait for passage end (default click strategy) but the click does not render a new passage', async () => {
