@@ -282,12 +282,7 @@ function start(moduleScripts: Script[], storyScripts: Script[]) {
     evalLogger.info(`evaluating storyScripts element named ${script.path}`);
     Scripting.evalJavaScript(script.content);
   });
-  // Run user scripts (user stylesheet, JavaScript, and widgets).
-  // Engine.runUserScripts();
-  _scripts.forEach((script) => {
-    evalLogger.info(`evaluating _scripts element named ${script.title}`);
-    Scripting.evalJavaScript(script.text);
-  });
+  runUserScripts();
   _widgets.forEach((widget) => {
     evalLogger.info(`evaluating _widget element named ${widget.title}`);
     Wikifier.wikifyEval(widget.processText());
@@ -338,4 +333,12 @@ export function runStoryInit() {
   jQuery.event.trigger(':storyready');
 
   logger.debug('[SugarCube/main()] Startup complete; story ready.');
+}
+
+export function runUserScripts() {
+    // Run user scripts (user stylesheet, JavaScript, and widgets).
+  _scripts.forEach((script) => {
+    evalLogger.info(`evaluating _scripts element named ${script.title}`);
+    Scripting.evalJavaScript(script.text);
+  });
 }

@@ -85,6 +85,7 @@ describe(`History`, () => {
     const sugarcubeParser = await SugarcubeParser.create({
       passages,
     });
+    sugarcubeParser.resetState();
     await forwardBackwardTest(sugarcubeParser);
 
     sugarcubeParser.resetState();
@@ -154,6 +155,7 @@ $(document).on(':passageend', function (ev) {
     const sugarcubeParser = await SugarcubeParser.create({
       passages,
     });
+    sugarcubeParser.resetState();
 
     await forwardBackwardTest(sugarcubeParser);
 
