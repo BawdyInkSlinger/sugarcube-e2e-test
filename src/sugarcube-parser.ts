@@ -262,7 +262,6 @@ export class SugarcubeParser {
   }
 
   resetState(urlParams = ''): void {
-    resetGlobal('setup', {});
     logger.debug(`resetState(urlParams=\`${urlParams}\`)`);
 
     const url = baseUrl + (urlParams.length > 0 ? `?${urlParams}` : '');
