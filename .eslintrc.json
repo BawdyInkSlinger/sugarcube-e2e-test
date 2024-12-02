@@ -15,8 +15,7 @@
   "globals": {
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly",
-    "State": "writable",
-    "setup": "writable"
+    "State": "writable"
   },
   "parserOptions": {
     "ecmaVersion": 2018,

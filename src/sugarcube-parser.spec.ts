@@ -1,4 +1,4 @@
-import './test-api/internal/monkey-patching/jsdom/strings'
+import './test-api/internal/monkey-patching/jsdom/strings';
 import { Selector, SugarcubeParser } from '.';
 import {
   ResourceLoaderConstructorOptions,
@@ -140,7 +140,7 @@ describe('SugarcubeParser', () => {
       fail(`Error expected`);
     } catch (parentError) {
       expect(parentError.message).toEqual('Goto error');
-      
+
       const childError = parentError.cause;
       expect(childError.message).toMatch(/does not exist/);
       expect(childError.message).toMatch(/foobar/);
@@ -180,7 +180,35 @@ describe('SugarcubeParser', () => {
       expect(sugarcubeParser.State.variables[`variable`]).not.toBeDefined();
       expect(sugarcubeParser.State.temporary[`temporary`]).not.toBeDefined();
     });
-    
+
+    it(`resets setup`, async () => {
+      const sugarcubeParser = await SugarcubeParser.create({
+        passages: [
+          {
+            title: 'passage title',
+            tags: ['passage tag'],
+            text: 'setup.foo: <span class="setup-foo"><<= setup.foo>></span> <<button "Init" `passage()`>><<script>>setup.foo = 1;<</script>><</button>>',
+          },
+        ],
+      });
+
+      await sugarcubeParser.testController
+        .goto('passage title')
+        .expect(Selector(`.setup-foo`).innerText)
+        .eql('[undefined]')
+        // click the button to initialize
+        .click(Selector(`.passage button`).withText(`Init`))
+        .expect(Selector(`.setup-foo`).innerText)
+        .eql('1');
+
+      sugarcubeParser.resetState();
+
+      await sugarcubeParser.testController
+        .goto('passage title')
+        .expect(Selector(`.setup-foo`).innerText)
+        .eql('[undefined]');
+    });
+
     it(`does NOT clear passages`, async () => {
       const sugarcubeParser = await SugarcubeParser.create({
         passages: [
@@ -193,13 +221,14 @@ describe('SugarcubeParser', () => {
       });
 
       function getPassageCount() {
-        return globalThis.Story.lookupWith(() => true).map((p) => p.title).length;
+        return globalThis.Story.lookupWith(() => true).map((p) => p.title)
+          .length;
       }
 
       expect(getPassageCount()).toEqual(1);
-      
+
       sugarcubeParser.resetState();
-      
+
       expect(getPassageCount()).toEqual(1);
     });
   });
