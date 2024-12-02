@@ -15,7 +15,7 @@ import { clearTimeouts } from './observable-timeout';
 import jQueryFactory from 'jquery';
 import {} from 'node:path';
 import type { State } from './internal/state';
-import type { Story } from './internal/fakes/story';
+import type { Story, runStoryInit } from './internal/fakes/story';
 import type { Config } from './internal/config';
 import type { Engine } from './internal/fakes/engine';
 import type { Save } from './internal/save';
@@ -47,6 +47,7 @@ export class SugarcubeParser {
   Save: typeof Save;
   Template: typeof Template;
   Story: typeof Story;
+  private runStoryInit: typeof runStoryInit;
   Dialog: typeof Dialog;
 
   private constructor() {
@@ -59,6 +60,7 @@ export class SugarcubeParser {
     this.Save = globalThis.Save;
     this.Template = globalThis.Template;
     this.Story = globalThis.Story;
+    this.runStoryInit = globalThis.runStoryInit;
     this.Dialog = globalThis.Dialog;
   }
 
@@ -267,11 +269,11 @@ export class SugarcubeParser {
     logger.debug(`resetState(url=\`${url}\`)`);
     globalThis.jsdom.reconfigure({ url });
 
-    // globalThis.Story.reset();
-    globalThis.Save.clear();
-    globalThis.Engine.restart();
+    // this.Story.reset();
+    this.Save.clear();
+    this.Engine.restart();
 
-    globalThis.runStoryInit();
+    this.runStoryInit();
   }
 
   async assignStateAndReload<V = any, T = any>(
