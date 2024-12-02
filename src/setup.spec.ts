@@ -75,7 +75,8 @@ setup.init: <span class="init"><<= setup.init>></span>
 
     sugarcubeParser.resetState();
 
-    await t.goto('Start');
+    await t.goto('Start')
+    .logDocument({ includeHeadElement: false });
     await assertValues(t, {
       init_s1_s2: 'story init',
       s1: '_s1',
