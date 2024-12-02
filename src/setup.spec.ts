@@ -86,6 +86,24 @@ setup.init: <span class="init"><<= setup.init>></span>
     });
   });
 
+  it(`runs the script passages in the order they're defined`, async () => {
+    const sugarcubeParser = await SugarcubeParser.create({
+      passages: [init, s2, s1, start],
+    });
+    const t = sugarcubeParser.testController;
+
+    await t.goto('Start');
+
+    await assertValues(t, {
+      init_s1_s2: 'story init',
+      s1: '_s1',
+      s2: 's2',
+      s1_s2: 's1',
+      start: '[undefined]',
+      init: 'story init',
+    });
+  });
+
   type SetupValues = {
     init_s1_s2: string;
     s1: string;
